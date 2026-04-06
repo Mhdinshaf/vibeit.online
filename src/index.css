@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
-/* VibeIt.lk - Blue & White Theme with Dark Mode Support */
+/* VibeIt.lk - Premium Blue & White Theme */
 
 /* Base Styles */
 body {
   margin: 0;
-  background-color: #F8FAFC;
-  color: #1f2937;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background-color: #FFFFFF;
+  color: #1e293b;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -16,53 +16,71 @@ body {
   min-height: 100vh;
 }
 
-/* Button Components */
+/* Premium Button Components */
 .btn-primary {
-  background-color: #2563EB;
+  background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%);
   color: white;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  padding: 0.875rem 2rem;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
 }
 
 .btn-primary:hover {
-  background-color: #1d4ed8;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-outline {
   border: 2px solid #2563EB;
   color: #2563EB;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  letter-spacing: 0.05em;
+  padding: 0.875rem 2rem;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
   background: transparent;
 }
 
 .btn-outline:hover {
   background-color: #2563EB;
   color: white;
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
 }
 
-/* Form Components */
+/* Premium Form Components */
 .form-input {
   width: 100%;
-  border: 1px solid #d1d5db;
-  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  padding: 0.875rem 1rem;
   font-size: 0.875rem;
   background-color: white;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+}
+
+.form-input:hover {
+  border-color: #d1d5db;
 }
 
 .form-input:focus {
   border-color: #2563EB;
-  box-shadow: 0 0 0 1px #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background-color: #f0f7ff;
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
 }
 
 /* Dark mode form input */
@@ -72,95 +90,129 @@ body {
   color: white;
 }
 
-/* Admin Sidebar Link */
+.dark .form-input:focus {
+  border-color: #3b82f6;
+  background-color: #1e3a5f;
+}
+
+/* Premium Admin Sidebar */
 .admin-link {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  color: #9ca3af;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  color: #94a3b8;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .admin-link:hover {
   color: white;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .admin-link.active {
   color: white;
-  background-color: #2563EB;
+  background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%);
+  box-shadow: 0 4px 12px 0 rgba(37, 99, 235, 0.3);
 }
 
-/* Badge Components */
+/* Premium Badge Components */
 .badge-sale {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  background-color: #2563EB;
+  background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%);
   color: white;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 0.25rem 0.5rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  letter-spacing: 0.05em;
 }
 
-/* Status Badges */
+/* Premium Status Badges */
 .status-pending {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.75rem;
+  padding: 0.375rem 0.875rem;
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background-color: #fef3c7;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   color: #92400e;
+  box-shadow: 0 2px 4px rgba(251, 191, 36, 0.2);
 }
 
 .status-processing {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.75rem;
+  padding: 0.375rem 0.875rem;
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background-color: #dbeafe;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   color: #1e40af;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
 .status-shipped {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.75rem;
+  padding: 0.375rem 0.875rem;
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background-color: #f3e8ff;
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
   color: #7c3aed;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
 }
 
 .status-delivered {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.75rem;
+  padding: 0.375rem 0.875rem;
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background-color: #dcfce7;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
   color: #166534;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
 }
 
 .status-cancelled {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.75rem;
+  padding: 0.375rem 0.875rem;
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background-color: #fee2e2;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   color: #dc2626;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+/* Premium Card Styles */
+.premium-card {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+.premium-card:hover {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Glass Effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Scrollbar Hide Utility */
@@ -171,4 +223,23 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Premium Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-blue {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  50% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-blue {
+  animation: pulse-blue 2s ease-in-out infinite;
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -16,7 +16,7 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already logged in - check both state and localStorage
+  // Redirect if already logged in
   const token = localStorage.getItem('vibeit_token');
   if (admin || token) {
     const from = location.state?.from?.pathname || '/admin';
@@ -39,7 +39,6 @@ const AdminLogin = () => {
       const adminName = data.admin?.name || data.name || 'Admin';
       toast.success(`Welcome back, ${adminName}!`);
       
-      // Small delay to ensure state is updated before navigation
       setTimeout(() => {
         const from = location.state?.from?.pathname || '/admin';
         navigate(from, { replace: true });
@@ -53,7 +52,7 @@ const AdminLogin = () => {
   };
 
   const handleChange = (e) => {
-    setError(''); // Clear error on input change
+    setError('');
     setCredentials((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -61,109 +60,167 @@ const AdminLogin = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ backgroundColor: '#0F172A' }}
-    >
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          {/* Logo */}
-          <div className="text-center mb-8">
+    <div className="min-h-screen flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex flex-col justify-center px-16">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
+              VB
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">VIBEIT</h1>
+              <p className="text-blue-300 text-sm">Admin Portal</p>
+            </div>
+          </div>
+          
+          <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
+            Manage Your Store<br />
+            <span className="text-blue-400">With Ease</span>
+          </h2>
+          <p className="text-gray-400 text-lg max-w-md">
+            Access your dashboard to manage products, orders, and customers all in one place.
+          </p>
+          
+          <div className="mt-12 flex items-center gap-4">
+            {[
+              { label: 'Products', value: '500+' },
+              { label: 'Orders', value: '1000+' },
+              { label: 'Customers', value: '5000+' },
+            ].map((stat, index) => (
+              <div key={index} className="bg-white/5 backdrop-blur-sm rounded-xl px-6 py-4 border border-white/10">
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-sm text-gray-400">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className="flex-1 flex items-center justify-center px-6 bg-gray-50">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-200">
                 VB
               </div>
               <span className="text-2xl font-bold text-gray-900">VIBEIT</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Admin Login</h1>
-            <p className="text-sm text-gray-600">
-              Enter your credentials to access the dashboard
-            </p>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{error}</p>
+          {/* Form Card */}
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 lg:p-10 border border-gray-100">
+            <div className="mb-8">
+              <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
+                <Lock className="w-4 h-4" />
+                Admin Access
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+              <p className="text-gray-500">
+                Enter your credentials to access the dashboard
+              </p>
             </div>
-          )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label 
-                htmlFor="email" 
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={credentials.email}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="admin@gmail.com"
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label 
+                  htmlFor="email" 
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={credentials.email}
+                    onChange={handleChange}
+                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300"
+                    placeholder="admin@gmail.com"
+                    disabled={isLoading}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label 
+                  htmlFor="password" 
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    value={credentials.password}
+                    onChange={handleChange}
+                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300"
+                    placeholder="••••••••"
+                    disabled={isLoading}
+                    autoComplete="current-password"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
                 disabled={isLoading}
-                autoComplete="email"
-              />
-            </div>
-
-            <div>
-              <label 
-                htmlFor="password" 
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold uppercase tracking-wider py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-300 shadow-lg shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={credentials.password}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="••••••••"
-                disabled={isLoading}
-                autoComplete="current-password"
-              />
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    SIGNING IN...
+                  </>
+                ) : (
+                  <>
+                    SIGN IN
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* View Store Link */}
+            <div className="mt-8 text-center">
+              <Link 
+                to="/" 
+                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors group"
+              >
+                View Store
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  LOGGING IN...
-                </>
-              ) : (
-                'LOGIN'
-              )}
-            </button>
-          </form>
-
-          {/* View Store Link */}
-          <div className="mt-6 text-center">
-            <Link 
-              to="/" 
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              View Store →
-            </Link>
           </div>
+
+          {/* Footer Text */}
+          <p className="text-center text-sm text-gray-400 mt-8">
+            VibeIt.lk Admin Portal • Secure Access
+          </p>
         </div>
-
-        {/* Footer Text */}
-        <p className="text-center text-sm text-gray-400 mt-6">
-          VibeIt.lk Admin Portal
-        </p>
       </div>
     </div>
   );

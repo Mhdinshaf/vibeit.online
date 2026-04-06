@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { Truck, CreditCard, DollarSign, AlertCircle } from 'lucide-react';
+import { Truck, CreditCard, DollarSign, AlertCircle, ChevronRight, Package, MapPin, User, Mail, Phone, Home, Shield, Loader2 } from 'lucide-react';
 import { useCartStore } from '../../context/store';
 import { createOrder } from '../../services/api';
 import toast from 'react-hot-toast';
@@ -13,6 +13,26 @@ const SRI_LANKA_DISTRICTS = [
   'Kurunegala', 'Puttalam', 'Anuradhapura', 'Polonnaruwa', 'Badulla',
   'Moneragala', 'Ratnapura', 'Kegalle'
 ];
+
+// Premium Input Component
+const CheckoutInput = ({ icon: Icon, label, required, ...props }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      {label} {required && <span className="text-blue-500">*</span>}
+    </label>
+    <div className="relative">
+      {Icon && (
+        <div className="absolute left-3 top-1/2 -translate-y-1/2">
+          <Icon className="w-5 h-5 text-gray-400" />
+        </div>
+      )}
+      <input
+        {...props}
+        className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-300 text-gray-900 placeholder-gray-400`}
+      />
+    </div>
+  </div>
+);
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -38,6 +58,14 @@ const CheckoutPage = () => {
 
   const setField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Helper to get image URL
+  const getImageUrl = (img) => {
+    if (!img) return '/placeholder.jpg';
+    if (typeof img === 'string') return img;
+    if (img.url) return img.url;
+    return '/placeholder.jpg';
   };
 
   const shippingFee = subtotal >= 5000 ? 0 : 400;
@@ -103,52 +131,61 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Checkout</h1>
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm mb-8 bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm">
+          <Link to="/cart" className="text-gray-500 hover:text-blue-600 transition-colors">Cart</Link>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+          <span className="text-blue-600 font-semibold">Checkout</span>
+        </nav>
+
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Secure Checkout</h1>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Column - Form */}
             <div className="lg:col-span-7 space-y-6">
               {/* Contact Information */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                  1. Contact Information
-                </h2>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={form.email}
-                    onChange={(e) => setField('email', e.target.value)}
-                    className="form-input"
-                    placeholder="your@email.com"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    We will send order details to this email
-                  </p>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                    <Mail className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold text-gray-900">Contact Information</h2>
                 </div>
+                <CheckoutInput
+                  icon={Mail}
+                  label="Email Address"
+                  required
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setField('email', e.target.value)}
+                  placeholder="your@email.com"
+                />
+                <p className="text-xs text-gray-500 mt-2 ml-1">
+                  We'll send order confirmation to this email
+                </p>
               </div>
 
               {/* Shipping Address */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                  2. Shipping Address
-                </h2>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                    <MapPin className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold text-gray-900">Shipping Address</h2>
+                </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      District *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      District <span className="text-blue-500">*</span>
                     </label>
                     <select
                       required
                       value={form.district}
                       onChange={(e) => setField('district', e.target.value)}
-                      className="form-input"
+                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-300 text-gray-900"
                     >
                       <option value="">Select District</option>
                       {SRI_LANKA_DISTRICTS.map((district) => (
@@ -160,112 +197,88 @@ const CheckoutPage = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        First Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={form.firstName}
-                        onChange={(e) => setField('firstName', e.target.value)}
-                        className="form-input"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Last Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={form.lastName}
-                        onChange={(e) => setField('lastName', e.target.value)}
-                        className="form-input"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
+                    <CheckoutInput
+                      icon={User}
+                      label="First Name"
                       required
-                      value={form.phone}
-                      onChange={(e) => setField('phone', e.target.value)}
-                      className="form-input"
-                      placeholder="+94 71 234 5678"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Street Address *
-                    </label>
-                    <input
                       type="text"
+                      value={form.firstName}
+                      onChange={(e) => setField('firstName', e.target.value)}
+                      placeholder="John"
+                    />
+                    <CheckoutInput
+                      label="Last Name"
                       required
-                      value={form.address}
-                      onChange={(e) => setField('address', e.target.value)}
-                      className="form-input"
-                      placeholder="123 Main Street"
+                      type="text"
+                      value={form.lastName}
+                      onChange={(e) => setField('lastName', e.target.value)}
+                      placeholder="Doe"
                     />
                   </div>
+
+                  <CheckoutInput
+                    icon={Phone}
+                    label="Phone Number"
+                    required
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setField('phone', e.target.value)}
+                    placeholder="+94 71 234 5678"
+                  />
+
+                  <CheckoutInput
+                    icon={Home}
+                    label="Street Address"
+                    required
+                    type="text"
+                    value={form.address}
+                    onChange={(e) => setField('address', e.target.value)}
+                    placeholder="123 Main Street"
+                  />
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={form.city}
-                        onChange={(e) => setField('city', e.target.value)}
-                        className="form-input"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Postal Code
-                      </label>
-                      <input
-                        type="text"
-                        value={form.postalCode}
-                        onChange={(e) => setField('postalCode', e.target.value)}
-                        className="form-input"
-                      />
-                    </div>
+                    <CheckoutInput
+                      label="City"
+                      required
+                      type="text"
+                      value={form.city}
+                      onChange={(e) => setField('city', e.target.value)}
+                      placeholder="Colombo"
+                    />
+                    <CheckoutInput
+                      label="Postal Code"
+                      type="text"
+                      value={form.postalCode}
+                      onChange={(e) => setField('postalCode', e.target.value)}
+                      placeholder="10100"
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Shipping Option */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                  3. Shipping Option
-                </h2>
-                <div className="border-2 border-blue-600 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                    <Truck className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold text-gray-900">Shipping Method</h2>
+                </div>
+                <div className="border-2 border-blue-500 rounded-xl p-4 bg-blue-50/50">
                   <div className="flex items-start gap-4">
-                    <Truck className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Truck className="w-5 h-5 text-blue-600" />
+                    </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 dark:text-white">
-                        Standard Delivery
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        3 to 5 business days
-                      </p>
+                      <h3 className="font-bold text-gray-900">Standard Delivery</h3>
+                      <p className="text-sm text-gray-600">3-5 business days • Island wide</p>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-blue-600 text-lg">
                         {shippingFee === 0 ? 'FREE' : `රු${shippingFee}`}
                       </p>
                       {shippingFee > 0 && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Free on orders above රු5000
-                        </p>
+                        <p className="text-xs text-gray-500">Free above රු5000</p>
                       )}
                     </div>
                   </div>
@@ -273,65 +286,64 @@ const CheckoutPage = () => {
               </div>
 
               {/* Payment Method */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                  4. Payment Method
-                </h2>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                    <CreditCard className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold text-gray-900">Payment Method</h2>
+                </div>
                 <div className="space-y-3">
                   {/* Bank Transfer */}
                   <label
-                    className={`block border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                    className={`block border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 ${
                       paymentMethod === 'Bank Transfer'
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        ? 'border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-100'
+                        : 'border-gray-200 hover:border-blue-300'
                     }`}
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-center gap-4">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="Bank Transfer"
                         checked={paymentMethod === 'Bank Transfer'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="mt-1"
+                        className="w-5 h-5 text-blue-600"
                       />
-                      <CreditCard className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <CreditCard className="w-5 h-5 text-blue-600" />
+                      </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 dark:text-white">
-                          Bank Transfer
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Make payment and send slip to WhatsApp 0718684580
-                        </p>
+                        <h3 className="font-bold text-gray-900">Bank Transfer</h3>
+                        <p className="text-sm text-gray-500">Send slip to WhatsApp 0718684580</p>
                       </div>
                     </div>
                   </label>
 
                   {/* Cash on Delivery */}
                   <label
-                    className={`block border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                    className={`block border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 ${
                       paymentMethod === 'Cash on Delivery'
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        ? 'border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-100'
+                        : 'border-gray-200 hover:border-blue-300'
                     }`}
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-center gap-4">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="Cash on Delivery"
                         checked={paymentMethod === 'Cash on Delivery'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="mt-1"
+                        className="w-5 h-5 text-blue-600"
                       />
-                      <DollarSign className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                        <DollarSign className="w-5 h-5 text-green-600" />
+                      </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 dark:text-white">
-                          Cash on Delivery
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Pay when you receive your order
-                        </p>
+                        <h3 className="font-bold text-gray-900">Cash on Delivery</h3>
+                        <p className="text-sm text-gray-500">Pay when you receive</p>
                       </div>
                     </div>
                   </label>
@@ -339,24 +351,22 @@ const CheckoutPage = () => {
               </div>
 
               {/* Order Notes */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <label className="flex items-center gap-2 mb-4 cursor-pointer">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={showNotes}
                     onChange={(e) => setShowNotes(e.target.checked)}
-                    className="rounded"
+                    className="w-5 h-5 rounded-lg text-blue-600 border-gray-300 focus:ring-blue-500"
                   />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Add order notes (optional)
-                  </span>
+                  <span className="font-medium text-gray-700">Add order notes (optional)</span>
                 </label>
 
                 {showNotes && (
                   <textarea
                     value={form.notes}
                     onChange={(e) => setField('notes', e.target.value)}
-                    className="form-input"
+                    className="w-full mt-4 px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-300 text-gray-900 placeholder-gray-400 resize-none"
                     rows="3"
                     placeholder="Any special instructions for your order..."
                   />
@@ -364,10 +374,10 @@ const CheckoutPage = () => {
               </div>
 
               {/* Legal Text */}
-              <div className="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-4">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-600">
                     By placing this order, you agree to our Terms of Service and Privacy Policy. 
                     Your order will be processed and shipped within 1-2 business days.
                   </p>
@@ -378,81 +388,101 @@ const CheckoutPage = () => {
               <button
                 type="submit"
                 disabled={isPending}
-                className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-blue-200"
               >
-                {isPending ? 'PLACING ORDER...' : 'PLACE ORDER'}
+                {isPending ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    PLACING ORDER...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="w-5 h-5" />
+                    PLACE ORDER • රු{total.toLocaleString()}
+                  </>
+                )}
               </button>
             </div>
 
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-5">
-              <div className="lg:sticky lg:top-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                  Order Summary
-                </h2>
+              <div className="lg:sticky lg:top-8 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4">
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <Package className="w-5 h-5" />
+                    Order Summary
+                  </h2>
+                </div>
 
-                {/* Items List */}
-                <div className="space-y-4 mb-6">
-                  {items.map((item) => (
-                    <div key={item.key} className="flex gap-3">
-                      <div className="relative flex-shrink-0">
-                        <img
-                          src={item.product.images?.[0] || '/placeholder.jpg'}
-                          alt={item.product.name}
-                          className="w-16 h-16 rounded-lg object-cover"
-                        />
-                        <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                          {item.quantity}
+                <div className="p-6">
+                  {/* Items List */}
+                  <div className="space-y-4 mb-6">
+                    {items.map((item) => (
+                      <div key={item.key} className="flex gap-3 p-3 bg-gray-50 rounded-xl">
+                        <div className="relative flex-shrink-0">
+                          <img
+                            src={getImageUrl(item.product.images?.[0])}
+                            alt={item.product.name}
+                            className="w-16 h-16 rounded-xl object-cover border border-gray-100"
+                          />
+                          <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                            {item.quantity}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
+                            {item.product.name}
+                          </h3>
+                          {item.size && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-lg font-medium">
+                              Size: {item.size}
+                            </span>
+                          )}
+                          <p className="text-sm font-bold text-blue-600 mt-1">
+                            රු{(item.price * item.quantity).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pricing */}
+                  <div className="border-t border-gray-100 pt-4 space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="font-semibold text-gray-900">රු{subtotal.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className="font-semibold">
+                        {shippingFee === 0 ? (
+                          <span className="text-green-600 flex items-center gap-1">
+                            <Truck className="w-4 h-4" />
+                            FREE
+                          </span>
+                        ) : (
+                          <span className="text-gray-900">රු{shippingFee}</span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="border-t border-gray-100 pt-4">
+                      <div className="flex justify-between">
+                        <span className="text-lg font-bold text-gray-900">Total</span>
+                        <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                          රු{total.toLocaleString()}
                         </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
-                          {item.product.name}
-                        </h3>
-                        {item.size && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Size: {item.size}
-                          </p>
-                        )}
-                        <p className="text-sm font-bold text-blue-600 mt-1">
-                          රු{(item.price * item.quantity).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
-                  <div className="flex justify-between text-gray-700 dark:text-gray-300">
-                    <span>Subtotal</span>
-                    <span className="font-medium">රු{subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-700 dark:text-gray-300">
-                    <span>Shipping</span>
-                    <span className="font-medium">
-                      {shippingFee === 0 ? (
-                        <span className="text-green-600">Free</span>
-                      ) : (
-                        `රු${shippingFee}`
-                      )}
-                    </span>
-                  </div>
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
-                    <div className="flex justify-between">
-                      <span className="text-lg font-bold text-gray-900 dark:text-white">
-                        Total
-                      </span>
-                      <span className="text-2xl font-bold text-blue-600">
-                        රු{total.toLocaleString()}
-                      </span>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    <strong>Estimated Delivery:</strong> 3-5 business days from order confirmation
-                  </p>
+                  {/* Delivery Info */}
+                  <div className="mt-6 bg-blue-50 rounded-xl p-4 border border-blue-100">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Truck className="w-4 h-4 text-blue-600" />
+                      <span><strong>Estimated:</strong> 3-5 business days</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

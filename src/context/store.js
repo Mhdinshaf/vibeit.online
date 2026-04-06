@@ -9,7 +9,7 @@ export const useCartStore = create(
 
       addItem: (product, quantity, size) => {
         const key = `${product._id}-${size}`;
-        const price = product.discountPrice || product.originalPrice;
+        const price = product.discountPrice || product.originalPrice || 0;
 
         set((state) => {
           const existingItem = state.items.find((item) => item.key === key);
