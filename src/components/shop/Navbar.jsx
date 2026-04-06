@@ -103,15 +103,8 @@ const Navbar = () => {
                 <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               </button>
 
-              {/* Admin Link - Desktop Only */}
-              <button
-                onClick={() => navigate('/admin/login')}
-                className="hidden md:flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                aria-label="Admin Access"
-              >
-                <Lock className="w-4 h-4" />
-                <span>Admin</span>
-              </button>
+              
+              
 
               {/* Mobile Menu Toggle */}
               <button

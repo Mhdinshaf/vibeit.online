@@ -64,30 +64,3 @@ export const useCartStore = create(
     }
   )
 );
-
-// Auth Store
-export const useAuthStore = create(
-  persist(
-    (set) => ({
-      admin: null,
-      token: null,
-
-      setAuth: (admin, token) => {
-        localStorage.setItem('vbToken', token);
-        set({ admin, token });
-      },
-
-      logout: () => {
-        localStorage.removeItem('vbToken');
-        set({ admin: null, token: null });
-      },
-
-      isAuthenticated: () => {
-        return !!localStorage.getItem('vbToken');
-      },
-    }),
-    {
-      name: 'vibeit-auth',
-    }
-  )
-);

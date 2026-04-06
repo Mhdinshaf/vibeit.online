@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -10,7 +10,7 @@ const api = axios.create({
 // Request interceptor - attach token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('vbToken');
+    const token = localStorage.getItem('vibeit_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -26,8 +26,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('vbToken');
-      localStorage.removeItem('vbAdmin');
+      localStorage.removeItem('vibeit_token');
+      localStorage.removeItem('vibeit_admin');
       window.location.href = '/admin/login';
     }
     return Promise.reject(error);
@@ -103,6 +103,15 @@ export const getMe = async () => {
 };
 
 // Upload API
+export const uploadImage = async (formData) => {
+  const response = await api.post('/upload/image', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
 export const uploadImages = async (formData) => {
   const response = await api.post('/upload/images', formData, {
     headers: {

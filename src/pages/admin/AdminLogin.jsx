@@ -1,50 +1,59 @@
 import { useState } from 'react';
-import { Navigate, useNavigate, Link } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
-import { loginAdmin } from '../../services/api';
-import { useAuthStore } from '../../context/store';
+import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const location = useLocation();
+  const { login, admin } = useAuth();
   
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
   });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already logged in
-  const token = localStorage.getItem('vbToken');
-  if (token) {
-    return <Navigate to="/admin" replace />;
+  // Redirect if already logged in - check both state and localStorage
+  const token = localStorage.getItem('vibeit_token');
+  if (admin || token) {
+    const from = location.state?.from?.pathname || '/admin';
+    return <Navigate to={from} replace />;
   }
 
-  const { mutate: login, isPending } = useMutation({
-    mutationFn: loginAdmin,
-    onSuccess: (data) => {
-      setAuth(data.admin, data.token);
-      toast.success(`Welcome back, ${data.admin.name}!`);
-      navigate('/admin');
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Invalid credentials');
-    },
-  });
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     
     if (!credentials.email || !credentials.password) {
-      toast.error('Please fill in all fields');
+      setError('Please fill in all fields');
       return;
     }
 
-    login(credentials);
+    setIsLoading(true);
+    
+    try {
+      const data = await login(credentials.email, credentials.password);
+      const adminName = data.admin?.name || data.name || 'Admin';
+      toast.success(`Welcome back, ${adminName}!`);
+      
+      // Small delay to ensure state is updated before navigation
+      setTimeout(() => {
+        const from = location.state?.from?.pathname || '/admin';
+        navigate(from, { replace: true });
+      }, 100);
+    } catch (err) {
+      const message = err.response?.data?.message || 'Invalid credentials. Please try again.';
+      setError(message);
+      toast.error(message);
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e) => {
+    setError(''); // Clear error on input change
     setCredentials((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -72,6 +81,14 @@ const AdminLogin = () => {
             </p>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -88,9 +105,10 @@ const AdminLogin = () => {
                 required
                 value={credentials.email}
                 onChange={handleChange}
-                className="form-input dark:bg-gray-800"
-                placeholder="admin@vibeit.lk"
-                disabled={isPending}
+                className="form-input"
+                placeholder="admin@gmail.com"
+                disabled={isLoading}
+                autoComplete="email"
               />
             </div>
 
@@ -108,18 +126,19 @@ const AdminLogin = () => {
                 required
                 value={credentials.password}
                 onChange={handleChange}
-                className="form-input dark:bg-gray-800"
+                className="form-input"
                 placeholder="••••••••"
-                disabled={isPending}
+                disabled={isLoading}
+                autoComplete="current-password"
               />
             </div>
 
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isLoading}
               className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isPending ? (
+              {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   LOGGING IN...

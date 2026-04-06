@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import { LayoutDashboard, Package, ShoppingBag, Menu, X, LogOut, ExternalLink } from 'lucide-react';
-import { useAuthStore } from '../../context/store';
+import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { admin, logout } = useAuthStore();
+  const { admin, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
