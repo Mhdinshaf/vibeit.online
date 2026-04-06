@@ -1,6 +1,93 @@
-// Zustand store
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-export const useStore = create((set) => ({
-  // Add your store state here
-}));
+// Cart Store
+export const useCartStore = create(
+  persist(
+    (set, get) => ({
+      items: [],
+
+      addItem: (product, quantity, size) => {
+        const key = `${product._id}-${size}`;
+        const price = product.discountPrice || product.originalPrice;
+
+        set((state) => {
+          const existingItem = state.items.find((item) => item.key === key);
+
+          if (existingItem) {
+            return {
+              items: state.items.map((item) =>
+                item.key === key
+                  ? { ...item, quantity: item.quantity + quantity }
+                  : item
+              ),
+            };
+          }
+
+          return {
+            items: [...state.items, { key, product, quantity, size, price }],
+          };
+        });
+      },
+
+      removeItem: (key) => {
+        set((state) => ({
+          items: state.items.filter((item) => item.key !== key),
+        }));
+      },
+
+      updateQuantity: (key, quantity) => {
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.key === key ? { ...item, quantity } : item
+          ),
+        }));
+      },
+
+      clearCart: () => {
+        set({ items: [] });
+      },
+
+      get itemCount() {
+        return get().items.reduce((total, item) => total + item.quantity, 0);
+      },
+
+      get subtotal() {
+        return get().items.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        );
+      },
+    }),
+    {
+      name: 'vibeit-cart',
+    }
+  )
+);
+
+// Auth Store
+export const useAuthStore = create(
+  persist(
+    (set) => ({
+      admin: null,
+      token: null,
+
+      setAuth: (admin, token) => {
+        localStorage.setItem('vbToken', token);
+        set({ admin, token });
+      },
+
+      logout: () => {
+        localStorage.removeItem('vbToken');
+        set({ admin: null, token: null });
+      },
+
+      isAuthenticated: () => {
+        return !!localStorage.getItem('vbToken');
+      },
+    }),
+    {
+      name: 'vibeit-auth',
+    }
+  )
+);
