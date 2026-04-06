@@ -8,12 +8,12 @@ import ProductCard from '../../components/shop/ProductCard';
 const HomePage = () => {
   const [expandedCategory, setExpandedCategory] = useState(null);
 
-  const { data: newArrivals, isLoading: loadingNew } = useQuery({
+  const { data: newArrivals, isLoading: loadingNew, isError: errorNew } = useQuery({
     queryKey: ['featured-products'],
     queryFn: () => getProducts({ limit: 8 }),
   });
 
-  const { data: trending, isLoading: loadingTrending } = useQuery({
+  const { data: trending, isLoading: loadingTrending, isError: errorTrending } = useQuery({
     queryKey: ['trending-products'],
     queryFn: () => getProducts({ featured: true, limit: 4 }),
   });
@@ -178,6 +178,15 @@ const HomePage = () => {
                   style={{ aspectRatio: '1/1.4' }}
                 />
               ))
+            ) : errorNew ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400 mb-2">
+                  Unable to load products at the moment.
+                </p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">
+                  Please make sure the backend server is running.
+                </p>
+              </div>
             ) : newArrivals?.products && newArrivals.products.length > 0 ? (
               newArrivals.products.map((product) => (
                 <ProductCard key={product._id} product={product} />
@@ -298,6 +307,15 @@ const HomePage = () => {
                   style={{ aspectRatio: '1/1.4' }}
                 />
               ))
+            ) : errorTrending ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400 mb-2">
+                  Unable to load trending products.
+                </p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">
+                  Please make sure the backend server is running.
+                </p>
+              </div>
             ) : trending?.products && trending.products.length > 0 ? (
               trending.products.map((product) => (
                 <ProductCard key={product._id} product={product} />

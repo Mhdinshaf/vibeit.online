@@ -2,73 +2,165 @@
 
 /* VibeIt.lk - Blue & White Theme with Dark Mode Support */
 
-@theme {
-  --color-primary: #2563EB;
-  --color-primary-dark: #1E40AF;
-  --color-light-bg: #F8FAFC;
-  --color-dark: #0F172A;
-  --color-dark-card: #1E293B;
-}
-
 /* Base Styles */
 body {
-  @apply m-0 bg-light-bg text-gray-900 dark:bg-dark dark:text-gray-100;
+  margin: 0;
+  background-color: #F8FAFC;
+  color: #1f2937;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
-  @apply min-h-screen;
+  min-height: 100vh;
 }
 
 /* Button Components */
 .btn-primary {
-  @apply bg-blue-600 text-white font-bold uppercase tracking-wider px-6 py-3 hover:bg-blue-700 transition-all rounded-lg;
+  background-color: #2563EB;
+  color: white;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
 }
 
 .btn-outline {
-  @apply border-2 border-blue-600 text-blue-600 font-bold uppercase px-6 py-3 hover:bg-blue-600 hover:text-white transition-all rounded-lg;
+  border: 2px solid #2563EB;
+  color: #2563EB;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background-color: #2563EB;
+  color: white;
 }
 
 /* Form Components */
 .form-input {
-  @apply w-full border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm bg-white dark:bg-gray-800 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-lg;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-input:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 1px #2563EB;
+}
+
+/* Dark mode form input */
+.dark .form-input {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: white;
 }
 
 /* Admin Sidebar Link */
 .admin-link {
-  @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 font-medium transition-colors;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: #9ca3af;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.admin-link:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .admin-link.active {
-  @apply text-white bg-blue-600;
+  color: white;
+  background-color: #2563EB;
 }
 
 /* Badge Components */
 .badge-sale {
-  @apply absolute top-3 right-3 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background-color: #2563EB;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
 }
 
 /* Status Badges */
 .status-pending {
-  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #fef3c7;
+  color: #92400e;
 }
 
 .status-processing {
-  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #dbeafe;
+  color: #1e40af;
 }
 
 .status-shipped {
-  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #f3e8ff;
+  color: #7c3aed;
 }
 
 .status-delivered {
-  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #dcfce7;
+  color: #166534;
 }
 
 .status-cancelled {
-  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 /* Scrollbar Hide Utility */

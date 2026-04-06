@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X, ChevronRight } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, ChevronRight, Lock } from 'lucide-react';
 import { useCartStore } from '../../context/store';
 
 const Navbar = () => {
@@ -8,7 +8,8 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const itemCount = useCartStore((state) => state.itemCount);
+  const items = useCartStore((state) => state.items);
+  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -93,12 +94,23 @@ const Navbar = () => {
                 )}
               </NavLink>
 
-              {/* User Icon */}
+              {/* User Icon - Mobile: Navigate to Admin */}
               <button
+                onClick={() => navigate('/admin/login')}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors hidden md:block"
                 aria-label="User Account"
               >
                 <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              </button>
+
+              {/* Admin Link - Desktop Only */}
+              <button
+                onClick={() => navigate('/admin/login')}
+                className="hidden md:flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                aria-label="Admin Access"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Admin</span>
               </button>
 
               {/* Mobile Menu Toggle */}
@@ -158,6 +170,17 @@ const Navbar = () => {
                   {link.label}
                 </NavLink>
               ))}
+              {/* Admin Access - Mobile */}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate('/admin/login');
+                }}
+                className="w-full flex items-center gap-2 px-4 py-3 rounded-lg font-semibold text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                <Lock className="w-4 h-4" />
+                <span>ADMIN LOGIN</span>
+              </button>
             </nav>
           </div>
         )}

@@ -16,7 +16,10 @@ const SRI_LANKA_DISTRICTS = [
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { items, subtotal, clearCart } = useCartStore();
+  const { items, clearCart } = useCartStore();
+  
+  // Calculate subtotal locally
+  const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const [form, setForm] = useState({
     firstName: '',

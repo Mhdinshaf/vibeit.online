@@ -4,7 +4,11 @@ import { useCartStore } from '../../context/store';
 import toast from 'react-hot-toast';
 
 const CartPage = () => {
-  const { items, removeItem, updateQuantity, clearCart, subtotal, itemCount } = useCartStore();
+  const { items, removeItem, updateQuantity, clearCart } = useCartStore();
+  
+  // Calculate values locally
+  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+  const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const handleClearCart = () => {
     if (window.confirm('Are you sure you want to clear your cart?')) {

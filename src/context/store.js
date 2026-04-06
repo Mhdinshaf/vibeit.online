@@ -48,11 +48,11 @@ export const useCartStore = create(
         set({ items: [] });
       },
 
-      get itemCount() {
+      getItemCount: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);
       },
 
-      get subtotal() {
+      getSubtotal: () => {
         return get().items.reduce(
           (total, item) => total + item.price * item.quantity,
           0
