@@ -60,167 +60,124 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
-        
-        <div className="relative flex flex-col justify-center px-16">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
+    <div className="min-h-screen flex items-center justify-center px-6 bg-gray-50">
+      <div className="w-full max-w-md">
+        {/* Mobile Logo */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-200">
               VB
             </div>
+            <span className="text-2xl font-bold text-gray-900">VIBEIT</span>
+          </div>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 lg:p-10 border border-gray-100">
+          <div className="mb-8">
+            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
+              <Lock className="w-4 h-4" />
+              Admin Access
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+            <p className="text-gray-500">
+              Enter your credentials to access the dashboard
+            </p>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-white">VIBEIT</h1>
-              <p className="text-blue-300 text-sm">Admin Portal</p>
-            </div>
-          </div>
-          
-          <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
-            Manage Your Store<br />
-            <span className="text-blue-400">With Ease</span>
-          </h2>
-          <p className="text-gray-400 text-lg max-w-md">
-            Access your dashboard to manage products, orders, and customers all in one place.
-          </p>
-          
-          <div className="mt-12 flex items-center gap-4">
-            {[
-              { label: 'Products', value: '500+' },
-              { label: 'Orders', value: '1000+' },
-              { label: 'Customers', value: '5000+' },
-            ].map((stat, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-sm rounded-xl px-6 py-4 border border-white/10">
-                <div className="text-2xl font-bold text-white">{stat.value}</div>
-                <div className="text-sm text-gray-400">{stat.label}</div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={credentials.email}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300"
+                  placeholder="admin@gmail.com"
+                  disabled={isLoading}
+                  autoComplete="email"
+                />
               </div>
-            ))}
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={credentials.password}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300"
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold uppercase tracking-wider py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-300 shadow-lg shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  SIGNING IN...
+                </>
+              ) : (
+                <>
+                  SIGN IN
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* View Store Link */}
+          <div className="mt-8 text-center">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors group"
+            >
+              View Store
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
-      </div>
 
-      {/* Right Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center px-6 bg-gray-50">
-        <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-200">
-                VB
-              </div>
-              <span className="text-2xl font-bold text-gray-900">VIBEIT</span>
-            </div>
-          </div>
-
-          {/* Form Card */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 lg:p-10 border border-gray-100">
-            <div className="mb-8">
-              <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
-                <Lock className="w-4 h-4" />
-                Admin Access
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-              <p className="text-gray-500">
-                Enter your credentials to access the dashboard
-              </p>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label 
-                  htmlFor="email" 
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={credentials.email}
-                    onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300"
-                    placeholder="admin@gmail.com"
-                    disabled={isLoading}
-                    autoComplete="email"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label 
-                  htmlFor="password" 
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    value={credentials.password}
-                    onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all duration-300"
-                    placeholder="••••••••"
-                    disabled={isLoading}
-                    autoComplete="current-password"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold uppercase tracking-wider py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-300 shadow-lg shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    SIGNING IN...
-                  </>
-                ) : (
-                  <>
-                    SIGN IN
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
-            </form>
-
-            {/* View Store Link */}
-            <div className="mt-8 text-center">
-              <Link 
-                to="/" 
-                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors group"
-              >
-                View Store
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Footer Text */}
-          <p className="text-center text-sm text-gray-400 mt-8">
-            VibeIt.lk Admin Portal • Secure Access
-          </p>
-        </div>
+        {/* Footer Text */}
+        <p className="text-center text-sm text-gray-400 mt-8">
+          VibeIt.lk Admin Portal • Secure Access
+        </p>
       </div>
     </div>
   );

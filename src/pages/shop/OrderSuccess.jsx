@@ -1,10 +1,10 @@
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { CheckCircle, MessageCircle, CreditCard, Package, Truck, MapPin, Mail, Phone, ArrowRight, Sparkles, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
 
 const OrderSuccess = () => {
-  const { id } = useParams();
   const location = useLocation();
   const order = location.state?.order;
   const [copied, setCopied] = useState(false);
@@ -106,11 +106,18 @@ const OrderSuccess = () => {
                 </div>
                 <div className="flex items-center gap-3 bg-white/60 rounded-xl p-3">
                   <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 font-bold">2</div>
-                  <p>Use reference: <strong className="font-mono">{orderNumber}</strong></p>
+                  <p>Use reference: <strong className="font-mono">{orderNumber}</strong> and transfer to:</p>
                 </div>
                 <div className="flex items-center gap-3 bg-white/60 rounded-xl p-3">
                   <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 font-bold">3</div>
-                  <p>Send payment slip to WhatsApp: <strong>071 868 4580</strong></p>
+                  <p>
+                    <strong>{BANK_TRANSFER_DETAILS.accountHolder}</strong> • A/C {BANK_TRANSFER_DETAILS.accountNumber} •{' '}
+                    {BANK_TRANSFER_DETAILS.bankName}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 bg-white/60 rounded-xl p-3">
+                  <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 font-bold">4</div>
+                  <p>Send payment slip to WhatsApp: <strong>0753979659</strong></p>
                 </div>
               </div>
               <div className="bg-amber-100 rounded-xl p-3 text-sm text-amber-800 font-medium">
@@ -210,6 +217,19 @@ const OrderSuccess = () => {
                 <span className="text-gray-700 text-sm">{order.shippingAddress?.email}</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Next Steps</h2>
+          <div className="space-y-2 text-sm text-gray-600">
+            <p>1. Keep your Order ID: <span className="font-mono text-blue-600">{orderNumber}</span></p>
+            {isBankTransfer ? (
+              <p>2. Complete the bank transfer and send your slip on WhatsApp for confirmation.</p>
+            ) : (
+              <p>2. This order is marked as Cash on Delivery and will be paid when delivered.</p>
+            )}
+            <p>3. Our admin team reviews your order and updates shipment status.</p>
           </div>
         </div>
 

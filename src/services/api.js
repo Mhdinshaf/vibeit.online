@@ -1,5 +1,199 @@
 import axios from 'axios';
 
+const ORDER_DB_KEY = 'vibeit_orders_db';
+const ORDER_SYNC_KEY = 'vibeit_orders_sync';
+export const ORDER_SYNC_EVENT = 'vibeit:orders-updated';
+
+const isOfflineOrServerUnavailable = (error) => {
+  if (!error) return false;
+  if (!error.response) return true;
+  return error.response.status >= 500;
+};
+
+const readLocalOrders = () => {
+  const raw = localStorage.getItem(ORDER_DB_KEY);
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeLocalOrders = (orders) => {
+  localStorage.setItem(ORDER_DB_KEY, JSON.stringify(orders));
+};
+
+const notifyOrdersUpdated = () => {
+  localStorage.setItem(ORDER_SYNC_KEY, String(Date.now()));
+  window.dispatchEvent(new CustomEvent(ORDER_SYNC_EVENT));
+};
+
+const buildOrderNumber = () => {
+  const now = new Date();
+  const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return `VB-${stamp}-${random}`;
+};
+
+const getCartItemsSnapshot = () => {
+  const raw = localStorage.getItem('vibeit-cart');
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed?.state?.items || [];
+  } catch {
+    return [];
+  }
+};
+
+const enrichItems = (items = []) => {
+  const cartItems = getCartItemsSnapshot();
+
+  return items.map((item) => {
+    const matched = cartItems.find(
+      (cartItem) =>
+        String(cartItem?.product?._id) === String(item.product) &&
+        String(cartItem?.size || '') === String(item?.size || '')
+    );
+
+    return {
+      ...item,
+      product: matched?.product || item.product,
+    };
+  });
+};
+
+const createLocalOrder = (payload) => {
+  const now = new Date().toISOString();
+  const orderId =
+    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+
+  return {
+    _id: orderId,
+    orderNumber: buildOrderNumber(),
+    items: enrichItems(payload.items || []),
+    shippingAddress: payload.shippingAddress || {},
+    paymentMethod: payload.paymentMethod || 'Bank Transfer',
+    shippingFee: payload.shippingFee || 0,
+    subtotal: payload.subtotal || 0,
+    total: payload.total || 0,
+    notes: payload.notes || '',
+    status: 'Pending',
+    createdAt: now,
+    updatedAt: now,
+  };
+};
+
+const filterOrders = (orders, params = {}) => {
+  const { status, paymentMethod, search } = params;
+
+  return orders.filter((order) => {
+    const matchStatus = !status || status === 'all' || order.status === status;
+    const matchPayment = !paymentMethod || paymentMethod === 'all' || order.paymentMethod === paymentMethod;
+
+    if (!search) {
+      return matchStatus && matchPayment;
+    }
+
+    const normalizedSearch = String(search).toLowerCase();
+    const fullName = `${order?.shippingAddress?.firstName || ''} ${order?.shippingAddress?.lastName || ''}`.toLowerCase();
+    const orderRef = `${order.orderNumber || ''} ${order._id || ''}`.toLowerCase();
+
+    return matchStatus && matchPayment && (fullName.includes(normalizedSearch) || orderRef.includes(normalizedSearch));
+  });
+};
+
+const getOrderIdentity = (order) => String(order?._id || order?.id || order?.orderNumber || '');
+
+const sortOrdersByCreatedAtDesc = (orders = []) =>
+  [...orders].sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0));
+
+const upsertLocalOrder = (order) => {
+  if (!order || !getOrderIdentity(order)) return;
+
+  const orders = readLocalOrders();
+  const identity = getOrderIdentity(order);
+  const index = orders.findIndex((item) => getOrderIdentity(item) === identity);
+
+  if (index >= 0) {
+    orders[index] = { ...orders[index], ...order };
+  } else {
+    orders.unshift(order);
+  }
+
+  writeLocalOrders(sortOrdersByCreatedAtDesc(orders));
+};
+
+const mergeRemoteAndLocalOrders = (remoteOrders = [], localOrders = []) => {
+  const byId = new Map();
+
+  for (const localOrder of localOrders) {
+    const key = getOrderIdentity(localOrder);
+    if (!key) continue;
+    byId.set(key, localOrder);
+  }
+
+  for (const remoteOrder of remoteOrders) {
+    const key = getOrderIdentity(remoteOrder);
+    if (!key) continue;
+    const existing = byId.get(key);
+    byId.set(key, { ...existing, ...remoteOrder });
+  }
+
+  return sortOrdersByCreatedAtDesc(Array.from(byId.values()));
+};
+
+const normalizeOrdersResponse = (payload) => {
+  if (Array.isArray(payload)) {
+    return {
+      orders: payload,
+      total: payload.length,
+      page: 1,
+      pages: 1,
+    };
+  }
+
+  const orders = payload?.orders || payload?.data?.orders || [];
+  const total = payload?.total || payload?.data?.total || orders.length;
+  const page = payload?.page || payload?.data?.page || 1;
+  const pages = payload?.pages || payload?.totalPages || payload?.data?.pages || 1;
+
+  return {
+    ...payload,
+    orders,
+    total,
+    page,
+    pages,
+  };
+};
+
+const getLocalOrderMetrics = () => {
+  const orders = readLocalOrders();
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  const currentMonthOrders = orders.filter((order) => {
+    const createdAt = new Date(order?.createdAt || 0);
+    return createdAt.getFullYear() === currentYear && createdAt.getMonth() === currentMonth;
+  });
+
+  return {
+    orders,
+    monthlyOrders: currentMonthOrders.length,
+    monthlyRevenue: currentMonthOrders.reduce((sum, order) => sum + Number(order?.total || 0), 0),
+    pendingOrders: orders.filter((order) => order.status === 'Pending').length,
+    completedOrders: orders.filter((order) => order.status === 'Delivered').length,
+    cancelledOrders: orders.filter((order) => order.status === 'Cancelled').length,
+  };
+};
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
@@ -67,28 +261,175 @@ export const deleteProduct = async (id) => {
 
 // Order APIs
 export const createOrder = async (data) => {
-  const response = await api.post('/orders', data);
-  return response.data;
+  try {
+    const response = await api.post('/orders', data);
+    upsertLocalOrder(response.data);
+    notifyOrdersUpdated();
+    return response.data;
+  } catch (error) {
+    const message = String(error?.response?.data?.message || '').toLowerCase();
+    const itemError =
+      message.includes('no order item provided') ||
+      message.includes('order item') ||
+      message.includes('orderitems');
+
+    if (itemError) {
+      const normalizedItems = Array.isArray(data?.orderItems) && data.orderItems.length > 0
+        ? data.orderItems
+        : Array.isArray(data?.items)
+          ? data.items
+          : [];
+
+      const retryPayload = {
+        ...data,
+        items: normalizedItems,
+        orderItems: normalizedItems,
+      };
+
+      const retryResponse = await api.post('/orders', retryPayload);
+      upsertLocalOrder(retryResponse.data);
+      notifyOrdersUpdated();
+      return retryResponse.data;
+    }
+
+    if (!isOfflineOrServerUnavailable(error)) {
+      throw error;
+    }
+
+    const order = createLocalOrder(data);
+    const orders = readLocalOrders();
+    orders.unshift(order);
+    writeLocalOrders(orders);
+    notifyOrdersUpdated();
+    return order;
+  }
 };
 
 export const getOrders = async (params) => {
-  const response = await api.get('/orders', { params });
-  return response.data;
+  try {
+    const response = await api.get('/orders', { params });
+    const remotePayload = normalizeOrdersResponse(response.data);
+    const localOrders = readLocalOrders();
+    const mergedOrders = mergeRemoteAndLocalOrders(remotePayload.orders, localOrders);
+
+    for (const order of remotePayload.orders) {
+      upsertLocalOrder(order);
+    }
+
+    const filtered = filterOrders(mergedOrders, params || {});
+    const page = Number(params?.page || remotePayload.page || 1);
+    const limit = Number(params?.limit || 20);
+    const start = (page - 1) * limit;
+    const pagedOrders = filtered.slice(start, start + limit);
+
+    return {
+      ...remotePayload,
+      orders: pagedOrders,
+      total: filtered.length,
+      page,
+      pages: Math.max(1, Math.ceil(filtered.length / limit)),
+    };
+  } catch (error) {
+    if (!isOfflineOrServerUnavailable(error)) {
+      throw error;
+    }
+
+    const page = Number(params?.page || 1);
+    const limit = Number(params?.limit || 20);
+    const filtered = filterOrders(
+      [...readLocalOrders()].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+      params || {}
+    );
+
+    const start = (page - 1) * limit;
+    const pagedOrders = filtered.slice(start, start + limit);
+
+    return {
+      orders: pagedOrders,
+      total: filtered.length,
+      page,
+      pages: Math.max(1, Math.ceil(filtered.length / limit)),
+    };
+  }
 };
 
 export const getOrderById = async (id) => {
-  const response = await api.get(`/orders/${id}`);
-  return response.data;
+  try {
+    const response = await api.get(`/orders/${id}`);
+    const order = response.data;
+    upsertLocalOrder(order);
+    return order;
+  } catch (error) {
+    if (!isOfflineOrServerUnavailable(error)) {
+      throw error;
+    }
+
+    const order = readLocalOrders().find((item) => String(item._id) === String(id));
+    if (!order) {
+      throw error;
+    }
+
+    return order;
+  }
 };
 
 export const updateOrderStatus = async (id, data) => {
-  const response = await api.put(`/orders/${id}/status`, data);
-  return response.data;
+  try {
+    const response = await api.put(`/orders/${id}/status`, data);
+    upsertLocalOrder(response.data);
+    notifyOrdersUpdated();
+    return response.data;
+  } catch (error) {
+    if (!isOfflineOrServerUnavailable(error)) {
+      throw error;
+    }
+
+    const orders = readLocalOrders();
+    const index = orders.findIndex((item) => String(item._id) === String(id));
+
+    if (index === -1) {
+      throw error;
+    }
+
+    const updated = {
+      ...orders[index],
+      status: data?.status || orders[index].status,
+      updatedAt: new Date().toISOString(),
+    };
+
+    orders[index] = updated;
+    writeLocalOrders(orders);
+    notifyOrdersUpdated();
+    return updated;
+  }
 };
 
 export const getOrderStats = async () => {
-  const response = await api.get('/orders/stats');
-  return response.data;
+  const localMetrics = getLocalOrderMetrics();
+
+  try {
+    const response = await api.get('/orders/stats');
+    const remote = response.data || {};
+
+    return {
+      ...remote,
+      totalOrders: Math.max(Number(remote.totalOrders || 0), localMetrics.orders.length),
+      pendingOrders: Math.max(Number(remote.pendingOrders || 0), localMetrics.pendingOrders),
+      completedOrders: Math.max(Number(remote.completedOrders || 0), localMetrics.completedOrders),
+      cancelledOrders: Math.max(Number(remote.cancelledOrders || 0), localMetrics.cancelledOrders),
+    };
+  } catch (error) {
+    if (!isOfflineOrServerUnavailable(error)) {
+      throw error;
+    }
+
+    return {
+      totalOrders: localMetrics.orders.length,
+      pendingOrders: localMetrics.pendingOrders,
+      completedOrders: localMetrics.completedOrders,
+      cancelledOrders: localMetrics.cancelledOrders,
+    };
+  }
 };
 
 // Auth APIs
@@ -123,8 +464,40 @@ export const uploadImages = async (formData) => {
 
 // Analytics API
 export const getDashboardStats = async () => {
-  const response = await api.get('/analytics/dashboard');
-  return response.data;
+  const localMetrics = getLocalOrderMetrics();
+
+  try {
+    const response = await api.get('/analytics/dashboard');
+    const remote = response.data || {};
+
+    return {
+      ...remote,
+      monthlyRevenue: Math.max(Number(remote.monthlyRevenue || 0), localMetrics.monthlyRevenue),
+      monthlyOrders: Math.max(Number(remote.monthlyOrders || 0), localMetrics.monthlyOrders),
+      pendingOrders: Math.max(Number(remote.pendingOrders || 0), localMetrics.pendingOrders),
+      revenueByDay: remote.revenueByDay || [],
+      ordersByCategory: remote.ordersByCategory || [],
+      topSellingProducts: remote.topSellingProducts || [],
+      lowStockProducts: remote.lowStockProducts || [],
+    };
+  } catch (error) {
+    if (!isOfflineOrServerUnavailable(error)) {
+      throw error;
+    }
+
+    return {
+      monthlyRevenue: localMetrics.monthlyRevenue,
+      revenueGrowth: 0,
+      monthlyOrders: localMetrics.monthlyOrders,
+      pendingOrders: localMetrics.pendingOrders,
+      totalProducts: 0,
+      lowStockCount: 0,
+      revenueByDay: [],
+      ordersByCategory: [],
+      topSellingProducts: [],
+      lowStockProducts: [],
+    };
+  }
 };
 
 export default api;

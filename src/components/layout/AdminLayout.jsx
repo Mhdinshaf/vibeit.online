@@ -140,9 +140,6 @@ const AdminLayout = () => {
                 <h2 className="text-xl font-bold text-gray-900">
                   {getPageTitle()}
                 </h2>
-                <p className="text-sm text-gray-500 hidden sm:block">
-                  Manage your store
-                </p>
               </div>
             </div>
 

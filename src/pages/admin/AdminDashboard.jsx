@@ -1,14 +1,32 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TrendingUp, ShoppingBag, Package, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { getDashboardStats } from '../../services/api';
+import { getDashboardStats, ORDER_SYNC_EVENT } from '../../services/api';
 
 const AdminDashboard = () => {
+  const queryClient = useQueryClient();
+
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: getDashboardStats,
     refetchInterval: 60000,
   });
+
+  useEffect(() => {
+    const refreshDashboard = () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+    };
+
+    window.addEventListener(ORDER_SYNC_EVENT, refreshDashboard);
+    window.addEventListener('storage', refreshDashboard);
+
+    return () => {
+      window.removeEventListener(ORDER_SYNC_EVENT, refreshDashboard);
+      window.removeEventListener('storage', refreshDashboard);
+    };
+  }, [queryClient]);
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',

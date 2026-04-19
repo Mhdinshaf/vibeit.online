@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Truck, CreditCard, DollarSign, AlertCircle, ChevronRight, Package, MapPin, User, Mail, Phone, Home, Shield, Loader2 } from 'lucide-react';
 import { useCartStore } from '../../context/store';
 import { createOrder } from '../../services/api';
+import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
 import toast from 'react-hot-toast';
 
 const SRI_LANKA_DISTRICTS = [
@@ -55,6 +56,7 @@ const CheckoutPage = () => {
 
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
   const [showNotes, setShowNotes] = useState(false);
+  const [isOrderFinalizing, setIsOrderFinalizing] = useState(false);
 
   const setField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -73,17 +75,23 @@ const CheckoutPage = () => {
 
   const { mutate: placeOrder, isPending } = useMutation({
     mutationFn: createOrder,
+    onMutate: () => {
+      setIsOrderFinalizing(true);
+    },
     onSuccess: (data) => {
       // Open WhatsApp if URL provided
       if (data.whatsappUrl) {
         window.open(data.whatsappUrl, '_blank');
       }
-      // Clear cart
-      clearCart();
       // Navigate to success page with order data
       navigate(`/order-success/${data._id}`, { state: { order: data } });
+      // Clear cart after navigation to avoid checkout empty-cart redirect race
+      setTimeout(() => {
+        clearCart();
+      }, 0);
     },
     onError: (error) => {
+      setIsOrderFinalizing(false);
       toast.error(error.response?.data?.message || 'Failed to place order');
     },
   });
@@ -97,14 +105,36 @@ const CheckoutPage = () => {
       return;
     }
 
+    const normalizedOrderItems = items
+      .map((item) => {
+        const productId =
+          item?.product?._id ||
+          item?.product?.id ||
+          (typeof item?.product === 'string' ? item.product : '') ||
+          item?.productId ||
+          (typeof item?.key === 'string' ? item.key.split('-')[0] : '') ||
+          item?._id;
+
+        return {
+          product: productId,
+          productId,
+          quantity: Number(item?.quantity || 0),
+          size: item?.size,
+          price: Number(item?.price || 0),
+        };
+      })
+      .filter((item) => Boolean(item.product) && item.quantity > 0);
+
+    if (normalizedOrderItems.length === 0) {
+      toast.error('No valid order items found. Please re-add your cart items.');
+      return;
+    }
+
     // Prepare order data
     const orderData = {
-      items: items.map((item) => ({
-        product: item.product._id,
-        quantity: item.quantity,
-        size: item.size,
-        price: item.price,
-      })),
+      // Send both keys for backend compatibility (`items` and `orderItems`)
+      items: normalizedOrderItems,
+      orderItems: normalizedOrderItems,
       shippingAddress: {
         firstName: form.firstName,
         lastName: form.lastName,
@@ -126,7 +156,7 @@ const CheckoutPage = () => {
   };
 
   // Redirect if cart is empty
-  if (!items || items.length === 0) {
+  if ((!items || items.length === 0) && !isPending && !isOrderFinalizing) {
     return <Navigate to="/shop" replace />;
   }
 
@@ -254,6 +284,20 @@ const CheckoutPage = () => {
                     />
                   </div>
                 </div>
+                {paymentMethod === 'Bank Transfer' && (
+                  <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                    <p className="text-sm font-semibold text-amber-800">Bank details for transfer</p>
+                    <p className="text-sm text-amber-700 mt-2">
+                      {BANK_TRANSFER_DETAILS.accountHolder}
+                    </p>
+                    <p className="text-sm text-amber-700">
+                      Account: {BANK_TRANSFER_DETAILS.accountNumber}
+                    </p>
+                    <p className="text-sm text-amber-700">
+                      Bank: {BANK_TRANSFER_DETAILS.bankName}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Shipping Option */}
@@ -316,7 +360,7 @@ const CheckoutPage = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-gray-900">Bank Transfer</h3>
-                        <p className="text-sm text-gray-500">Send slip to WhatsApp 0718684580</p>
+                        <p className="text-sm text-gray-500">Send slip to WhatsApp 0753979659</p>
                       </div>
                     </div>
                   </label>
