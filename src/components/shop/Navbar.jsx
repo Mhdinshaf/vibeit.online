@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Sparkles, Lock } from 'lucide-react';
 import { useCartStore } from '../../context/store';
+import logo from '../../assets/favicon.jpeg';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -43,8 +44,12 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-18 py-3">
             {/* Logo */}
             <NavLink to="/" className="flex items-center gap-3 group">
-              <div className="w-11 h-11 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-200 group-hover:shadow-blue-300 transition-all duration-300 group-hover:scale-105">
-                VB
+              <div className="w-11 h-11 rounded-xl overflow-hidden shadow-lg shadow-blue-200 transition-all duration-300 group-hover:scale-105 group-hover:shadow-blue-300 bg-slate-900">
+                <img
+                  src={logo}
+                  alt="VIBEIT logo"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-blue-900 tracking-tight">
