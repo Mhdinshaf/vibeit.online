@@ -55,12 +55,22 @@ export const authService = {
   },
 
   /**
-   * Get stored admin data
+   * Get stored admin data - safely handles corrupted/invalid JSON
    * @returns {object|null}
    */
   getStoredAdmin() {
-    const admin = localStorage.getItem(ADMIN_KEY);
-    return admin ? JSON.parse(admin) : null;
+    try {
+      const admin = localStorage.getItem(ADMIN_KEY);
+      if (!admin) return null;
+      
+      const parsed = JSON.parse(admin);
+      return parsed;
+    } catch (error) {
+      console.warn('⚠️ Corrupted admin data in localStorage, clearing it:', error.message);
+      // Clear the corrupted data to prevent repeated errors
+      localStorage.removeItem(ADMIN_KEY);
+      return null;
+    }
   },
 };
 

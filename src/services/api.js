@@ -111,7 +111,17 @@ const filterOrders = (orders, params = {}) => {
   });
 };
 
-const getOrderIdentity = (order) => String(order?._id || order?.id || order?.orderNumber || '');
+// Use orderNumber as primary key since it's stable across frontend/backend
+// _id may vary (UUID vs MongoDB ObjectId), but orderNumber is always consistent
+const getOrderIdentity = (order) => {
+  // Prefer orderNumber since it's the stable identifier across all states
+  if (order?.orderNumber) return String(order.orderNumber);
+  // Fallback to _id if orderNumber is missing (edge case)
+  if (order?._id) return String(order._id);
+  // Last resort: id field (legacy)
+  if (order?.id) return String(order.id);
+  return '';
+};
 
 const sortOrdersByCreatedAtDesc = (orders = []) =>
   [...orders].sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0));
@@ -124,7 +134,9 @@ const upsertLocalOrder = (order) => {
   const index = orders.findIndex((item) => getOrderIdentity(item) === identity);
 
   if (index >= 0) {
-    orders[index] = { ...orders[index], ...order };
+    // IMPORTANT: Remote order data should completely override local, especially _id
+    // This ensures we never keep stale UUIDs from cache
+    orders[index] = { ...orders[index], ...order, _id: order._id, orderNumber: order.orderNumber };
   } else {
     orders.unshift(order);
   }
@@ -133,22 +145,29 @@ const upsertLocalOrder = (order) => {
 };
 
 const mergeRemoteAndLocalOrders = (remoteOrders = [], localOrders = []) => {
-  const byId = new Map();
-
+  const byOrderNumber = new Map();
+  
+  // First, add all local orders (these are backups for offline mode)
   for (const localOrder of localOrders) {
-    const key = getOrderIdentity(localOrder);
+    const key = localOrder?.orderNumber || getOrderIdentity(localOrder);
     if (!key) continue;
-    byId.set(key, localOrder);
+    byOrderNumber.set(key, localOrder);
   }
 
+  // IMPORTANT: Remote orders ALWAYS override local ones (they have the true database _id)
   for (const remoteOrder of remoteOrders) {
-    const key = getOrderIdentity(remoteOrder);
+    const key = remoteOrder?.orderNumber || getOrderIdentity(remoteOrder);
     if (!key) continue;
-    const existing = byId.get(key);
-    byId.set(key, { ...existing, ...remoteOrder });
+    
+    // Use remote order completely, but preserve any missing fields from local if needed
+    const existing = byOrderNumber.get(key);
+    byOrderNumber.set(key, {
+      ...existing,      // Keep any local data
+      ...remoteOrder,   // Override with remote data (including _id)
+    });
   }
 
-  return sortOrdersByCreatedAtDesc(Array.from(byId.values()));
+  return sortOrdersByCreatedAtDesc(Array.from(byOrderNumber.values()));
 };
 
 const normalizeOrdersResponse = (payload) => {
@@ -342,9 +361,17 @@ export const getOrders = async (params) => {
     const start = (page - 1) * limit;
     const pagedOrders = filtered.slice(start, start + limit);
 
-    // Debug logging - can be removed later
+    // Debug logging - verify _id is from remote (ObjectId), not from cache (UUID)
     if (pagedOrders.length > 0) {
-      console.log('📦 Orders from server - IDs:', pagedOrders.map(o => o._id).join(', '));
+      console.log('🔍 ORDERS LOADED FROM API:');
+      console.log('  Remote order count:', remotePayload.orders.length);
+      console.log('  Local order count:', localOrders.length);
+      console.log('  Merged & filtered count:', filtered.length);
+      console.log('  First 3 orders:');
+      pagedOrders.slice(0, 3).forEach((o, i) => {
+        console.log(`    [${i}] orderNumber: ${o.orderNumber}, _id: ${o._id}, _id_type: ${typeof o._id}, _id_length: ${String(o._id).length}`);
+      });
+      console.log('  All page orders _ids:', pagedOrders.map(o => o._id));
     }
 
     return {
@@ -428,11 +455,22 @@ export const updateOrderStatus = async (id, data) => {
   }
   
   try {
-    console.log('🔄 Frontend - Updating order:', id, 'to status:', data.status);
-    const response = await api.put(`/orders/${id}/status`, data);
+    // Log detailed information about the request
+    const url = `/orders/${id}/status`;
+    console.log('🔄 UPDATE ORDER STATUS REQUEST:');
+    console.log('  URL:', url);
+    console.log('  ID Type:', typeof id, '| ID Value:', id);
+    console.log('  ID Length:', String(id).length, '| ID Format:', /^[0-9a-f]{24}$/.test(id) ? 'MongoDB ObjectId' : 'Other');
+    console.log('  New Status:', data.status);
+    console.log('  Request Body:', JSON.stringify(data));
+    
+    const response = await api.put(url, data);
     const updatedOrder = response.data;
     
-    console.log('✅ Backend updated order._id:', updatedOrder?._id, 'status:', updatedOrder?.status);
+    console.log('✅ UPDATE ORDER STATUS SUCCESS:');
+    console.log('  Response._id:', updatedOrder?._id);
+    console.log('  Response.status:', updatedOrder?.status);
+    console.log('  Response.orderNumber:', updatedOrder?.orderNumber);
     
     // Ensure we use the server's response
     if (updatedOrder && updatedOrder._id) {
@@ -442,7 +480,10 @@ export const updateOrderStatus = async (id, data) => {
     notifyOrdersUpdated();
     return updatedOrder;
   } catch (error) {
-    console.error('❌ Error updating order status:', error?.response?.status, error?.response?.data?.message);
+    console.error('❌ UPDATE ORDER STATUS ERROR:');
+    console.error('  Status:', error?.response?.status);
+    console.error('  Message:', error?.response?.data?.message);
+    console.error('  Full Error:', error?.response?.data);
     
     if (!isOfflineOrServerUnavailable(error)) {
       throw error;
