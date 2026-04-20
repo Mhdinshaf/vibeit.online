@@ -92,7 +92,9 @@ const CheckoutPage = () => {
     },
     onError: (error) => {
       setIsOrderFinalizing(false);
-      toast.error(error.response?.data?.message || 'Failed to place order');
+      const errorMsg = error.message || error.response?.data?.message || 'Failed to place order';
+      console.error('❌ Checkout error:', errorMsg);
+      toast.error(errorMsg);
     },
   });
 

@@ -70,14 +70,24 @@ const enrichItems = (items = []) => {
 const createLocalOrder = (payload) => {
   const now = new Date().toISOString();
   
-  // If payload has _id from server, use it. Otherwise generate a temporary ID.
-  const orderId = payload._id ||
-    (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.floor(Math.random() * 100000)}`);
+  // STRICT: Backend MUST return _id - no fallback
+  // This ensures order can be viewed and updated later
+  if (!payload._id) {
+    console.error('❌ CRITICAL ERROR: Backend response missing _id field!', {
+      payload,
+      hasId: !!payload._id,
+      hasOrderNumber: !!payload.orderNumber,
+      keys: Object.keys(payload),
+    });
+    throw new Error(
+      'Backend order creation failed: Response missing _id field.\n' +
+      'Backend must return the MongoDB _id for the created order.\n' +
+      'Contact support if this persists.'
+    );
+  }
 
   return {
-    _id: orderId,
+    _id: payload._id,
     orderNumber: payload.orderNumber || buildOrderNumber(),
     items: enrichItems(payload.items || []),
     shippingAddress: payload.shippingAddress || {},
@@ -298,23 +308,51 @@ export const deleteProductPermanent = async (id) => {
 // Order APIs
 export const createOrder = async (data) => {
   try {
+    console.log('📤 POST /orders - Creating order...');
     const response = await api.post('/orders', data);
-    upsertLocalOrder(response.data);
+    
+    // CRITICAL: Verify backend returned _id
+    const order = response.data;
+    if (!order?._id) {
+      console.error('❌ CRITICAL: Backend POST response missing _id!', {
+        response: order,
+        hasId: !!order?._id,
+        hasOrderNumber: !!order?.orderNumber,
+        keys: Object.keys(order || {}),
+      });
+      throw new Error(
+        'Order created but backend response missing _id.\n' +
+        'Cannot view or update this order.\n' +
+        'Backend must include _id in POST response.'
+      );
+    }
+    
+    console.log('✅ Order created with _id:', order._id);
+    
+    // Save to local cache
+    upsertLocalOrder(order);
     notifyOrdersUpdated();
-    return response.data;
+    return order;
   } catch (error) {
-    const message = String(error?.response?.data?.message || '').toLowerCase();
+    // Check for item validation errors
+    const message = String(error?.response?.data?.message || error.message || '').toLowerCase();
     const itemError =
       message.includes('no order item provided') ||
       message.includes('order item') ||
       message.includes('orderitems');
 
-    if (itemError) {
+    if (itemError && error.response?.status < 500) {
+      console.log('📝 Item validation error, retrying with normalized format...');
+      
       const normalizedItems = Array.isArray(data?.orderItems) && data.orderItems.length > 0
         ? data.orderItems
         : Array.isArray(data?.items)
           ? data.items
           : [];
+
+      if (normalizedItems.length === 0) {
+        throw error;  // Still fail if no items
+      }
 
       const retryPayload = {
         ...data,
@@ -323,21 +361,33 @@ export const createOrder = async (data) => {
       };
 
       const retryResponse = await api.post('/orders', retryPayload);
-      upsertLocalOrder(retryResponse.data);
+      const retryOrder = retryResponse.data;
+      
+      // Verify retry response also has _id
+      if (!retryOrder?._id) {
+        console.error('❌ CRITICAL: Retry response missing _id!', {
+          response: retryOrder,
+          hasId: !!retryOrder?._id,
+        });
+        throw new Error('Retry failed: Backend response missing _id.');
+      }
+      
+      console.log('✅ Order created (retry) with _id:', retryOrder._id);
+      
+      upsertLocalOrder(retryOrder);
       notifyOrdersUpdated();
-      return retryResponse.data;
+      return retryOrder;
     }
 
-    if (!isOfflineOrServerUnavailable(error)) {
-      throw error;
-    }
-
-    const order = createLocalOrder(data);
-    const orders = readLocalOrders();
-    orders.unshift(order);
-    writeLocalOrders(orders);
-    notifyOrdersUpdated();
-    return order;
+    // If offline or server error, propagate the original error
+    // DO NOT create local order - user should retry
+    console.error('❌ Failed to create order:', {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      isOffline: !error.response,
+    });
+    
+    throw error;
   }
 };
 
@@ -345,6 +395,17 @@ export const getOrders = async (params) => {
   try {
     const response = await api.get('/orders', { params });
     const remotePayload = normalizeOrdersResponse(response.data);
+    
+    // ⚠️ CRITICAL CHECK: Log EXACT backend response before any processing
+    console.log('🌐 RAW BACKEND RESPONSE - First 2 orders:');
+    const firstOrders = remotePayload.orders?.slice(0, 2) || [];
+    firstOrders.forEach((o, i) => {
+      console.log(`  [${i}] _id: ${o._id} (${String(o._id).length} chars), orderNumber: ${o.orderNumber}`);
+      console.log(`       Full _id: "${o._id}"`);
+      console.log(`       Is 24-char hex (MongoDB ObjectId): ${/^[0-9a-f]{24}$/.test(o._id)}`);
+      console.log(`       Is 36-char UUID: ${/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(o._id)}`);
+    });
+    
     const localOrders = readLocalOrders();
     
     // Prioritize remote orders with their MongoDB _id
@@ -410,38 +471,51 @@ export const getOrderById = async (id) => {
     throw new Error('Order ID is required');
   }
   
+  // STRICT: Reject temp-IDs - only backend _ids are valid
+  if (String(id).startsWith('temp-')) {
+    console.error('❌ INVALID: Attempting to fetch temp-ID order:', id);
+    throw new Error(
+      'Cannot view order: This order was not properly created in the database.\n' +
+      'Please try placing the order again.'
+    );
+  }
+  
   try {
-    console.log('🔍 Frontend - Getting order by ID:', id);
+    console.log('🔍 Frontend - Getting order by ID:', id, 'Type:', typeof id, 'Length:', String(id).length);
     const response = await api.get(`/orders/${id}`);
     const order = response.data;
     
-    console.log('✅ Backend returned order._id:', order?._id);
+    console.log('✅ Backend returned order._id:', order?._id, 'Length:', String(order?._id).length);
     
-    // Ensure we use the server's _id, not a local UUID
+    // Cache the order locally
     if (order && order._id) {
       upsertLocalOrder(order);
     }
     
     return order;
   } catch (error) {
-    console.error('❌ Error fetching order:', error?.response?.status, error?.response?.data?.message);
+    console.error('❌ Error fetching order:', {
+      status: error?.response?.status,
+      message: error?.response?.data?.message,
+      requestedId: id,
+    });
     
-    if (!isOfflineOrServerUnavailable(error)) {
-      throw error;
-    }
-
-    const order = readLocalOrders().find((item) => String(item._id) === String(id));
-    if (!order) {
-      throw error;
-    }
-
-    return order;
+    throw error;  // Always throw - no offline fallback for detail pages
   }
 };
 
 export const updateOrderStatus = async (id, data) => {
   if (!id) {
     throw new Error('Order ID is required');
+  }
+  
+  // STRICT: Reject temp-IDs - only backend _ids are valid
+  if (String(id).startsWith('temp-')) {
+    console.error('❌ INVALID: Attempting to update temp-ID order:', id);
+    throw new Error(
+      'Cannot update order status: This order was not properly created in the database.\n' +
+      'Please try placing the order again.'
+    );
   }
   
   if (!data?.status) {
@@ -455,14 +529,12 @@ export const updateOrderStatus = async (id, data) => {
   }
   
   try {
-    // Log detailed information about the request
     const url = `/orders/${id}/status`;
     console.log('🔄 UPDATE ORDER STATUS REQUEST:');
     console.log('  URL:', url);
     console.log('  ID Type:', typeof id, '| ID Value:', id);
     console.log('  ID Length:', String(id).length, '| ID Format:', /^[0-9a-f]{24}$/.test(id) ? 'MongoDB ObjectId' : 'Other');
     console.log('  New Status:', data.status);
-    console.log('  Request Body:', JSON.stringify(data));
     
     const response = await api.put(url, data);
     const updatedOrder = response.data;
@@ -470,9 +542,7 @@ export const updateOrderStatus = async (id, data) => {
     console.log('✅ UPDATE ORDER STATUS SUCCESS:');
     console.log('  Response._id:', updatedOrder?._id);
     console.log('  Response.status:', updatedOrder?.status);
-    console.log('  Response.orderNumber:', updatedOrder?.orderNumber);
     
-    // Ensure we use the server's response
     if (updatedOrder && updatedOrder._id) {
       upsertLocalOrder(updatedOrder);
     }
@@ -485,27 +555,7 @@ export const updateOrderStatus = async (id, data) => {
     console.error('  Message:', error?.response?.data?.message);
     console.error('  Full Error:', error?.response?.data);
     
-    if (!isOfflineOrServerUnavailable(error)) {
-      throw error;
-    }
-
-    const orders = readLocalOrders();
-    const index = orders.findIndex((item) => String(item._id) === String(id));
-
-    if (index === -1) {
-      throw error;
-    }
-
-    const updated = {
-      ...orders[index],
-      status: data?.status || orders[index].status,
-      updatedAt: new Date().toISOString(),
-    };
-
-    orders[index] = updated;
-    writeLocalOrders(orders);
-    notifyOrdersUpdated();
-    return updated;
+    throw error;  // Always throw - no offline fallback
   }
 };
 

@@ -177,19 +177,24 @@ const AdminOrders = () => {
                     <select
                       value={order.status || 'Pending'}
                       onChange={(e) => {
-                        const orderId = order._id || order.id;
-                        if (!orderId) {
-                          console.error('❌ CRITICAL: Order has no _id or id!', order);
-                          toast.error('Order ID missing - cannot update status');
+                        // ✅ STRICT: Only use order._id from backend, never fallback
+                        if (!order._id) {
+                          console.error('❌ CRITICAL: Order missing _id field!', {
+                            order,
+                            keys: Object.keys(order),
+                          });
+                          toast.error('Order ID missing from database - contact support');
                           return;
                         }
-                        console.log('📋 Status change initiated:');
-                        console.log('  - Order._id:', order._id);
-                        console.log('  - Order.id:', order.id);
-                        console.log('  - Using ID:', orderId);
-                        console.log('  - New Status:', e.target.value);
-                        console.log('  - Full Order:', JSON.stringify(order, null, 2));
-                        mutateOrderStatus({ id: orderId, nextStatus: e.target.value });
+                        
+                        console.log('📋 STATUS UPDATE:');
+                        console.log('  Order Number:', order.orderNumber);
+                        console.log('  Order _id:', order._id);
+                        console.log('  _id Type:', typeof order._id);
+                        console.log('  _id Length:', String(order._id).length);
+                        console.log('  New Status:', e.target.value);
+                        
+                        mutateOrderStatus({ id: order._id, nextStatus: e.target.value });
                       }}
                       className="px-3 py-2.5 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 text-sm"
                     >

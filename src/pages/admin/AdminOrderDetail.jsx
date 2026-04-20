@@ -11,11 +11,16 @@ const AdminOrderDetail = () => {
   const queryClient = useQueryClient();
   
   // Log the ID being used from URL params
-  console.log('📄 AdminOrderDetail - URL param ID:', id);
+  console.log('📄 AdminOrderDetail - URL param ID:', id, 'Type:', typeof id, 'Length:', String(id).length);
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['admin-order', id],
-    queryFn: () => getOrderById(id),
+    queryFn: () => {
+      if (!id) {
+        throw new Error('Order ID is required');
+      }
+      return getOrderById(id);
+    },
     enabled: Boolean(id),
     refetchInterval: 5000,
   });
