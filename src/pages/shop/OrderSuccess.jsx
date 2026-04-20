@@ -50,7 +50,7 @@ const OrderSuccess = () => {
   const whatsappMessage = encodeURIComponent(
     `Hi VibeIt! I've placed an order.\n\nOrder Number: ${orderNumber}\nTotal: රු${order.total.toLocaleString()}\nPayment Method: ${order.paymentMethod}`
   );
-  const whatsappUrl = `https://wa.me/94718684580?text=${whatsappMessage}`;
+  const whatsappUrl = `https://wa.me/94753979659?text=${whatsappMessage}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-white py-8">
