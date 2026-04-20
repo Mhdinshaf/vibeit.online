@@ -69,14 +69,16 @@ const enrichItems = (items = []) => {
 
 const createLocalOrder = (payload) => {
   const now = new Date().toISOString();
-  const orderId =
-    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+  
+  // If payload has _id from server, use it. Otherwise generate a temporary ID.
+  const orderId = payload._id ||
+    (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()
-      : `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+      : `${Date.now()}-${Math.floor(Math.random() * 100000)}`);
 
   return {
     _id: orderId,
-    orderNumber: buildOrderNumber(),
+    orderNumber: payload.orderNumber || buildOrderNumber(),
     items: enrichItems(payload.items || []),
     shippingAddress: payload.shippingAddress || {},
     paymentMethod: payload.paymentMethod || 'Bank Transfer',
@@ -84,9 +86,9 @@ const createLocalOrder = (payload) => {
     subtotal: payload.subtotal || 0,
     total: payload.total || 0,
     notes: payload.notes || '',
-    status: 'Pending',
-    createdAt: now,
-    updatedAt: now,
+    status: payload.status || 'Pending',
+    createdAt: payload.createdAt || now,
+    updatedAt: payload.updatedAt || now,
   };
 };
 
@@ -259,6 +261,21 @@ export const deleteProduct = async (id) => {
   return response.data;
 };
 
+export const deleteProductPermanent = async (id) => {
+  try {
+    // Try permanent delete endpoint first
+    const response = await api.delete(`/products/${id}/permanent`);
+    return response.data;
+  } catch (error) {
+    // If permanent endpoint doesn't exist, fall back to regular delete
+    // This sends a special flag to indicate hard delete
+    const response = await api.delete(`/products/${id}`, {
+      params: { permanent: true }
+    });
+    return response.data;
+  }
+};
+
 // Order APIs
 export const createOrder = async (data) => {
   try {
@@ -310,8 +327,11 @@ export const getOrders = async (params) => {
     const response = await api.get('/orders', { params });
     const remotePayload = normalizeOrdersResponse(response.data);
     const localOrders = readLocalOrders();
+    
+    // Prioritize remote orders with their MongoDB _id
     const mergedOrders = mergeRemoteAndLocalOrders(remotePayload.orders, localOrders);
 
+    // Ensure all remote orders are cached locally with their original _id
     for (const order of remotePayload.orders) {
       upsertLocalOrder(order);
     }
@@ -321,6 +341,11 @@ export const getOrders = async (params) => {
     const limit = Number(params?.limit || 20);
     const start = (page - 1) * limit;
     const pagedOrders = filtered.slice(start, start + limit);
+
+    // Debug logging - can be removed later
+    if (pagedOrders.length > 0) {
+      console.log('📦 Orders from server - IDs:', pagedOrders.map(o => o._id).join(', '));
+    }
 
     return {
       ...remotePayload,
@@ -354,12 +379,26 @@ export const getOrders = async (params) => {
 };
 
 export const getOrderById = async (id) => {
+  if (!id) {
+    throw new Error('Order ID is required');
+  }
+  
   try {
+    console.log('🔍 Frontend - Getting order by ID:', id);
     const response = await api.get(`/orders/${id}`);
     const order = response.data;
-    upsertLocalOrder(order);
+    
+    console.log('✅ Backend returned order._id:', order?._id);
+    
+    // Ensure we use the server's _id, not a local UUID
+    if (order && order._id) {
+      upsertLocalOrder(order);
+    }
+    
     return order;
   } catch (error) {
+    console.error('❌ Error fetching order:', error?.response?.status, error?.response?.data?.message);
+    
     if (!isOfflineOrServerUnavailable(error)) {
       throw error;
     }
@@ -374,12 +413,37 @@ export const getOrderById = async (id) => {
 };
 
 export const updateOrderStatus = async (id, data) => {
+  if (!id) {
+    throw new Error('Order ID is required');
+  }
+  
+  if (!data?.status) {
+    throw new Error('Status is required');
+  }
+  
+  // Validate status is one of the allowed values
+  const validStatuses = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
+  if (!validStatuses.includes(data.status)) {
+    throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+  }
+  
   try {
+    console.log('🔄 Frontend - Updating order:', id, 'to status:', data.status);
     const response = await api.put(`/orders/${id}/status`, data);
-    upsertLocalOrder(response.data);
+    const updatedOrder = response.data;
+    
+    console.log('✅ Backend updated order._id:', updatedOrder?._id, 'status:', updatedOrder?.status);
+    
+    // Ensure we use the server's response
+    if (updatedOrder && updatedOrder._id) {
+      upsertLocalOrder(updatedOrder);
+    }
+    
     notifyOrdersUpdated();
-    return response.data;
+    return updatedOrder;
   } catch (error) {
+    console.error('❌ Error updating order status:', error?.response?.status, error?.response?.data?.message);
+    
     if (!isOfflineOrServerUnavailable(error)) {
       throw error;
     }

@@ -23,12 +23,43 @@ const AdminOrders = () => {
 
   const { mutate: mutateOrderStatus } = useMutation({
     mutationFn: ({ id, nextStatus }) => updateOrderStatus(id, { status: nextStatus }),
+    onMutate: async ({ id, nextStatus }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['admin-orders'] });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData(['admin-orders', page, status, paymentMethod, search]);
+
+      // Optimistically update to the new value
+      if (previousData) {
+        queryClient.setQueryData(
+          ['admin-orders', page, status, paymentMethod, search],
+          {
+            ...previousData,
+            orders: previousData.orders.map((order) =>
+              order._id === id ? { ...order, status: nextStatus } : order
+            ),
+          }
+        );
+      }
+
+      return { previousData };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
-      toast.success('Order status updated');
+      queryClient.invalidateQueries({ queryKey: ['admin-order'] });
+      toast.success('Order status updated successfully');
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update order status');
+    onError: (error, variables, context) => {
+      // Revert on error
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          ['admin-orders', page, status, paymentMethod, search],
+          context.previousData
+        );
+      }
+      const errorMsg = error.response?.data?.message || 'Failed to update order status';
+      toast.error(errorMsg);
     },
   });
 

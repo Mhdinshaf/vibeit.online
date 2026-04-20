@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Edit, Trash2, Plus, Search, Package } from 'lucide-react';
-import { getAdminProducts, deleteProduct } from '../../services/api';
+import { getAdminProducts, deleteProductPermanent } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const AdminProducts = () => {
@@ -17,13 +17,17 @@ const AdminProducts = () => {
   });
 
   const { mutate: handleDelete } = useMutation({
-    mutationFn: deleteProduct,
+    mutationFn: deleteProductPermanent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast.success('Product removed');
+      toast.success('Product permanently deleted');
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to delete product');
+      const errorMsg = error.response?.data?.message || 'Failed to delete product';
+      toast.error(errorMsg);
+      if (error.response?.status === 404) {
+        toast.error('Product not found. It may have already been deleted.');
+      }
     },
   });
 

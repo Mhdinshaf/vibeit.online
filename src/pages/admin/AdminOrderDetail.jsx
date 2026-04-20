@@ -9,6 +9,9 @@ const STATUSES = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
 const AdminOrderDetail = () => {
   const { id } = useParams();
   const queryClient = useQueryClient();
+  
+  // Log the ID being used from URL params
+  console.log('📄 AdminOrderDetail - URL param ID:', id);
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['admin-order', id],
@@ -19,13 +22,35 @@ const AdminOrderDetail = () => {
 
   const { mutate: mutateOrderStatus, isPending: isUpdating } = useMutation({
     mutationFn: (status) => updateOrderStatus(id, { status }),
+    onMutate: async (nextStatus) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['admin-order', id] });
+
+      // Snapshot the previous value
+      const previousOrder = queryClient.getQueryData(['admin-order', id]);
+
+      // Optimistically update to the new value
+      if (previousOrder) {
+        queryClient.setQueryData(['admin-order', id], {
+          ...previousOrder,
+          status: nextStatus,
+        });
+      }
+
+      return { previousOrder };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-order', id] });
       queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
-      toast.success('Order status updated');
+      toast.success('Order status updated successfully');
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update order status');
+    onError: (error, variables, context) => {
+      // Revert on error
+      if (context?.previousOrder) {
+        queryClient.setQueryData(['admin-order', id], context.previousOrder);
+      }
+      const errorMsg = error.response?.data?.message || 'Failed to update order status';
+      toast.error(errorMsg);
     },
   });
 
@@ -36,7 +61,9 @@ const AdminOrderDetail = () => {
   if (!order) {
     return (
       <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center">
-        <p className="text-gray-500">Order not found.</p>
+        <p className="text-red-600 font-semibold">Order not found.</p>
+        <p className="text-gray-500 text-sm mt-2">Order ID: {id}</p>
+        <p className="text-gray-500 text-sm">The order may have been deleted or the ID may be incorrect.</p>
       </div>
     );
   }
