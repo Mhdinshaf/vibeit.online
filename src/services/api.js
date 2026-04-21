@@ -3,6 +3,7 @@ import axios from 'axios';
 const ORDER_DB_KEY = 'vibeit_orders_db';
 const ORDER_SYNC_KEY = 'vibeit_orders_sync';
 export const ORDER_SYNC_EVENT = 'vibeit:orders-updated';
+const API = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
 const isOfflineOrServerUnavailable = (error) => {
   if (!error) return false;
