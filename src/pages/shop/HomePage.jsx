@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { Truck, Shield, Headphones, ChevronRight, ChevronDown, Sparkles, ArrowRight, Star } from 'lucide-react';
 import { getProducts } from '../../services/api';
@@ -37,6 +38,39 @@ const HomePage = () => {
 
   return (
     <div className="bg-white">
+      <Helmet>
+        <title>VIBEIT - Shop Fashion, Tech & Home Online in Sri Lanka | Free Delivery</title>
+        <meta name="description" content="Shop online at VIBEIT Sri Lanka. Premium fashion, tech gadgets, home essentials & more. Cash on delivery available across Sri Lanka. Free gifts on orders above රු5000!" />
+        <meta name="keywords" content="online shopping, fashion, tech gadgets, home accessories, Sri Lanka, VIBEIT" />
+        <meta property="og:title" content="VIBEIT - Shop Fashion, Tech & Home Online in Sri Lanka" />
+        <meta property="og:description" content="Sri Lanka's modern online store. Fashion, tech gadgets, home essentials & more. Free delivery & cash on delivery available." />
+        <meta property="og:image" content="https://vibeitlk.vercel.app/og-image.jpg" />
+        <meta property="og:url" content="https://vibeitlk.vercel.app/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="VIBEIT - Shop Premium Products Online" />
+        <meta name="twitter:description" content="Fashion, tech gadgets, home essentials & more. Free delivery & cash on delivery across Sri Lanka." />
+        <meta name="theme-color" content="#2563eb" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "VIBEIT",
+            "image": "https://vibeitlk.vercel.app/logo.png",
+            "description": "Online shopping store in Sri Lanka offering fashion, tech gadgets, and home essentials",
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "LK",
+              "addressLocality": "Colombo"
+            },
+            "telephone": "+94753979659",
+            "email": "vibeit@gmail.com",
+            "url": "https://vibeitlk.vercel.app",
+            "priceRange": "$$",
+            "areaServed": "LK"
+          })}
+        </script>
+      </Helmet>
       {/* Premium Hero Section */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         {/* Background with gradient */}

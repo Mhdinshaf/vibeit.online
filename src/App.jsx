@@ -16,14 +16,14 @@ import OrderSuccess from './pages/shop/OrderSuccess';
 import AboutPage from './pages/shop/AboutPage';
 import ContactPage from './pages/shop/ContactPage';
 
-// Admin Pages
+// Admin Pages - Lazy loaded for code splitting
 import AdminLogin from './pages/admin/AdminLogin';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminProducts from './pages/admin/AdminProducts';
-import AdminAddProduct from './pages/admin/AdminAddProduct';
-import AdminEditProduct from './pages/admin/AdminEditProduct';
-import AdminOrders from './pages/admin/AdminOrders';
-import AdminOrderDetail from './pages/admin/AdminOrderDetail';
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
+const AdminAddProduct = lazy(() => import('./pages/admin/AdminAddProduct'));
+const AdminEditProduct = lazy(() => import('./pages/admin/AdminEditProduct'));
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminOrderDetail = lazy(() => import('./pages/admin/AdminOrderDetail'));
 
 // Loading Spinner
 const LoadingSpinner = () => (
@@ -51,15 +51,15 @@ export default function App() {
         {/* Admin Login (no layout) */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Protected Admin Routes */}
+        {/* Protected Admin Routes - Wrapped with Suspense for lazy loading */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/products" element={<AdminProducts />} />
-            <Route path="/admin/products/add" element={<AdminAddProduct />} />
-            <Route path="/admin/products/edit/:id" element={<AdminEditProduct />} />
-            <Route path="/admin/orders" element={<AdminOrders />} />
-            <Route path="/admin/orders/:id" element={<AdminOrderDetail />} />
+            <Route path="/admin" element={<Suspense fallback={<LoadingSpinner />}><AdminDashboard /></Suspense>} />
+            <Route path="/admin/products" element={<Suspense fallback={<LoadingSpinner />}><AdminProducts /></Suspense>} />
+            <Route path="/admin/products/add" element={<Suspense fallback={<LoadingSpinner />}><AdminAddProduct /></Suspense>} />
+            <Route path="/admin/products/edit/:id" element={<Suspense fallback={<LoadingSpinner />}><AdminEditProduct /></Suspense>} />
+            <Route path="/admin/orders" element={<Suspense fallback={<LoadingSpinner />}><AdminOrders /></Suspense>} />
+            <Route path="/admin/orders/:id" element={<Suspense fallback={<LoadingSpinner />}><AdminOrderDetail /></Suspense>} />
           </Route>
         </Route>
       </Routes>

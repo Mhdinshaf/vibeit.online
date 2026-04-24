@@ -6,12 +6,19 @@ import toast from 'react-hot-toast';
 
 const STATUSES = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
 
+// Helper for environment-aware logging
+const devLog = (...args) => {
+  if (import.meta.env.DEV) {
+    console.log?.(...args);
+  }
+};
+
 const AdminOrderDetail = () => {
   const { id } = useParams();
   const queryClient = useQueryClient();
   
   // Log the ID being used from URL params
-  console.log('📄 AdminOrderDetail - URL param ID:', id, 'Type:', typeof id, 'Length:', String(id).length);
+  devLog('📄 AdminOrderDetail - URL param ID:', id, 'Type:', typeof id, 'Length:', String(id).length);
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['admin-order', id],

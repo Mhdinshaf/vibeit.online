@@ -1,9 +1,17 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Users, Target, Heart, Award, Truck, Shield, Headphones, Star, ArrowRight } from 'lucide-react';
 
 const AboutPage = () => {
   return (
     <div className="bg-white">
+      <Helmet>
+        <title>About VIBEIT - Sri Lanka's Online Store</title>
+        <meta name="description" content="Learn about VIBEIT - Sri Lanka's trusted online shopping destination for fashion, tech gadgets, home essentials and more. Quality products, fast delivery, cash on delivery." />
+        <meta property="og:title" content="About VIBEIT" />
+        <meta property="og:description" content="Sri Lanka's trusted online store offering quality products at affordable prices." />
+        <meta property="og:url" content="https://vibeitlk.vercel.app/about" />
+      </Helmet>
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-600 overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />

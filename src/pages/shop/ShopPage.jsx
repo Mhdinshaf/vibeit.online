@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { Filter, X, ChevronRight, ChevronDown, Package, SlidersHorizontal, Sparkles } from 'lucide-react';
 import { getProducts } from '../../services/api';
@@ -186,6 +187,13 @@ const ShopPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>Shop All Products | VIBEIT - Fashion, Tech & Home</title>
+        <meta name="description" content="Browse all products at VIBEIT. Find fashion, tech gadgets, home essentials and more. Filter by category, price, and more. Fast delivery across Sri Lanka." />
+        <meta property="og:title" content="Shop All Products | VIBEIT" />
+        <meta property="og:description" content="Browse our complete collection of fashion, tech gadgets, and home essentials." />
+        <meta property="og:url" content="https://vibeitlk.vercel.app/shop" />
+      </Helmet>
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 relative overflow-hidden">
         <div className="absolute inset-0">

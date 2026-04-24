@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import { Truck, Shield, Minus, Plus, ChevronRight, ShoppingCart, Check, Package, Star, RefreshCw, Sparkles } from 'lucide-react';
 import { getProductById } from '../../services/api';
 import { useCartStore } from '../../context/store';
@@ -115,6 +116,28 @@ const ProductPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      <Helmet>
+        <title>{product?.name} - Buy at VIBEIT Sri Lanka</title>
+        <meta name="description" content={`Buy ${product?.name} at VIBEIT. ${product?.description ? product.description.substring(0, 120) : 'Premium quality product'} - Cash on delivery available across Sri Lanka.`} />
+        <meta property="og:title" content={product?.name} />
+        <meta property="og:description" content={product?.description || 'Premium quality product at VIBEIT'} />
+        <meta property="og:image" content={images[0]} />
+        <meta property="og:url" content={`https://vibeitlk.vercel.app/product/${id}`} />
+        <meta property="og:type" content="product" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product?.name,
+            "description": product?.description,
+            "image": images,
+            "price": product?.price || product?.originalPrice,
+            "priceCurrency": "LKR",
+            "availability": isOutOfStock ? "OutOfStock" : "InStock",
+            "url": `https://vibeitlk.vercel.app/product/${id}`
+          })}
+        </script>
+      </Helmet>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm mb-8 bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm">

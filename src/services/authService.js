@@ -3,6 +3,13 @@ import api from './api';
 const TOKEN_KEY = 'vibeit_token';
 const ADMIN_KEY = 'vibeit_admin';
 
+// Helper for environment-aware logging
+const devWarn = (...args) => {
+  if (import.meta.env.DEV) {
+    console.warn?.(...args);
+  }
+};
+
 export const authService = {
   /**
    * Login admin user
@@ -66,7 +73,7 @@ export const authService = {
       const parsed = JSON.parse(admin);
       return parsed;
     } catch (error) {
-      console.warn('⚠️ Corrupted admin data in localStorage, clearing it:', error.message);
+      devWarn('⚠️ Corrupted admin data in localStorage, clearing it:', error.message);
       // Clear the corrupted data to prevent repeated errors
       localStorage.removeItem(ADMIN_KEY);
       return null;

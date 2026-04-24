@@ -3,6 +3,13 @@ import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
 
+// Helper for environment-aware logging
+const devError = (...args) => {
+  if (import.meta.env.DEV) {
+    console.error?.(...args);
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   // Initialize admin from localStorage synchronously to avoid flash
   const [admin, setAdmin] = useState(() => authService.getStoredAdmin());
@@ -17,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       try {
         setAdmin(JSON.parse(adminData));
       } catch (e) {
-        console.error('Failed to parse admin data:', e);
+        devError('Failed to parse admin data:', e);
         authService.logout();
         setAdmin(null);
       }

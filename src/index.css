@@ -16,6 +16,37 @@ body {
   min-height: 100vh;
 }
 
+/* Accessibility: Focus Visible Styles */
+@layer components {
+  /* Global focus-visible styles for better keyboard navigation */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+  }
+  
+  /* Skip link styling */
+  a[href="#main-content"] {
+    position: absolute;
+    top: -40px;
+    left: 16px;
+    background: #2563eb;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 600;
+    z-index: 9999;
+  }
+  
+  a[href="#main-content"]:focus {
+    top: 16px;
+  }
+}
+
 /* Premium Button Components */
 .btn-primary {
   background: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%);

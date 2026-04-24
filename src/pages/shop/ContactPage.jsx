@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Mail, Phone, MapPin, MessageCircle, Send, Clock, ArrowRight } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+import { escape as escapeHtml } from 'html-escaper';
 import toast from 'react-hot-toast';
 
 const ContactPage = () => {
@@ -19,11 +21,29 @@ const ContactPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Validate inputs
+    const trimmedName = formData.name.trim();
+    const trimmedEmail = formData.email.trim();
+    const trimmedSubject = formData.subject.trim();
+    const trimmedMessage = formData.message.trim();
+    
+    if (!trimmedName || !trimmedEmail || !trimmedSubject || !trimmedMessage) {
+      toast.error('Please fill in all required fields');
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Sanitize inputs to prevent XSS
+    const sanitizedName = escapeHtml(trimmedName);
+    const sanitizedEmail = escapeHtml(trimmedEmail);
+    const sanitizedSubject = escapeHtml(trimmedSubject);
+    const sanitizedMessage = escapeHtml(trimmedMessage);
+    
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Open WhatsApp with the message
-    const message = `New Contact Form Submission\n\nName: ${formData.name}\nEmail: ${formData.email}\nSubject: ${formData.subject}\n\nMessage:\n${formData.message}`;
+    // Open WhatsApp with sanitized message
+    const message = `New Contact Form Submission\n\nName: ${sanitizedName}\nEmail: ${sanitizedEmail}\nSubject: ${sanitizedSubject}\n\nMessage:\n${sanitizedMessage}`;
     window.open(`https://wa.me/94753979659?text=${encodeURIComponent(message)}`, '_blank');
     
     toast.success('Redirecting to WhatsApp...');
@@ -33,6 +53,13 @@ const ContactPage = () => {
 
   return (
     <div className="bg-white">
+      <Helmet>
+        <title>Contact VIBEIT - Get Help & Support</title>
+        <meta name="description" content="Contact VIBEIT for help with orders, products, or inquiries. We're available 9 AM - 9 PM daily on WhatsApp and email. Fast customer support in Sri Lanka." />
+        <meta property="og:title" content="Contact VIBEIT - Customer Support" />
+        <meta property="og:description" content="Get in touch with VIBEIT. Available on WhatsApp, email, and phone." />
+        <meta property="og:url" content="https://vibeitlk.vercel.app/contact" />
+      </Helmet>
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-600 overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />

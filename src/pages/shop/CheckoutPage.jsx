@@ -15,6 +15,13 @@ const SRI_LANKA_DISTRICTS = [
   'Moneragala', 'Ratnapura', 'Kegalle'
 ];
 
+// Helper for environment-aware logging
+const devError = (...args) => {
+  if (import.meta.env.DEV) {
+    console.error?.(...args);
+  }
+};
+
 // Premium Input Component
 const CheckoutInput = ({ icon: Icon, label, required, ...props }) => (
   <div>
@@ -93,7 +100,7 @@ const CheckoutPage = () => {
     onError: (error) => {
       setIsOrderFinalizing(false);
       const errorMsg = error.message || error.response?.data?.message || 'Failed to place order';
-      console.error('❌ Checkout error:', errorMsg);
+      devError('❌ Checkout error:', errorMsg);
       toast.error(errorMsg);
     },
   });

@@ -29,6 +29,14 @@ const Navbar = () => {
 
   return (
     <>
+      {/* Skip to main content link (accessibility) */}
+      <a 
+        href="#main-content" 
+        className="absolute -top-10 left-4 z-[9999] bg-blue-600 text-white px-4 py-2 rounded focus:top-4 transition-all duration-300 font-semibold"
+      >
+        Skip to main content
+      </a>
+
       {/* Premium Announcement Bar */}
       <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 text-white py-2.5 text-center text-sm font-medium">
         <div className="flex items-center justify-center gap-2">

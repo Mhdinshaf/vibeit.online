@@ -8,6 +8,19 @@ import toast from 'react-hot-toast';
 
 const STATUSES = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
 
+// Helper for environment-aware logging
+const devLog = (...args) => {
+  if (import.meta.env.DEV) {
+    console.log?.(...args);
+  }
+};
+
+const devError = (...args) => {
+  if (import.meta.env.DEV) {
+    console.error?.(...args);
+  }
+};
+
 const AdminOrders = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -179,7 +192,7 @@ const AdminOrders = () => {
                       onChange={(e) => {
                         // ✅ STRICT: Only use order._id from backend, never fallback
                         if (!order._id) {
-                          console.error('❌ CRITICAL: Order missing _id field!', {
+                          devError('❌ CRITICAL: Order missing _id field!', {
                             order,
                             keys: Object.keys(order),
                           });
@@ -187,7 +200,7 @@ const AdminOrders = () => {
                           return;
                         }
                         
-                        console.log('📋 STATUS UPDATE:');
+                        devLog('📋 STATUS UPDATE:');
                         console.log('  Order Number:', order.orderNumber);
                         console.log('  Order _id:', order._id);
                         console.log('  _id Type:', typeof order._id);
@@ -259,3 +272,5 @@ const AdminOrders = () => {
 };
 
 export default AdminOrders;
+
+

@@ -5,6 +5,15 @@ const ORDER_SYNC_KEY = 'vibeit_orders_sync';
 export const ORDER_SYNC_EVENT = 'vibeit:orders-updated';
 const API = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
+// Helper for environment-aware logging
+const devLog = (level, ...args) => {
+  if (import.meta.env.DEV) {
+    console[level]?.(...args);
+  }
+};
+const devWarn = (...args) => devLog('warn', ...args);
+const devError = (...args) => devLog('error', ...args);
+
 const isOfflineOrServerUnavailable = (error) => {
   if (!error) return false;
   if (!error.response) return true;
@@ -74,7 +83,7 @@ const createLocalOrder = (payload) => {
   // STRICT: Backend MUST return _id - no fallback
   // This ensures order can be viewed and updated later
   if (!payload._id) {
-    console.error('❌ CRITICAL ERROR: Backend response missing _id field!', {
+    devError('❌ CRITICAL ERROR: Backend response missing _id field!', {
       payload,
       hasId: !!payload._id,
       hasOrderNumber: !!payload.orderNumber,
@@ -309,13 +318,13 @@ export const deleteProductPermanent = async (id) => {
 // Order APIs
 export const createOrder = async (data) => {
   try {
-    console.log('📤 POST /orders - Creating order...');
+    devLog('log', '📤 POST /orders - Creating order...');
     const response = await api.post('/orders', data);
     
     // CRITICAL: Verify backend returned _id
     const order = response.data;
     if (!order?._id) {
-      console.error('❌ CRITICAL: Backend POST response missing _id!', {
+      devError('❌ CRITICAL: Backend POST response missing _id!', {
         response: order,
         hasId: !!order?._id,
         hasOrderNumber: !!order?.orderNumber,
@@ -328,7 +337,7 @@ export const createOrder = async (data) => {
       );
     }
     
-    console.log('✅ Order created with _id:', order._id);
+    devLog('log', '✅ Order created with _id:', order._id);
     
     // Save to local cache
     upsertLocalOrder(order);
@@ -343,7 +352,7 @@ export const createOrder = async (data) => {
       message.includes('orderitems');
 
     if (itemError && error.response?.status < 500) {
-      console.log('📝 Item validation error, retrying with normalized format...');
+      devLog('log', '📝 Item validation error, retrying with normalized format...');
       
       const normalizedItems = Array.isArray(data?.orderItems) && data.orderItems.length > 0
         ? data.orderItems
@@ -366,14 +375,14 @@ export const createOrder = async (data) => {
       
       // Verify retry response also has _id
       if (!retryOrder?._id) {
-        console.error('❌ CRITICAL: Retry response missing _id!', {
+        devError('❌ CRITICAL: Retry response missing _id!', {
           response: retryOrder,
           hasId: !!retryOrder?._id,
         });
         throw new Error('Retry failed: Backend response missing _id.');
       }
       
-      console.log('✅ Order created (retry) with _id:', retryOrder._id);
+      devLog('log', '✅ Order created (retry) with _id:', retryOrder._id);
       
       upsertLocalOrder(retryOrder);
       notifyOrdersUpdated();
@@ -382,7 +391,7 @@ export const createOrder = async (data) => {
 
     // If offline or server error, propagate the original error
     // DO NOT create local order - user should retry
-    console.error('❌ Failed to create order:', {
+    devError('❌ Failed to create order:', {
       status: error.response?.status,
       message: error.response?.data?.message || error.message,
       isOffline: !error.response,
@@ -398,13 +407,13 @@ export const getOrders = async (params) => {
     const remotePayload = normalizeOrdersResponse(response.data);
     
     // ⚠️ CRITICAL CHECK: Log EXACT backend response before any processing
-    console.log('🌐 RAW BACKEND RESPONSE - First 2 orders:');
+    devLog('log', '🌐 RAW BACKEND RESPONSE - First 2 orders:');
     const firstOrders = remotePayload.orders?.slice(0, 2) || [];
     firstOrders.forEach((o, i) => {
-      console.log(`  [${i}] _id: ${o._id} (${String(o._id).length} chars), orderNumber: ${o.orderNumber}`);
-      console.log(`       Full _id: "${o._id}"`);
-      console.log(`       Is 24-char hex (MongoDB ObjectId): ${/^[0-9a-f]{24}$/.test(o._id)}`);
-      console.log(`       Is 36-char UUID: ${/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(o._id)}`);
+      devLog('log', `  [${i}] _id: ${o._id} (${String(o._id).length} chars), orderNumber: ${o.orderNumber}`);
+      devLog('log', `       Full _id: "${o._id}"`);
+      devLog('log', `       Is 24-char hex (MongoDB ObjectId): ${/^[0-9a-f]{24}$/.test(o._id)}`);
+      devLog('log', `       Is 36-char UUID: ${/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(o._id)}`);
     });
     
     const localOrders = readLocalOrders();
@@ -425,15 +434,15 @@ export const getOrders = async (params) => {
 
     // Debug logging - verify _id is from remote (ObjectId), not from cache (UUID)
     if (pagedOrders.length > 0) {
-      console.log('🔍 ORDERS LOADED FROM API:');
-      console.log('  Remote order count:', remotePayload.orders.length);
-      console.log('  Local order count:', localOrders.length);
-      console.log('  Merged & filtered count:', filtered.length);
-      console.log('  First 3 orders:');
+      devLog('log', '🔍 ORDERS LOADED FROM API:');
+      devLog('log', '  Remote order count:', remotePayload.orders.length);
+      devLog('log', '  Local order count:', localOrders.length);
+      devLog('log', '  Merged & filtered count:', filtered.length);
+      devLog('log', '  First 3 orders:');
       pagedOrders.slice(0, 3).forEach((o, i) => {
-        console.log(`    [${i}] orderNumber: ${o.orderNumber}, _id: ${o._id}, _id_type: ${typeof o._id}, _id_length: ${String(o._id).length}`);
+        devLog('log', `    [${i}] orderNumber: ${o.orderNumber}, _id: ${o._id}, _id_type: ${typeof o._id}, _id_length: ${String(o._id).length}`);
       });
-      console.log('  All page orders _ids:', pagedOrders.map(o => o._id));
+      devLog('log', '  All page orders _ids:', pagedOrders.map(o => o._id));
     }
 
     return {
@@ -474,7 +483,7 @@ export const getOrderById = async (id) => {
   
   // STRICT: Reject temp-IDs - only backend _ids are valid
   if (String(id).startsWith('temp-')) {
-    console.error('❌ INVALID: Attempting to fetch temp-ID order:', id);
+    devError('❌ INVALID: Attempting to fetch temp-ID order:', id);
     throw new Error(
       'Cannot view order: This order was not properly created in the database.\n' +
       'Please try placing the order again.'
@@ -482,11 +491,11 @@ export const getOrderById = async (id) => {
   }
   
   try {
-    console.log('🔍 Frontend - Getting order by ID:', id, 'Type:', typeof id, 'Length:', String(id).length);
+    devLog('log', '🔍 Frontend - Getting order by ID:', id, 'Type:', typeof id, 'Length:', String(id).length);
     const response = await api.get(`/orders/${id}`);
     const order = response.data;
     
-    console.log('✅ Backend returned order._id:', order?._id, 'Length:', String(order?._id).length);
+    devLog('log', '✅ Backend returned order._id:', order?._id, 'Length:', String(order?._id).length);
     
     // Cache the order locally
     if (order && order._id) {
@@ -495,7 +504,7 @@ export const getOrderById = async (id) => {
     
     return order;
   } catch (error) {
-    console.error('❌ Error fetching order:', {
+    devError('❌ Error fetching order:', {
       status: error?.response?.status,
       message: error?.response?.data?.message,
       requestedId: id,
@@ -512,7 +521,7 @@ export const updateOrderStatus = async (id, data) => {
   
   // STRICT: Reject temp-IDs - only backend _ids are valid
   if (String(id).startsWith('temp-')) {
-    console.error('❌ INVALID: Attempting to update temp-ID order:', id);
+    devError('❌ INVALID: Attempting to update temp-ID order:', id);
     throw new Error(
       'Cannot update order status: This order was not properly created in the database.\n' +
       'Please try placing the order again.'
@@ -531,18 +540,18 @@ export const updateOrderStatus = async (id, data) => {
   
   try {
     const url = `/orders/${id}/status`;
-    console.log('🔄 UPDATE ORDER STATUS REQUEST:');
-    console.log('  URL:', url);
-    console.log('  ID Type:', typeof id, '| ID Value:', id);
-    console.log('  ID Length:', String(id).length, '| ID Format:', /^[0-9a-f]{24}$/.test(id) ? 'MongoDB ObjectId' : 'Other');
-    console.log('  New Status:', data.status);
+    devLog('log', '🔄 UPDATE ORDER STATUS REQUEST:');
+    devLog('log', '  URL:', url);
+    devLog('log', '  ID Type:', typeof id, '| ID Value:', id);
+    devLog('log', '  ID Length:', String(id).length, '| ID Format:', /^[0-9a-f]{24}$/.test(id) ? 'MongoDB ObjectId' : 'Other');
+    devLog('log', '  New Status:', data.status);
     
     const response = await api.put(url, data);
     const updatedOrder = response.data;
     
-    console.log('✅ UPDATE ORDER STATUS SUCCESS:');
-    console.log('  Response._id:', updatedOrder?._id);
-    console.log('  Response.status:', updatedOrder?.status);
+    devLog('log', '✅ UPDATE ORDER STATUS SUCCESS:');
+    devLog('log', '  Response._id:', updatedOrder?._id);
+    devLog('log', '  Response.status:', updatedOrder?.status);
     
     if (updatedOrder && updatedOrder._id) {
       upsertLocalOrder(updatedOrder);
@@ -551,10 +560,10 @@ export const updateOrderStatus = async (id, data) => {
     notifyOrdersUpdated();
     return updatedOrder;
   } catch (error) {
-    console.error('❌ UPDATE ORDER STATUS ERROR:');
-    console.error('  Status:', error?.response?.status);
-    console.error('  Message:', error?.response?.data?.message);
-    console.error('  Full Error:', error?.response?.data);
+    devError('❌ UPDATE ORDER STATUS ERROR:');
+    devError('  Status:', error?.response?.status);
+    devError('  Message:', error?.response?.data?.message);
+    devError('  Full Error:', error?.response?.data);
     
     throw error;  // Always throw - no offline fallback
   }
