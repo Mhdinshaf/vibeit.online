@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, Loader2, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import toast from 'react-hot-toast';
@@ -7,7 +7,11 @@ import logo from '../../assets/favicon.jpeg';
 
 const CustomerLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, isAuthenticated } = useCustomerAuth();
+  
+  // Determine where to redirect after login
+  const from = location.state?.from?.pathname || '/customer/dashboard';
   
   const [formData, setFormData] = useState({
     email: '',
@@ -54,7 +58,8 @@ const CustomerLogin = () => {
 
       await login(formData.email, formData.password);
       toast.success('Login successful!');
-      navigate('/customer/dashboard');
+      // Redirect to the original location or dashboard
+      navigate(from);
     } catch (err) {
       const errorMsg = err.message || 'Login failed. Please try again.';
       setError(errorMsg);
@@ -89,6 +94,14 @@ const CustomerLogin = () => {
             <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
+          {/* Checkout Redirect Info */}
+          {from === '/checkout' && (
+            <div className="mb-6 flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-blue-700"><strong>Heads up!</strong> You'll be returned to checkout after login to complete your order.</p>
             </div>
           )}
 

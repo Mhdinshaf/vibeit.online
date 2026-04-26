@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { Truck, CreditCard, DollarSign, AlertCircle, ChevronRight, Package, MapPin, User, Mail, Phone, Home, Shield, Loader2 } from 'lucide-react';
+import { Truck, CreditCard, DollarSign, AlertCircle, ChevronRight, Package, MapPin, User, Mail, Phone, Home, Shield, Loader2, CheckCircle } from 'lucide-react';
 import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { createOrder } from '../../services/api';
@@ -47,45 +47,6 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, clearCart } = useCartStore();
   const { customer, isAuthenticated } = useCustomerAuth();
-
-  // Redirect to login if not authenticated
-  if (!isAuthenticated()) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="mb-6">
-            <Shield className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Login Required
-            </h1>
-            <p className="text-gray-600 mb-6">
-              Please log in to your account to proceed with checkout. If you don't have an account, you can create one now.
-            </p>
-          </div>
-          <div className="space-y-3">
-            <button
-              onClick={() => navigate('/auth/customer/login')}
-              className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-300"
-            >
-              Login to Your Account
-            </button>
-            <button
-              onClick={() => navigate('/auth/customer/register')}
-              className="w-full px-6 py-3 border-2 border-blue-200 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-all duration-300"
-            >
-              Create New Account
-            </button>
-            <button
-              onClick={() => navigate('/cart')}
-              className="w-full px-6 py-3 text-gray-600 font-medium hover:text-gray-900 transition-colors"
-            >
-              Back to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
   
   // Calculate subtotal locally
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -239,6 +200,39 @@ const CheckoutPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Column - Form */}
             <div className="lg:col-span-7 space-y-6">
+              {/* Login Option Banner */}
+              {!isAuthenticated() && (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-4 md:p-6">
+                  <div className="flex items-start gap-3">
+                    <User className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">Have an account?</h3>
+                      <p className="text-sm text-gray-600 mb-3">Log in to auto-fill your information and access your order history anytime.</p>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/auth/customer/login')}
+                        className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                      >
+                        Sign in now →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Logged In Banner */}
+              {isAuthenticated() && (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-4 md:p-6">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">Welcome, {customer?.firstName}!</h3>
+                      <p className="text-sm text-gray-600">Your information is auto-filled. You can track this order in your dashboard after purchase.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Contact Information */}
               <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">

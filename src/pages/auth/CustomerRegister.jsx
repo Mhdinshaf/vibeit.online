@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, User, Phone, Loader2, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import toast from 'react-hot-toast';
@@ -7,7 +7,11 @@ import logo from '../../assets/favicon.jpeg';
 
 const CustomerRegister = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { register, isAuthenticated } = useCustomerAuth();
+  
+  // Determine where to redirect after registration
+  const from = location.state?.from?.pathname || '/customer/dashboard';
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -106,7 +110,7 @@ const CustomerRegister = () => {
         formData.phone
       );
       toast.success('Registration successful! Welcome to VIBEIT');
-      navigate('/customer/dashboard');
+      navigate(from);
     } catch (err) {
       const errorMsg = err.message || 'Registration failed. Please try again.';
       setError(errorMsg);
@@ -141,6 +145,14 @@ const CustomerRegister = () => {
             <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
+          {/* Checkout Redirect Info */}
+          {from === '/checkout' && (
+            <div className="mb-6 flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-blue-700"><strong>Quick setup!</strong> After registration, you'll go straight to checkout to complete your order.</p>
             </div>
           )}
 

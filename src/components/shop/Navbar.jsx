@@ -123,33 +123,39 @@ const Navbar = () => {
                 <div className="hidden md:block relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-xl transition-all duration-300 text-gray-600 hover:text-blue-600"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-50 hover:from-blue-100 hover:to-blue-100 rounded-xl transition-all duration-300 text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-300"
                     aria-label="Customer Profile"
                   >
-                    <User className="w-5 h-5" />
-                    <span className="text-sm font-medium">{customer.firstName}</span>
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                      {customer.firstName?.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm font-semibold">{customer.firstName}</span>
                   </button>
 
                   {/* Profile Dropdown */}
                   {profileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-1 z-50 overflow-hidden">
+                      <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
+                        <p className="text-sm font-semibold text-gray-900">{customer.firstName} {customer.lastName}</p>
+                        <p className="text-xs text-gray-600">{customer.email}</p>
+                      </div>
                       <NavLink
                         to="/customer/dashboard"
                         onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all"
+                        className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all border-b border-gray-100"
                       >
                         <Settings className="w-4 h-4" />
-                        Dashboard
+                        <span>Dashboard</span>
                       </NavLink>
                       <button
                         onClick={() => {
                           logout();
                           setProfileDropdownOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
                       >
                         <LogOut className="w-4 h-4" />
-                        Logout
+                        <span>Logout</span>
                       </button>
                     </div>
                   )}
@@ -157,7 +163,7 @@ const Navbar = () => {
               ) : (
                 <button
                   onClick={() => navigate('/auth/customer/login')}
-                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 font-medium text-sm"
+                  className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-300 font-semibold text-sm shadow-lg shadow-blue-200"
                   aria-label="Customer Login"
                 >
                   <User className="w-4 h-4" />

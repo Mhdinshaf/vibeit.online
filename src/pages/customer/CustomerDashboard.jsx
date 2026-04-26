@@ -1,16 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useCustomerStore } from '../../context/store';
-import { Menu, X, LayoutDashboard, ShoppingBag, MapPin, User, LogOut } from 'lucide-react';
+import { Menu, X, LayoutDashboard, ShoppingBag, MapPin, User, LogOut, Loader2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { getOrders } from '../../services/api';
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
   const { customer, logout } = useCustomerAuth();
-  const { orders } = useCustomerStore();
+  const { orders, setOrders } = useCustomerStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+  const [orderError, setOrderError] = useState(null);
+
+  // Load orders when dashboard mounts
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        setIsLoadingOrders(true);
+        setOrderError(null);
+        const response = await getOrders();
+        if (response?.orders) {
+          setOrders(response.orders);
+        }
+      } catch (error) {
+        console.error('Failed to load orders:', error);
+        setOrderError('Failed to load orders. Please try again later.');
+      } finally {
+        setIsLoadingOrders(false);
+      }
+    };
+
+    if (customer) {
+      loadOrders();
+    }
+  }, [customer, setOrders]);
 
   const handleLogout = () => {
     logout();
@@ -96,8 +122,30 @@ const CustomerDashboard = () => {
                 </p>
               </div>
 
+              {/* Error Alert */}
+              {orderError && (
+                <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-red-700">{orderError}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Loading State */}
+              {isLoadingOrders && (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
+                    <p className="text-gray-600">Loading your orders...</p>
+                  </div>
+                </div>
+              )}
+
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {!isLoadingOrders && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div>
@@ -184,6 +232,8 @@ const CustomerDashboard = () => {
                   </p>
                 )}
               </div>
+                </>
+              )}
             </div>
           )}
 
