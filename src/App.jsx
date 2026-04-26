@@ -5,6 +5,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import StoreLayout from './components/layout/StoreLayout';
 import AdminLayout from './components/layout/AdminLayout';
 import ProtectedRoute from './components/layout/ProtectedRoute';
+import CustomerLayout from './components/layout/CustomerLayout';
+import ProtectedCustomerRoute from './components/layout/ProtectedCustomerRoute';
 
 // Shop Pages
 import HomePage from './pages/shop/HomePage';
@@ -16,8 +18,13 @@ import OrderSuccess from './pages/shop/OrderSuccess';
 import AboutPage from './pages/shop/AboutPage';
 import ContactPage from './pages/shop/ContactPage';
 
-// Admin Pages - Lazy loaded for code splitting
+// Auth Pages
 import AdminLogin from './pages/admin/AdminLogin';
+import CustomerLogin from './pages/auth/CustomerLogin';
+import CustomerRegister from './pages/auth/CustomerRegister';
+import CustomerDashboard from './pages/customer/CustomerDashboard';
+
+// Admin Pages - Lazy loaded for code splitting
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
 const AdminAddProduct = lazy(() => import('./pages/admin/AdminAddProduct'));
@@ -46,6 +53,17 @@ export default function App() {
           <Route path="/order-success/:id" element={<OrderSuccess />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+        </Route>
+
+        {/* Customer Auth Routes (no layout) */}
+        <Route path="/auth/customer/login" element={<CustomerLogin />} />
+        <Route path="/auth/customer/register" element={<CustomerRegister />} />
+
+        {/* Protected Customer Routes */}
+        <Route element={<ProtectedCustomerRoute />}>
+          <Route element={<CustomerLayout />}>
+            <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+          </Route>
         </Route>
 
         {/* Admin Login (no layout) */}

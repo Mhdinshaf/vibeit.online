@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X, Sparkles, Lock } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Sparkles, LogOut, Settings } from 'lucide-react';
 import { useCartStore } from '../../context/store';
+import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import logo from '../../assets/favicon.jpeg';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const items = useCartStore((state) => state.items);
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+  const { customer, logout } = useCustomerAuth();
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -115,14 +118,52 @@ const Navbar = () => {
                 )}
               </NavLink>
 
-              {/* User Icon - Desktop */}
-              <button
-                onClick={() => navigate('/admin/login')}
-                className="hidden md:flex p-2.5 hover:bg-gray-100 rounded-xl transition-all duration-300 text-gray-600 hover:text-blue-600"
-                aria-label="Admin Login"
-              >
-                <User className="w-5 h-5" />
-              </button>
+              {/* Customer Profile - Desktop */}
+              {customer ? (
+                <div className="hidden md:block relative">
+                  <button
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-xl transition-all duration-300 text-gray-600 hover:text-blue-600"
+                    aria-label="Customer Profile"
+                  >
+                    <User className="w-5 h-5" />
+                    <span className="text-sm font-medium">{customer.firstName}</span>
+                  </button>
+
+                  {/* Profile Dropdown */}
+                  {profileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                      <NavLink
+                        to="/customer/dashboard"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Dashboard
+                      </NavLink>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => navigate('/auth/customer/login')}
+                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 font-medium text-sm"
+                  aria-label="Customer Login"
+                >
+                  <User className="w-4 h-4" />
+                  Login
+                </button>
+              )}
 
               {/* Mobile Menu Toggle */}
               <button
@@ -184,17 +225,46 @@ const Navbar = () => {
                   {link.label}
                 </NavLink>
               ))}
-              {/* Admin Access - Mobile */}
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigate('/admin/login');
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-300"
-              >
-                <Lock className="w-4 h-4" />
-                <span>ADMIN LOGIN</span>
-              </button>
+              
+              {/* Customer Auth - Mobile */}
+              {customer ? (
+                <>
+                  <div className="border-t border-gray-200 my-2 pt-2">
+                    <div className="px-4 py-2 text-sm text-gray-600 font-medium">
+                      {customer.firstName} {customer.lastName}
+                    </div>
+                    <NavLink
+                      to="/customer/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-300"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Dashboard
+                    </NavLink>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all duration-300"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate('/auth/customer/login');
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-sm text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300"
+                >
+                  <User className="w-4 h-4" />
+                  Customer Login
+                </button>
+              )}
             </nav>
           </div>
         )}

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { Truck, CreditCard, DollarSign, AlertCircle, ChevronRight, Package, MapPin, User, Mail, Phone, Home, Shield, Loader2 } from 'lucide-react';
 import { useCartStore } from '../../context/store';
+import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { createOrder } from '../../services/api';
 import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
 import toast from 'react-hot-toast';
@@ -45,6 +46,46 @@ const CheckoutInput = ({ icon: Icon, label, required, ...props }) => (
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, clearCart } = useCartStore();
+  const { customer, isAuthenticated } = useCustomerAuth();
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated()) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="mb-6">
+            <Shield className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Login Required
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Please log in to your account to proceed with checkout. If you don't have an account, you can create one now.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate('/auth/customer/login')}
+              className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-300"
+            >
+              Login to Your Account
+            </button>
+            <button
+              onClick={() => navigate('/auth/customer/register')}
+              className="w-full px-6 py-3 border-2 border-blue-200 text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-all duration-300"
+            >
+              Create New Account
+            </button>
+            <button
+              onClick={() => navigate('/cart')}
+              className="w-full px-6 py-3 text-gray-600 font-medium hover:text-gray-900 transition-colors"
+            >
+              Back to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   // Calculate subtotal locally
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -60,6 +101,19 @@ const CheckoutPage = () => {
     postalCode: '',
     notes: '',
   });
+
+  // Auto-populate form with customer data
+  useEffect(() => {
+    if (customer) {
+      setForm((prev) => ({
+        ...prev,
+        firstName: customer.firstName || '',
+        lastName: customer.lastName || '',
+        email: customer.email || '',
+        phone: customer.phone || '',
+      }));
+    }
+  }, [customer]);
 
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
   const [showNotes, setShowNotes] = useState(false);
