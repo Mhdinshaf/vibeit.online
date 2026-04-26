@@ -13,7 +13,7 @@ const AdminLayout = () => {
   const handleLogout = () => {
     logout();
     toast.success('Logged out successfully');
-    navigate('/admin/login');
+    navigate('https://vibeitlk.vercel.app/admin/login');
   };
 
   const navLinks = [
