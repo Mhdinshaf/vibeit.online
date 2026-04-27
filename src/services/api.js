@@ -77,6 +77,26 @@ const enrichItems = (items = []) => {
   });
 };
 
+const normalizeOrderPayload = (payload) => {
+  if (!payload || typeof payload !== 'object') {
+    return payload;
+  }
+
+  const rawItems = Array.isArray(payload.items) && payload.items.length > 0
+    ? payload.items
+    : Array.isArray(payload.orderItems)
+      ? payload.orderItems
+      : [];
+
+  const normalizedItems = enrichItems(rawItems);
+
+  return {
+    ...payload,
+    items: normalizedItems,
+    orderItems: rawItems,
+  };
+};
+
 const createLocalOrder = (payload) => {
   const now = new Date().toISOString();
   
@@ -99,7 +119,7 @@ const createLocalOrder = (payload) => {
   return {
     _id: payload._id,
     orderNumber: payload.orderNumber || buildOrderNumber(),
-    items: enrichItems(payload.items || []),
+    items: enrichItems(payload.items || payload.orderItems || []),
     shippingAddress: payload.shippingAddress || {},
     paymentMethod: payload.paymentMethod || 'Bank Transfer',
     shippingFee: payload.shippingFee || 0,
@@ -196,15 +216,17 @@ const mergeRemoteAndLocalOrders = (remoteOrders = [], localOrders = []) => {
 
 const normalizeOrdersResponse = (payload) => {
   if (Array.isArray(payload)) {
+    const normalizedOrders = payload.map(normalizeOrderPayload);
     return {
-      orders: payload,
-      total: payload.length,
+      orders: normalizedOrders,
+      total: normalizedOrders.length,
       page: 1,
       pages: 1,
     };
   }
 
-  const orders = payload?.orders || payload?.data?.orders || [];
+  const rawOrders = payload?.orders || payload?.data?.orders || [];
+  const orders = rawOrders.map(normalizeOrderPayload);
   const total = payload?.total || payload?.data?.total || orders.length;
   const page = payload?.page || payload?.data?.page || 1;
   const pages = payload?.pages || payload?.totalPages || payload?.data?.pages || 1;
@@ -501,7 +523,8 @@ export const getOrderById = async (id) => {
   try {
     devLog('log', '🔍 Frontend - Getting order by ID:', id, 'Type:', typeof id, 'Length:', String(id).length);
     const response = await api.get(`/orders/${id}`);
-    const order = response.data;
+    const rawOrder = response?.data?.order || response?.data?.data?.order || response?.data?.data || response?.data;
+    const order = normalizeOrderPayload(rawOrder);
     
     devLog('log', '✅ Backend returned order._id:', order?._id, 'Length:', String(order?._id).length);
     
@@ -555,7 +578,8 @@ export const updateOrderStatus = async (id, data) => {
     devLog('log', '  New Status:', data.status);
     
     const response = await api.put(url, data);
-    const updatedOrder = response.data;
+    const rawUpdatedOrder = response?.data?.order || response?.data?.data?.order || response?.data?.data || response?.data;
+    const updatedOrder = normalizeOrderPayload(rawUpdatedOrder);
     
     devLog('log', '✅ UPDATE ORDER STATUS SUCCESS:');
     devLog('log', '  Response._id:', updatedOrder?._id);

@@ -82,6 +82,11 @@ const AdminOrderDetail = () => {
 
   const isCod = order.paymentMethod === 'Cash on Delivery';
   const isBankTransfer = order.paymentMethod === 'Bank Transfer';
+  const orderItems = Array.isArray(order?.items) && order.items.length > 0
+    ? order.items
+    : Array.isArray(order?.orderItems)
+      ? order.orderItems
+      : [];
 
   return (
     <div className="space-y-6">
@@ -141,24 +146,28 @@ const AdminOrderDetail = () => {
 
       <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Items</h2>
-        <div className="space-y-3">
-          {(order.items || []).map((item, index) => {
-            const productName = item?.product?.name || `Product ${index + 1}`;
-            return (
-              <div key={index} className="flex items-center justify-between bg-gray-50 rounded-xl p-3">
-                <div>
-                  <p className="font-semibold text-gray-900">{productName}</p>
-                  <p className="text-sm text-gray-500">
-                    Qty: {item.quantity} {item.size ? `• Size: ${item.size}` : ''}
+        {orderItems.length > 0 ? (
+          <div className="space-y-3">
+            {orderItems.map((item, index) => {
+              const productName = item?.product?.name || item?.name || `Product ${index + 1}`;
+              return (
+                <div key={index} className="flex items-center justify-between bg-gray-50 rounded-xl p-3">
+                  <div>
+                    <p className="font-semibold text-gray-900">{productName}</p>
+                    <p className="text-sm text-gray-500">
+                      Qty: {item.quantity || 0} {item.size ? `• Size: ${item.size}` : ''}
+                    </p>
+                  </div>
+                  <p className="font-semibold text-gray-900">
+                    රු{Number((item.price || 0) * (item.quantity || 0)).toLocaleString()}
                   </p>
                 </div>
-                <p className="font-semibold text-gray-900">
-                  රු{Number((item.price || 0) * (item.quantity || 0)).toLocaleString()}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500">No item details available for this order.</p>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">

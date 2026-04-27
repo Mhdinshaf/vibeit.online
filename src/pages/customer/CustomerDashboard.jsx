@@ -64,6 +64,12 @@ const CustomerDashboard = () => {
     return 0;
   };
 
+  const getOrderItems = (order) => {
+    if (Array.isArray(order?.items) && order.items.length > 0) return order.items;
+    if (Array.isArray(order?.orderItems)) return order.orderItems;
+    return [];
+  };
+
   const normalizeStatus = (status) => String(status || '').toLowerCase();
   const searchedOrder = normalizedQuery
     ? orders.find((order) =>
@@ -259,19 +265,49 @@ const CustomerDashboard = () => {
               {normalizedQuery && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 md:p-5">
                   {searchedOrder ? (
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                      <div>
-                        <p className="text-sm text-blue-700 font-medium">Order found</p>
-                        <p className="text-lg font-bold text-blue-900">{searchedOrder.orderNumber || searchedOrder._id}</p>
-                        <p className="text-sm text-blue-800">
-                          {new Date(searchedOrder.createdAt).toLocaleDateString()} • {getOrderItemsCount(searchedOrder)} items
-                        </p>
+                    <div className="space-y-4">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        <div>
+                          <p className="text-sm text-blue-700 font-medium">Order found</p>
+                          <p className="text-lg font-bold text-blue-900">{searchedOrder.orderNumber || searchedOrder._id}</p>
+                          <p className="text-sm text-blue-800">
+                            {new Date(searchedOrder.createdAt).toLocaleDateString()} • {getOrderItemsCount(searchedOrder)} items
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <p className="text-sm font-semibold text-blue-900">රු{searchedOrder.total?.toLocaleString() || 0}</p>
+                          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${getStatusBadgeClass(searchedOrder.status)}`}>
+                            {searchedOrder.status}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <p className="text-sm font-semibold text-blue-900">රු{searchedOrder.total?.toLocaleString() || 0}</p>
-                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${getStatusBadgeClass(searchedOrder.status)}`}>
-                          {searchedOrder.status}
-                        </span>
+
+                      <div>
+                        <p className="text-sm font-semibold text-blue-800 mb-2">Items</p>
+                        {getOrderItems(searchedOrder).length > 0 ? (
+                          <div className="space-y-2">
+                            {getOrderItems(searchedOrder).map((item, index) => (
+                              <div
+                                key={`${searchedOrder._id || searchedOrder.orderNumber}-item-${index}`}
+                                className="flex items-center justify-between bg-white border border-blue-100 rounded-lg p-3"
+                              >
+                                <div>
+                                  <p className="text-sm font-semibold text-gray-900">
+                                    {item?.product?.name || item?.name || `Product ${index + 1}`}
+                                  </p>
+                                  <p className="text-xs text-gray-600">
+                                    Qty: {item?.quantity || 0} {item?.size ? `• Size: ${item.size}` : ''}
+                                  </p>
+                                </div>
+                                <p className="text-sm font-semibold text-gray-900">
+                                  රු{Number((item?.price || 0) * (item?.quantity || 0)).toLocaleString()}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-600">No item details available for this order.</p>
+                        )}
                       </div>
                     </div>
                   ) : (
