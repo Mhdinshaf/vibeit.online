@@ -142,6 +142,8 @@ const CheckoutPage = () => {
         return {
           product: productId,
           productId,
+          name: item?.product?.name || item?.name || item?.title || '',
+          productName: item?.product?.name || item?.name || item?.title || '',
           quantity: Number(item?.quantity || 0),
           size: item?.size,
           price: Number(item?.price || 0),

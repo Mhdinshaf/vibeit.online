@@ -4,7 +4,7 @@ import { useCustomerStore } from '../../context/store';
 import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { getOrders } from '../../services/api';
+import { getOrders, getProductById } from '../../services/api';
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const CustomerDashboard = () => {
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [orderError, setOrderError] = useState(null);
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [resolvedItemNames, setResolvedItemNames] = useState({});
 
   // Load orders when dashboard mounts
   useEffect(() => {
@@ -70,6 +71,60 @@ const CustomerDashboard = () => {
     return [];
   };
 
+  const getOrderItemProductId = (item) =>
+    item?.productId ||
+    item?.product?._id ||
+    item?.product?.id ||
+    (typeof item?.product === 'string' ? item.product : '');
+
+  const getOrderItemDisplayName = (item, index) =>
+    item?.product?.name ||
+    item?.name ||
+    item?.productName ||
+    item?.title ||
+    resolvedItemNames[getOrderItemProductId(item)] ||
+    item?.productId ||
+    item?.product?._id ||
+    item?.product?.id ||
+    (typeof item?.product === 'string' ? item.product : '') ||
+    `Product ${index + 1}`;
+
+  useEffect(() => {
+    const resolveMissingProductNames = async () => {
+      if (!searchedOrder) return;
+
+      const items = getOrderItems(searchedOrder);
+      const missingProductIds = [...new Set(
+        items
+          .filter((item) => !(item?.product?.name || item?.name || item?.productName || item?.title))
+          .map((item) => getOrderItemProductId(item))
+          .filter(Boolean)
+          .filter((id) => !resolvedItemNames[id])
+      )];
+
+      if (missingProductIds.length === 0) return;
+
+      const entries = await Promise.all(
+        missingProductIds.map(async (productId) => {
+          try {
+            const product = await getProductById(productId);
+            const productName = product?.name || product?.data?.name || product?.product?.name || '';
+            return productName ? [productId, productName] : null;
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      const newNames = Object.fromEntries(entries.filter(Boolean));
+      if (Object.keys(newNames).length > 0) {
+        setResolvedItemNames((prev) => ({ ...prev, ...newNames }));
+      }
+    };
+
+    resolveMissingProductNames();
+  }, [searchedOrder, resolvedItemNames]);
+
   const normalizeStatus = (status) => String(status || '').toLowerCase();
   const searchedOrder = normalizedQuery
     ? orders.find((order) =>
@@ -95,14 +150,14 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 md:flex">
+    <div className="bg-gray-50 md:flex">
       {/* Sidebar */}
       <div
         className={`fixed left-0 top-24 bottom-0 w-64 bg-white border-r border-gray-200 transition-all duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } z-40 md:translate-x-0`}
+        } z-40 md:sticky md:top-24 md:bottom-auto md:h-[calc(100vh-6rem)] md:translate-x-0 md:shrink-0`}
       >
-        <nav className="p-6 space-y-2">
+        <nav className="p-6 space-y-2 h-full overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -137,7 +192,7 @@ const CustomerDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 md:ml-64">
+      <div className="flex-1 min-w-0">
         {/* Top Bar */}
         <div className="fixed top-20 left-0 right-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-30 md:hidden">
           <button
@@ -152,7 +207,7 @@ const CustomerDashboard = () => {
           </button>
         </div>
 
-        <div className="pt-28 md:pt-8 p-4 md:p-8">
+        <div className="pt-28 md:pt-8 p-4 md:p-8 pb-8">
           {/* Overview Section */}
           {activeSection === 'overview' && (
             <div className="space-y-6">
@@ -293,7 +348,7 @@ const CustomerDashboard = () => {
                               >
                                 <div>
                                   <p className="text-sm font-semibold text-gray-900">
-                                    {item?.product?.name || item?.name || `Product ${index + 1}`}
+                                    {getOrderItemDisplayName(item, index)}
                                   </p>
                                   <p className="text-xs text-gray-600">
                                     Qty: {item?.quantity || 0} {item?.size ? `• Size: ${item.size}` : ''}
