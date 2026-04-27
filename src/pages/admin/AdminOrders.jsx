@@ -160,6 +160,11 @@ const AdminOrders = () => {
           orders.map((order) => {
             const customerName = `${order?.shippingAddress?.firstName || ''} ${order?.shippingAddress?.lastName || ''}`.trim() || 'Customer';
             const orderRef = order.orderNumber || order._id;
+            const itemCount = Array.isArray(order?.items)
+              ? order.items.length
+              : Array.isArray(order?.orderItems)
+                ? order.orderItems.length
+                : 0;
             const isCod = order.paymentMethod === 'Cash on Delivery';
             const isBankTransfer = order.paymentMethod === 'Bank Transfer';
 
@@ -170,6 +175,7 @@ const AdminOrders = () => {
                     <p className="text-xs text-gray-500">Order</p>
                     <p className="font-mono font-semibold text-blue-600">{orderRef}</p>
                     <p className="text-sm text-gray-600 mt-1">{customerName}</p>
+                    <p className="text-xs text-gray-500">{itemCount} items</p>
                     <p className="text-sm font-semibold text-gray-900">රු{Number(order.total || 0).toLocaleString()}</p>
                   </div>
 

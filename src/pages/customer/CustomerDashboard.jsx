@@ -22,7 +22,7 @@ const CustomerDashboard = () => {
       try {
         setIsLoadingOrders(true);
         setOrderError(null);
-        const response = await getOrders();
+        const response = await getOrders({ page: 1, limit: 500 });
         if (response?.orders) {
           setOrders(response.orders);
         }
@@ -51,7 +51,20 @@ const CustomerDashboard = () => {
     { id: 'profile', label: 'Profile', icon: User },
   ];
 
-  const normalizedQuery = orderSearchQuery.trim().toLowerCase();
+  const normalizedQuery = orderSearchQuery
+    .trim()
+    .toLowerCase()
+    .replace('order id', '')
+    .replace('#', '')
+    .trim();
+
+  const getOrderItemsCount = (order) => {
+    if (Array.isArray(order?.items)) return order.items.length;
+    if (Array.isArray(order?.orderItems)) return order.orderItems.length;
+    return 0;
+  };
+
+  const normalizeStatus = (status) => String(status || '').toLowerCase();
   const searchedOrder = normalizedQuery
     ? orders.find((order) =>
         [order.orderNumber, order._id]
@@ -68,19 +81,20 @@ const CustomerDashboard = () => {
     : orders;
 
   const getStatusBadgeClass = (status) => {
-    if (status === 'delivered') return 'bg-green-100 text-green-700';
-    if (status === 'shipped') return 'bg-blue-100 text-blue-700';
-    if (status === 'processing') return 'bg-orange-100 text-orange-700';
+    const normalizedStatus = normalizeStatus(status);
+    if (normalizedStatus === 'delivered') return 'bg-green-100 text-green-700';
+    if (normalizedStatus === 'shipped') return 'bg-blue-100 text-blue-700';
+    if (normalizedStatus === 'processing') return 'bg-orange-100 text-orange-700';
     return 'bg-gray-100 text-gray-700';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 md:flex">
       {/* Sidebar */}
       <div
         className={`fixed left-0 top-24 bottom-0 w-64 bg-white border-r border-gray-200 transition-all duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } z-40 md:translate-x-0 md:static md:top-auto`}
+        } z-40 md:translate-x-0`}
       >
         <nav className="p-6 space-y-2">
           {menuItems.map((item) => {
@@ -117,7 +131,7 @@ const CustomerDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 md:ml-0">
+      <div className="flex-1 md:ml-64">
         {/* Top Bar */}
         <div className="fixed top-20 left-0 right-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-30 md:hidden">
           <button
@@ -132,7 +146,7 @@ const CustomerDashboard = () => {
           </button>
         </div>
 
-        <div className="pt-28 md:pt-28 p-4 md:p-8">
+        <div className="pt-28 md:pt-8 p-4 md:p-8">
           {/* Overview Section */}
           {activeSection === 'overview' && (
             <div className="space-y-6">
@@ -250,7 +264,7 @@ const CustomerDashboard = () => {
                         <p className="text-sm text-blue-700 font-medium">Order found</p>
                         <p className="text-lg font-bold text-blue-900">{searchedOrder.orderNumber || searchedOrder._id}</p>
                         <p className="text-sm text-blue-800">
-                          {new Date(searchedOrder.createdAt).toLocaleDateString()} • {searchedOrder.items?.length || 0} items
+                          {new Date(searchedOrder.createdAt).toLocaleDateString()} • {getOrderItemsCount(searchedOrder)} items
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
@@ -287,7 +301,7 @@ const CustomerDashboard = () => {
                             <tr key={order._id} className="border-b border-gray-100 last:border-b-0">
                               <td className="py-3 pr-4 font-semibold text-gray-900">{order.orderNumber || order._id}</td>
                               <td className="py-3 pr-4 text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>
-                              <td className="py-3 pr-4 text-gray-600">{order.items?.length || 0}</td>
+                              <td className="py-3 pr-4 text-gray-600">{getOrderItemsCount(order)}</td>
                               <td className="py-3 pr-4 font-medium text-gray-900">රු{order.total?.toLocaleString() || 0}</td>
                               <td className="py-3 pr-4">
                                 <span className={`text-xs font-semibold px-3 py-1 rounded-full inline-block ${getStatusBadgeClass(order.status)}`}>

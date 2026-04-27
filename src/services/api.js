@@ -123,7 +123,11 @@ const filterOrders = (orders, params = {}) => {
       return matchStatus && matchPayment;
     }
 
-    const normalizedSearch = String(search).toLowerCase();
+    const normalizedSearch = String(search)
+      .toLowerCase()
+      .replace('order id', '')
+      .replace('#', '')
+      .trim();
     const fullName = `${order?.shippingAddress?.firstName || ''} ${order?.shippingAddress?.lastName || ''}`.toLowerCase();
     const orderRef = `${order.orderNumber || ''} ${order._id || ''}`.toLowerCase();
 
@@ -403,7 +407,11 @@ export const createOrder = async (data) => {
 
 export const getOrders = async (params) => {
   try {
-    const response = await api.get('/orders', { params });
+    const normalizedSearch = String(params?.search || '').trim();
+    const requestParams = normalizedSearch
+      ? { ...params, page: 1, limit: Math.max(Number(params?.limit || 20), 500) }
+      : params;
+    const response = await api.get('/orders', { params: requestParams });
     const remotePayload = normalizeOrdersResponse(response.data);
     
     // ⚠️ CRITICAL CHECK: Log EXACT backend response before any processing
