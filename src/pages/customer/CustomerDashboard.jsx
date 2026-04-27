@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useCustomerStore } from '../../context/store';
-import { Menu, X, LayoutDashboard, ShoppingBag, MapPin, User, LogOut, Loader2, AlertCircle } from 'lucide-react';
+import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getOrders } from '../../services/api';
@@ -14,6 +14,7 @@ const CustomerDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [orderError, setOrderError] = useState(null);
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
 
   // Load orders when dashboard mounts
   useEffect(() => {
@@ -48,8 +49,30 @@ const CustomerDashboard = () => {
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'orders', label: 'My Orders', icon: ShoppingBag },
     { id: 'profile', label: 'Profile', icon: User },
-    { id: 'addresses', label: 'Addresses', icon: MapPin },
   ];
+
+  const normalizedQuery = orderSearchQuery.trim().toLowerCase();
+  const searchedOrder = normalizedQuery
+    ? orders.find((order) =>
+        [order.orderNumber, order._id]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(normalizedQuery))
+      )
+    : null;
+  const displayedOrders = normalizedQuery
+    ? orders.filter((order) =>
+        [order.orderNumber, order._id]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(normalizedQuery))
+      )
+    : orders;
+
+  const getStatusBadgeClass = (status) => {
+    if (status === 'delivered') return 'bg-green-100 text-green-700';
+    if (status === 'shipped') return 'bg-blue-100 text-blue-700';
+    if (status === 'processing') return 'bg-orange-100 text-orange-700';
+    return 'bg-gray-100 text-gray-700';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -109,7 +132,7 @@ const CustomerDashboard = () => {
           </button>
         </div>
 
-        <div className="pt-4 md:pt-0 p-4 md:p-8">
+        <div className="pt-28 md:pt-28 p-4 md:p-8">
           {/* Overview Section */}
           {activeSection === 'overview' && (
             <div className="space-y-6">
@@ -189,49 +212,6 @@ const CustomerDashboard = () => {
                 </div>
               </div>
 
-              {/* Recent Orders */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Orders</h2>
-                {orders.length > 0 ? (
-                  <div className="space-y-3">
-                    {orders.slice(0, 5).map((order) => (
-                      <div
-                        key={order._id}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {order.orderNumber}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium text-gray-900">
-                            රු{order.total?.toLocaleString()}
-                          </p>
-                          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                            order.status === 'delivered'
-                              ? 'bg-green-100 text-green-700'
-                              : order.status === 'shipped'
-                              ? 'bg-blue-100 text-blue-700'
-                              : order.status === 'processing'
-                              ? 'bg-orange-100 text-orange-700'
-                              : 'bg-gray-100 text-gray-700'
-                          }`}>
-                            {order.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-600 text-center py-8">
-                    No orders yet. Start shopping now!
-                  </p>
-                )}
-              </div>
                 </>
               )}
             </div>
@@ -246,42 +226,84 @@ const CustomerDashboard = () => {
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                {orders.length > 0 ? (
-                  <div className="space-y-3">
-                    {orders.map((order) => (
-                      <div
-                        key={order._id}
-                        className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all cursor-pointer"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-semibold text-gray-900">
-                              {order.orderNumber}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {new Date(order.createdAt).toLocaleDateString()} • {order.items?.length} items
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-gray-900">
-                              රු{order.total?.toLocaleString()}
-                            </p>
-                            <span className={`text-xs font-semibold px-3 py-1 rounded-full inline-block ${
-                              order.status === 'delivered'
-                                ? 'bg-green-100 text-green-700'
-                                : order.status === 'shipped'
-                                ? 'bg-blue-100 text-blue-700'
-                                : order.status === 'processing'
-                                ? 'bg-orange-100 text-orange-700'
-                                : 'bg-gray-100 text-gray-700'
-                            }`}>
-                              {order.status}
-                            </span>
-                          </div>
-                        </div>
+                <label htmlFor="order-search" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Search by Order ID
+                </label>
+                <div className="relative">
+                  <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="order-search"
+                    type="text"
+                    value={orderSearchQuery}
+                    onChange={(e) => setOrderSearchQuery(e.target.value)}
+                    placeholder="Enter Order ID (e.g., VIB-1001)"
+                    className="w-full border border-gray-300 rounded-lg py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              {normalizedQuery && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 md:p-5">
+                  {searchedOrder ? (
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-blue-700 font-medium">Order found</p>
+                        <p className="text-lg font-bold text-blue-900">{searchedOrder.orderNumber || searchedOrder._id}</p>
+                        <p className="text-sm text-blue-800">
+                          {new Date(searchedOrder.createdAt).toLocaleDateString()} • {searchedOrder.items?.length || 0} items
+                        </p>
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex items-center gap-4">
+                        <p className="text-sm font-semibold text-blue-900">රු{searchedOrder.total?.toLocaleString() || 0}</p>
+                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${getStatusBadgeClass(searchedOrder.status)}`}>
+                          {searchedOrder.status}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-medium text-red-700">
+                      No order found for “{orderSearchQuery}”.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                {orders.length > 0 ? (
+                  displayedOrders.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-gray-200 text-left">
+                            <th className="py-3 pr-4 font-semibold text-gray-700">Order ID</th>
+                            <th className="py-3 pr-4 font-semibold text-gray-700">Date</th>
+                            <th className="py-3 pr-4 font-semibold text-gray-700">Items</th>
+                            <th className="py-3 pr-4 font-semibold text-gray-700">Amount</th>
+                            <th className="py-3 pr-4 font-semibold text-gray-700">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {displayedOrders.map((order) => (
+                            <tr key={order._id} className="border-b border-gray-100 last:border-b-0">
+                              <td className="py-3 pr-4 font-semibold text-gray-900">{order.orderNumber || order._id}</td>
+                              <td className="py-3 pr-4 text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>
+                              <td className="py-3 pr-4 text-gray-600">{order.items?.length || 0}</td>
+                              <td className="py-3 pr-4 font-medium text-gray-900">රු{order.total?.toLocaleString() || 0}</td>
+                              <td className="py-3 pr-4">
+                                <span className={`text-xs font-semibold px-3 py-1 rounded-full inline-block ${getStatusBadgeClass(order.status)}`}>
+                                  {order.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 text-center py-12">
+                      No orders found for this Order ID.
+                    </p>
+                  )
                 ) : (
                   <p className="text-gray-600 text-center py-12">
                     No orders yet. Ready to shop? Browse our store now!
@@ -344,26 +366,6 @@ const CustomerDashboard = () => {
             </div>
           )}
 
-          {/* Addresses Section */}
-          {activeSection === 'addresses' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">My Addresses</h1>
-                  <p className="text-gray-600 mt-1">Manage your delivery addresses</p>
-                </div>
-                <button className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                  Add Address
-                </button>
-              </div>
-
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                <p className="text-gray-600 text-center py-12">
-                  No addresses saved yet. Add your first address to get started!
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
