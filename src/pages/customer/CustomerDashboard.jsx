@@ -89,6 +89,22 @@ const CustomerDashboard = () => {
     (typeof item?.product === 'string' ? item.product : '') ||
     `Product ${index + 1}`;
 
+  const normalizeStatus = (status) => String(status || '').toLowerCase();
+  const searchedOrder = normalizedQuery
+    ? orders.find((order) =>
+        [order.orderNumber, order._id]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(normalizedQuery))
+      )
+    : null;
+  const displayedOrders = normalizedQuery
+    ? orders.filter((order) =>
+        [order.orderNumber, order._id]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(normalizedQuery))
+      )
+    : orders;
+
   useEffect(() => {
     const resolveMissingProductNames = async () => {
       if (!searchedOrder) return;
@@ -124,22 +140,6 @@ const CustomerDashboard = () => {
 
     resolveMissingProductNames();
   }, [searchedOrder, resolvedItemNames]);
-
-  const normalizeStatus = (status) => String(status || '').toLowerCase();
-  const searchedOrder = normalizedQuery
-    ? orders.find((order) =>
-        [order.orderNumber, order._id]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(normalizedQuery))
-      )
-    : null;
-  const displayedOrders = normalizedQuery
-    ? orders.filter((order) =>
-        [order.orderNumber, order._id]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(normalizedQuery))
-      )
-    : orders;
 
   const getStatusBadgeClass = (status) => {
     const normalizedStatus = normalizeStatus(status);
