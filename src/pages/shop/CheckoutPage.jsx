@@ -26,18 +26,18 @@ const devError = (...args) => {
 // Premium Input Component
 const CheckoutInput = ({ icon: Icon, label, required, ...props }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-      {label} {required && <span className="text-blue-500">*</span>}
+    <label className="block text-sm font-medium text-slate-700 mb-2">
+      {label} {required && <span className="text-red-500">*</span>}
     </label>
     <div className="relative">
       {Icon && (
         <div className="absolute left-3 top-1/2 -translate-y-1/2">
-          <Icon className="w-5 h-5 text-gray-400" />
+          <Icon className="w-5 h-5 text-slate-400" />
         </div>
       )}
       <input
         {...props}
-        className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-300 text-gray-900 placeholder-gray-400`}
+        className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-slate-900 placeholder-slate-400`}
       />
     </div>
   </div>
@@ -187,33 +187,31 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-slate-50 py-6 sm:py-8 overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm mb-8 bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm">
-          <Link to="/cart" className="text-gray-500 hover:text-blue-600 transition-colors">Cart</Link>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-          <span className="text-blue-600 font-semibold">Checkout</span>
+        <nav className="flex items-center gap-2 text-sm mb-8 bg-white rounded-xl px-4 py-3 border border-slate-200 shadow-sm">
+          <Link to="/cart" className="text-slate-500 hover:text-slate-900 transition-colors">Cart</Link>
+          <ChevronRight className="w-4 h-4 text-slate-300" />
+          <span className="text-slate-900 font-semibold">Checkout</span>
         </nav>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Secure Checkout</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900 mb-8">Secure Checkout</h1>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Column - Form */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Login Option Banner */}
               {!isAuthenticated() && (
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-4 md:p-6">
+                <div className="bg-slate-100 rounded-2xl border border-slate-200 p-4 md:p-6">
                   <div className="flex items-start gap-3">
-                    <User className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <User className="w-5 h-5 text-slate-700 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">Have an account?</h3>
-                      <p className="text-sm text-gray-600 mb-3">Log in to auto-fill your information and access your order history anytime.</p>
+                      <h3 className="font-semibold text-slate-900 mb-1">Have an account?</h3>
+                      <p className="text-sm text-slate-600 mb-3">Log in to auto-fill your information and access your order history anytime.</p>
                       <button
                         type="button"
                         onClick={() => navigate('/auth/customer/login')}
-                        className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                        className="text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors"
                       >
                         Sign in now →
                       </button>
@@ -222,26 +220,24 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              {/* Logged In Banner */}
               {isAuthenticated() && (
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-4 md:p-6">
+                <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-4 md:p-6">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">Welcome, {customer?.firstName}!</h3>
-                      <p className="text-sm text-gray-600">Your information is auto-filled. You can track this order in your dashboard after purchase.</p>
+                      <h3 className="font-semibold text-slate-900 mb-1">Welcome, {customer?.firstName}!</h3>
+                      <p className="text-sm text-slate-600">Your information is auto-filled. You can track this order in your dashboard after purchase.</p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Contact Information */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <Mail className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-lg font-bold text-gray-900">Contact Information</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Contact Information</h2>
                 </div>
                 <CheckoutInput
                   icon={Mail}
@@ -252,29 +248,28 @@ const CheckoutPage = () => {
                   onChange={(e) => setField('email', e.target.value)}
                   placeholder="your@email.com"
                 />
-                <p className="text-xs text-gray-500 mt-2 ml-1">
+                <p className="text-xs text-slate-500 mt-2 ml-1">
                   We'll send order confirmation to this email
                 </p>
               </div>
 
-              {/* Shipping Address */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <MapPin className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-lg font-bold text-gray-900">Shipping Address</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Shipping Address</h2>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      District <span className="text-blue-500">*</span>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      District <span className="text-red-500">*</span>
                     </label>
                     <select
                       required
                       value={form.district}
                       onChange={(e) => setField('district', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-300 text-gray-900"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-slate-900"
                     >
                       <option value="">Select District</option>
                       {SRI_LANKA_DISTRICTS.map((district) => (
@@ -359,50 +354,47 @@ const CheckoutPage = () => {
                 )}
               </div>
 
-              {/* Shipping Option */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <Truck className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-lg font-bold text-gray-900">Shipping Method</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Shipping Method</h2>
                 </div>
-                <div className="border-2 border-blue-500 rounded-xl p-4 bg-blue-50/50">
+                <div className="border border-slate-300 rounded-xl p-4 bg-slate-50">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Truck className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Truck className="w-5 h-5 text-slate-700" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900">Standard Delivery</h3>
-                      <p className="text-sm text-gray-600">3-5 business days • Island wide</p>
+                      <h3 className="font-semibold text-slate-900">Standard Delivery</h3>
+                      <p className="text-sm text-slate-600">3-5 business days • Island wide</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-blue-600 text-lg">
+                      <p className="font-semibold text-slate-900 text-lg">
                         {shippingFee === 0 ? 'FREE' : `රු${shippingFee}`}
                       </p>
                       {shippingFee > 0 && (
-                        <p className="text-xs text-gray-500">Free above රු5000</p>
+                        <p className="text-xs text-slate-500">Free above රු5000</p>
                       )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Payment Method */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <CreditCard className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-lg font-bold text-gray-900">Payment Method</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Payment Method</h2>
                 </div>
                 <div className="space-y-3">
-                  {/* Bank Transfer */}
                   <label
-                    className={`block border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 ${
+                    className={`block border rounded-xl p-4 cursor-pointer transition-colors ${
                       paymentMethod === 'Bank Transfer'
-                        ? 'border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-100'
-                        : 'border-gray-200 hover:border-blue-300'
+                        ? 'border-slate-900 bg-slate-100'
+                        : 'border-slate-200 hover:border-slate-400'
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -412,24 +404,23 @@ const CheckoutPage = () => {
                         value="Bank Transfer"
                         checked={paymentMethod === 'Bank Transfer'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-5 h-5 text-blue-600"
+                        className="w-5 h-5 text-slate-900"
                       />
-                      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <CreditCard className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center">
+                        <CreditCard className="w-5 h-5 text-slate-700" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900">Bank Transfer</h3>
-                        <p className="text-sm text-gray-500">Send slip to WhatsApp 0753979659</p>
+                        <h3 className="font-semibold text-slate-900">Bank Transfer</h3>
+                        <p className="text-sm text-slate-500">Send slip to WhatsApp 0753979659</p>
                       </div>
                     </div>
                   </label>
 
-                  {/* Cash on Delivery */}
                   <label
-                    className={`block border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 ${
+                    className={`block border rounded-xl p-4 cursor-pointer transition-colors ${
                       paymentMethod === 'Cash on Delivery'
-                        ? 'border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-100'
-                        : 'border-gray-200 hover:border-blue-300'
+                        ? 'border-slate-900 bg-slate-100'
+                        : 'border-slate-200 hover:border-slate-400'
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -439,69 +430,66 @@ const CheckoutPage = () => {
                         value="Cash on Delivery"
                         checked={paymentMethod === 'Cash on Delivery'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-5 h-5 text-blue-600"
+                        className="w-5 h-5 text-slate-900"
                       />
                       <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                        <DollarSign className="w-5 h-5 text-green-600" />
+                        <DollarSign className="w-5 h-5 text-emerald-600" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900">Cash on Delivery</h3>
-                        <p className="text-sm text-gray-500">Pay when you receive</p>
+                        <h3 className="font-semibold text-slate-900">Cash on Delivery</h3>
+                        <p className="text-sm text-slate-500">Pay when you receive</p>
                       </div>
                     </div>
                   </label>
                 </div>
               </div>
 
-              {/* Order Notes */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={showNotes}
                     onChange={(e) => setShowNotes(e.target.checked)}
-                    className="w-5 h-5 rounded-lg text-blue-600 border-gray-300 focus:ring-blue-500"
+                    className="w-5 h-5 rounded-lg text-slate-900 border-slate-300 focus:ring-slate-500"
                   />
-                  <span className="font-medium text-gray-700">Add order notes (optional)</span>
+                  <span className="font-medium text-slate-700">Add order notes (optional)</span>
                 </label>
 
                 {showNotes && (
                   <textarea
                     value={form.notes}
                     onChange={(e) => setField('notes', e.target.value)}
-                    className="w-full mt-4 px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white focus:ring-0 transition-all duration-300 text-gray-900 placeholder-gray-400 resize-none"
+                    className="w-full mt-4 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-slate-900 placeholder-slate-400 resize-none"
                     rows="3"
                     placeholder="Any special instructions for your order..."
                   />
                 )}
               </div>
 
-              {/* Legal Text */}
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+              <div className="bg-slate-100 rounded-xl p-4 border border-slate-200">
                 <div className="flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-gray-600">
+                  <Shield className="w-5 h-5 text-slate-700 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-slate-600">
                     By placing this order, you agree to our Terms of Service and Privacy Policy. 
                     Your order will be processed and shipped within 1-2 business days.
                   </p>
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-blue-200"
+                className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-semibold py-4 rounded-xl hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isPending ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    PLACING ORDER...
+                    Placing order...
                   </>
                 ) : (
                   <>
                     <Shield className="w-5 h-5" />
-                    PLACE ORDER • රු{total.toLocaleString()}
+                    Place order • රු{total.toLocaleString()}
                   </>
                 )}
               </button>
@@ -509,40 +497,38 @@ const CheckoutPage = () => {
 
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-5">
-              <div className="lg:sticky lg:top-8 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4">
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <div className="lg:sticky lg:top-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="bg-slate-900 px-6 py-4">
+                  <h2 className="text-xl font-semibold text-white flex items-center gap-2">
                     <Package className="w-5 h-5" />
                     Order Summary
                   </h2>
                 </div>
 
                 <div className="p-6">
-                  {/* Items List */}
                   <div className="space-y-4 mb-6">
                     {items.map((item) => (
-                      <div key={item.key} className="flex gap-3 p-3 bg-gray-50 rounded-xl">
+                      <div key={item.key} className="flex gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                         <div className="relative flex-shrink-0">
                           <img
                             src={getImageUrl(item.product.images?.[0])}
                             alt={item.product.name}
-                            className="w-16 h-16 rounded-xl object-cover border border-gray-100"
+                            className="w-16 h-16 rounded-xl object-cover border border-slate-200"
                           />
-                          <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                          <span className="absolute -top-2 -right-2 bg-slate-900 text-white text-xs font-semibold w-5 h-5 rounded-full flex items-center justify-center">
                             {item.quantity}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
+                          <h3 className="text-sm font-medium text-slate-900 line-clamp-1">
                             {item.product.name}
                           </h3>
                           {item.size && (
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-lg font-medium">
+                            <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-lg font-medium">
                               Size: {item.size}
                             </span>
                           )}
-                          <p className="text-sm font-bold text-blue-600 mt-1">
+                          <p className="text-sm font-semibold text-slate-900 mt-1">
                             රු{(item.price * item.quantity).toLocaleString()}
                           </p>
                         </div>
@@ -550,39 +536,37 @@ const CheckoutPage = () => {
                     ))}
                   </div>
 
-                  {/* Pricing */}
-                  <div className="border-t border-gray-100 pt-4 space-y-3">
+                  <div className="border-t border-slate-200 pt-4 space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span className="font-semibold text-gray-900">රු{subtotal.toLocaleString()}</span>
+                      <span className="text-slate-600">Subtotal</span>
+                      <span className="font-semibold text-slate-900">රු{subtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Shipping</span>
+                      <span className="text-slate-600">Shipping</span>
                       <span className="font-semibold">
                         {shippingFee === 0 ? (
-                          <span className="text-green-600 flex items-center gap-1">
+                          <span className="text-emerald-600 flex items-center gap-1">
                             <Truck className="w-4 h-4" />
                             FREE
                           </span>
                         ) : (
-                          <span className="text-gray-900">රු{shippingFee}</span>
+                          <span className="text-slate-900">රු{shippingFee}</span>
                         )}
                       </span>
                     </div>
-                    <div className="border-t border-gray-100 pt-4">
+                    <div className="border-t border-slate-200 pt-4">
                       <div className="flex justify-between">
-                        <span className="text-lg font-bold text-gray-900">Total</span>
-                        <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                        <span className="text-lg font-semibold text-slate-900">Total</span>
+                        <span className="text-2xl font-semibold text-slate-900">
                           රු{total.toLocaleString()}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Delivery Info */}
-                  <div className="mt-6 bg-blue-50 rounded-xl p-4 border border-blue-100">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <Truck className="w-4 h-4 text-blue-600" />
+                  <div className="mt-6 bg-slate-100 rounded-xl p-4 border border-slate-200">
+                    <div className="flex items-center gap-2 text-sm text-slate-700">
+                      <Truck className="w-4 h-4 text-slate-700" />
                       <span><strong>Estimated:</strong> 3-5 business days</span>
                     </div>
                   </div>

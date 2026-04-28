@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const addItem = useCartStore((state) => state.addItem);
+  const NON_SELECTABLE_SIZES = new Set(['free size', 'freesize', 'one size', 'onesize', 'standard', 'default']);
 
   // Handle image - could be string URL or object with url property
   const getImageUrl = (img) => {
@@ -16,7 +17,12 @@ const ProductCard = ({ product }) => {
 
   const isOnSale = product.discountPrice && product.discountPrice < product.originalPrice;
   const isOutOfStock = product.stockQuantity === 0;
-  const hasSizes = product.sizes && product.sizes.length > 0;
+  const normalizedSizes = (product.sizes || [])
+    .map((size) => String(size || '').trim())
+    .filter(Boolean);
+  const selectableSizes = normalizedSizes.filter((size) => !NON_SELECTABLE_SIZES.has(size.toLowerCase()));
+  const requiresSizeSelection = selectableSizes.length > 0;
+  const defaultCartSize = normalizedSizes[0] || '';
   const discountPercent = isOnSale 
     ? Math.round((1 - product.discountPrice / product.originalPrice) * 100) 
     : 0;
@@ -27,7 +33,7 @@ const ProductCard = ({ product }) => {
     
     if (isOutOfStock) return;
 
-    addItem(product, 1, '');
+    addItem(product, 1, defaultCartSize);
     toast.success(`${product.name} added to cart!`, {
       duration: 2000,
       position: 'bottom-right',
@@ -90,20 +96,20 @@ const ProductCard = ({ product }) => {
       </Link>
 
       <div className="px-4 sm:px-5 pb-4 sm:pb-5">
-        {hasSizes ? (
-          <Link
-            to={`/product/${product._id}`}
-            className="flex items-center justify-center gap-2 w-full rounded-xl border border-slate-900 bg-slate-900 px-4 py-3 text-white text-sm font-medium transition-colors hover:bg-slate-700"
-          >
-            Select size
-          </Link>
-        ) : isOutOfStock ? (
+        {isOutOfStock ? (
           <button
             disabled
             className="w-full rounded-xl bg-slate-100 text-slate-400 text-sm font-medium px-4 py-3 cursor-not-allowed"
           >
             Not available
           </button>
+        ) : requiresSizeSelection ? (
+          <Link
+            to={`/product/${product._id}`}
+            className="flex items-center justify-center gap-2 w-full rounded-xl border border-slate-900 bg-slate-900 px-4 py-3 text-white text-sm font-medium transition-colors hover:bg-slate-700"
+          >
+            Select size
+          </Link>
         ) : (
           <button
             onClick={handleAddToCart}
