@@ -1,75 +1,59 @@
 import { Link } from 'react-router-dom';
-import { MessageCircle, Mail, Phone, MapPin, Heart, ArrowRight } from 'lucide-react';
+import { MessageCircle, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
+import logo from '../../assets/favicon.jpeg';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto">
-      {/* Premium CTA Band */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 text-white py-12 relative overflow-hidden">
-        {/* Decorative circles */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3" />
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+    <footer className="mt-auto border-t border-slate-200 bg-white">
+      <div className="bg-slate-900 text-white py-10 sm:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div className="text-center md:text-left">
-            <h3 className="text-2xl md:text-3xl font-bold mb-2">
-              Need Help with Your Order?
-            </h3>
-            <p className="text-blue-100">We're here to assist you 24/7</p>
+            <h3 className="text-2xl md:text-3xl font-semibold tracking-tight">Need help with your order?</h3>
+            <p className="mt-2 text-slate-300">Our support team is ready on WhatsApp and email.</p>
           </div>
-          <Link 
-            to="/contact" 
-            className="group flex items-center gap-2 bg-white text-blue-600 font-bold uppercase tracking-wider px-8 py-4 rounded-full hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl"
+          <Link
+            to="/contact"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white text-slate-900 px-6 py-3.5 font-medium hover:bg-slate-100 transition-colors"
           >
-            CONTACT US
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Contact us
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
 
-      {/* Main Footer */}
-      <div className="bg-slate-900 text-gray-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            {/* Brand Column */}
+      <div className="bg-white text-slate-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             <div className="lg:col-span-1">
-              <Link to="/" className="flex items-center gap-3 mb-6 group">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300">
-                  VB
+              <Link to="/" className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 rounded-xl overflow-hidden bg-slate-900 ring-1 ring-slate-200">
+                  <img src={logo} alt="VIBEIT logo" className="w-full h-full object-cover" />
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xl font-bold text-white">VIBEIT</span>
-                  <span className="text-[10px] text-gray-500 -mt-0.5 tracking-wider">.lk</span>
-                </div>
+                <span className="text-xl font-semibold tracking-tight text-slate-900">VIBEIT</span>
               </Link>
-              <p className="text-gray-400 leading-relaxed mb-6">
+              <p className="leading-relaxed mb-5">
                 The Vibe of Online Shopping. Premium quality products delivered to your doorstep across Sri Lanka.
               </p>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <span>Made with</span>
-                <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-                <span>in Sri Lanka</span>
-              </div>
+              <p className="text-sm text-slate-500">Sri Lanka • Island-wide delivery</p>
             </div>
 
-            {/* Information Column */}
             <div>
-              <h4 className="text-white font-bold mb-6 text-lg">Information</h4>
-              <ul className="space-y-4">
+              <h4 className="text-slate-900 font-semibold mb-4">Explore</h4>
+              <ul className="space-y-3">
                 {[
+                  { to: '/shop', label: 'Shop' },
                   { to: '/about', label: 'About Us' },
                   { to: '/contact', label: 'Contact Us' },
-                  { to: '/privacy', label: 'Privacy Policy' },
-                  { to: '/terms', label: 'Terms & Conditions' },
+                  { to: '/cart', label: 'Cart' },
                 ].map((link) => (
                   <li key={link.to}>
-                    <Link 
-                      to={link.to} 
-                      className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center gap-2 group"
+                    <Link
+                      to={link.to}
+                      className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
                     >
-                      <ArrowRight className="w-4 h-4 opacity-0 -ml-6 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+                      <ArrowRight className="w-4 h-4" />
                       {link.label}
                     </Link>
                   </li>
@@ -77,10 +61,9 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Support Column */}
             <div>
-              <h4 className="text-white font-bold mb-6 text-lg">Support</h4>
-              <ul className="space-y-4">
+              <h4 className="text-slate-900 font-semibold mb-4">Support</h4>
+              <ul className="space-y-3">
                 {[
                   { to: '/shipping', label: 'Shipping Info' },
                   { to: '/returns', label: 'Returns & Exchanges' },
@@ -88,11 +71,11 @@ const Footer = () => {
                   { to: '/shop', label: 'Shop Now' },
                 ].map((link) => (
                   <li key={link.to}>
-                    <Link 
-                      to={link.to} 
-                      className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center gap-2 group"
+                    <Link
+                      to={link.to}
+                      className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
                     >
-                      <ArrowRight className="w-4 h-4 opacity-0 -ml-6 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+                      <ArrowRight className="w-4 h-4" />
                       {link.label}
                     </Link>
                   </li>
@@ -100,17 +83,16 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Contact Column */}
             <div>
-              <h4 className="text-white font-bold mb-6 text-lg">Contact</h4>
+              <h4 className="text-slate-900 font-semibold mb-4">Contact</h4>
               <ul className="space-y-4">
                 <li>
                   <a
                     href="mailto:vibeit@gmail.com"
-                    className="flex items-center gap-3 text-gray-400 hover:text-blue-400 transition-colors duration-300 group"
+                    className="flex items-center gap-3 text-slate-600 hover:text-slate-900 transition-colors"
                   >
-                    <div className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center group-hover:bg-blue-600/20 transition-colors duration-300">
-                      <Mail className="w-5 h-5 text-blue-400" />
+                    <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+                      <Mail className="w-4 h-4 text-slate-700" />
                     </div>
                     <span>vibeit@gmail.com</span>
                   </a>
@@ -118,18 +100,18 @@ const Footer = () => {
                 <li>
                   <a
                     href="tel:+94753979659"
-                    className="flex items-center gap-3 text-gray-400 hover:text-blue-400 transition-colors duration-300 group"
+                    className="flex items-center gap-3 text-slate-600 hover:text-slate-900 transition-colors"
                   >
-                    <div className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center group-hover:bg-blue-600/20 transition-colors duration-300">
-                      <Phone className="w-5 h-5 text-blue-400" />
+                    <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+                      <Phone className="w-4 h-4 text-slate-700" />
                     </div>
                     <span>+94 75 397 9659</span>
                   </a>
                 </li>
                 <li>
-                  <div className="flex items-center gap-3 text-gray-400">
-                    <div className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-blue-400" />
+                  <div className="flex items-center gap-3 text-slate-600">
+                    <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+                      <MapPin className="w-4 h-4 text-slate-700" />
                     </div>
                     <span>Colombo, Sri Lanka</span>
                   </div>
@@ -138,29 +120,27 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Copyright */}
-          <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">
+          <div className="border-t border-slate-200 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-sm text-slate-500">
               &copy; {currentYear} VibeIt.lk. All rights reserved.
             </p>
-            <div className="flex items-center gap-6">
-              <span className="text-xs text-gray-600">Secure Payments</span>
-              <span className="text-xs text-gray-600">Quality Products</span>
-              <span className="text-xs text-gray-600">Fast Delivery</span>
+            <div className="flex items-center gap-4 text-xs text-slate-500">
+              <span>Secure Payments</span>
+              <span>Quality Products</span>
+              <span>Fast Delivery</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Premium Floating WhatsApp Button */}
       <a
         href="https://wa.me/94753979659"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white p-4 rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 hover:scale-110 z-50"
+        className="fixed bottom-5 right-5 bg-slate-900 hover:bg-slate-700 text-white p-3.5 rounded-2xl shadow-lg transition-colors z-50"
         aria-label="Chat on WhatsApp"
       >
-        <MessageCircle className="w-6 h-6" />
+        <MessageCircle className="w-5 h-5" />
       </a>
     </footer>
   );
