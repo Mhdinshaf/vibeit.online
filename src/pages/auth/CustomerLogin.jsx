@@ -8,10 +8,11 @@ import logo from '../../assets/favicon.jpeg';
 const CustomerLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useCustomerAuth();
+  const { login, startGoogleLogin, isAuthenticated } = useCustomerAuth();
   
   // Determine where to redirect after login
-  const from = location.state?.from?.pathname || '/customer/dashboard';
+  const searchParams = new URLSearchParams(location.search);
+  const from = location.state?.from?.pathname || searchParams.get('from') || '/customer/dashboard';
   
   const [formData, setFormData] = useState({
     email: '',
@@ -67,6 +68,11 @@ const CustomerLogin = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    toast.success('Redirecting to Google...');
+    startGoogleLogin(from);
   };
 
   return (
@@ -186,6 +192,17 @@ const CustomerLogin = () => {
                   Login
                 </>
               )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full py-3 px-4 border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M21.35 11.1H12v2.98h5.35c-.23 1.5-1.73 4.4-5.35 4.4-3.22 0-5.84-2.67-5.84-5.97s2.62-5.97 5.84-5.97c1.84 0 3.07.79 3.78 1.46l2.58-2.5C16.7 3.94 14.56 3 12 3 7.03 3 3 7.03 3 12s4.03 9 9 9c5.19 0 8.62-3.64 8.62-8.77 0-.59-.06-1.04-.27-1.13z" />
+              </svg>
+              Continue with Google
             </button>
           </form>
 

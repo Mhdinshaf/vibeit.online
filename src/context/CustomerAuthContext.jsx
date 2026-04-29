@@ -64,6 +64,14 @@ export const CustomerAuthProvider = ({ children }) => {
   };
 
   /**
+   * Start Google OAuth login
+   * @param {string} redirectPath
+   */
+  const startGoogleLogin = (redirectPath) => {
+    customerAuthService.startGoogleLogin(redirectPath);
+  };
+
+  /**
    * Logout function
    */
   const logout = () => {
@@ -96,6 +104,7 @@ export const CustomerAuthProvider = ({ children }) => {
     loading,
     register,
     login,
+    startGoogleLogin,
     logout,
     updateProfile,
     isAuthenticated,

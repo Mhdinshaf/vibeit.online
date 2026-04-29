@@ -69,6 +69,17 @@ export const customerAuthService = {
   },
 
   /**
+   * Start Google OAuth login flow
+   * @param {string} redirectPath
+   */
+  startGoogleLogin(redirectPath = '/customer/dashboard') {
+    const apiBaseUrl = String(api.defaults.baseURL || '').replace(/\/+$/, '');
+    const targetPath = redirectPath || '/customer/dashboard';
+    localStorage.setItem('vibeit_post_login_redirect', targetPath);
+    window.location.href = `${apiBaseUrl}/customer/auth/google`;
+  },
+
+  /**
    * Logout - clear all auth data
    */
   logout() {
