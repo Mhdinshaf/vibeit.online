@@ -295,55 +295,73 @@ html.dark body {
   color: #e2e8f0;
 }
 
+html.dark #root {
+  background-color: #020617;
+}
+
+/* Global dark theme surfaces */
 html.dark .bg-white {
-  background-color: #0f172a !important;
+  background-color: #0f172a;
 }
 
+html.dark .bg-gray-50,
 html.dark .bg-slate-50 {
-  background-color: #020617 !important;
+  background-color: #020617;
 }
 
+html.dark .bg-gray-100,
 html.dark .bg-slate-100 {
-  background-color: #1e293b !important;
+  background-color: #1e293b;
 }
 
+html.dark .bg-gray-200,
 html.dark .bg-slate-200 {
-  background-color: #334155 !important;
+  background-color: #334155;
 }
 
+/* Global dark theme text colors */
+html.dark .text-gray-900,
 html.dark .text-slate-900 {
-  color: #f8fafc !important;
+  color: #f8fafc;
 }
 
+html.dark .text-gray-800,
+html.dark .text-gray-700,
 html.dark .text-slate-800,
 html.dark .text-slate-700 {
-  color: #cbd5e1 !important;
+  color: #cbd5e1;
 }
 
+html.dark .text-gray-600,
+html.dark .text-gray-500,
 html.dark .text-slate-600,
 html.dark .text-slate-500 {
-  color: #94a3b8 !important;
+  color: #94a3b8;
 }
 
+/* Global dark theme borders */
+html.dark .border-gray-100,
+html.dark .border-slate-100 {
+  border-color: #1e293b;
+}
+
+html.dark .border-gray-200,
 html.dark .border-slate-200,
 html.dark .border-slate-200\/70,
 html.dark .border-slate-200\/80 {
-  border-color: #334155 !important;
+  border-color: #334155;
 }
 
-html.dark .border-slate-100 {
-  border-color: #1e293b !important;
-}
-
+/* Form fields in dark theme */
 html.dark input,
 html.dark textarea,
 html.dark select {
-  background-color: #0b1220 !important;
-  color: #e2e8f0 !important;
-  border-color: #334155 !important;
+  background-color: #0b1220;
+  color: #e2e8f0;
+  border-color: #334155;
 }
 
 html.dark input::placeholder,
 html.dark textarea::placeholder {
-  color: #64748b !important;
+  color: #64748b;
 }

@@ -10,18 +10,7 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    try {
-      const manuallySet = localStorage.getItem('vibeit-theme-manual') === 'true';
-      const storedTheme = localStorage.getItem('vibeit-theme');
-      if (manuallySet && (storedTheme === 'dark' || storedTheme === 'light')) {
-        return storedTheme;
-      }
-      return 'light';
-    } catch {
-      return 'light';
-    }
-  });
+  const [theme, setTheme] = useState('light');
   const navigate = useNavigate();
   const items = useCartStore((state) => state.items);
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
