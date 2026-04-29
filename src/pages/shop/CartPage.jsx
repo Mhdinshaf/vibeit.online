@@ -1,9 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Trash2, Lock, Minus, Plus, ArrowRight, Gift, ShoppingBag, Truck } from 'lucide-react';
 import { useCartStore } from '../../context/store';
+import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import toast from 'react-hot-toast';
 
 const CartPage = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useCustomerAuth();
   const { items, removeItem, updateQuantity, clearCart } = useCartStore();
   
   // Calculate values locally
@@ -42,6 +45,22 @@ const CartPage = () => {
   const shippingCost = subtotal >= 5000 ? 0 : 400;
   const total = subtotal + shippingCost;
   const freeShippingRemaining = subtotal >= 5000 ? 0 : 5000 - subtotal;
+
+  const handleProceedToCheckout = () => {
+    if (isAuthenticated()) {
+      navigate('/checkout');
+      return;
+    }
+
+    const cartSnapshot = {
+      items,
+      savedAt: new Date().toISOString(),
+      redirectTo: '/checkout',
+    };
+    localStorage.setItem('vibeit-cart-checkout-snapshot', JSON.stringify(cartSnapshot));
+    toast.error('Please login to complete your purchase.');
+    navigate('/login', { state: { from: { pathname: '/checkout' } } });
+  };
 
   // Empty State
   if (!items || items.length === 0) {
@@ -269,13 +288,14 @@ const CartPage = () => {
                     </div>
                   </div>
 
-                  <Link 
-                    to="/checkout" 
+                  <button
+                    type="button"
+                    onClick={handleProceedToCheckout}
                     className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-medium py-4 rounded-xl hover:bg-slate-700 transition-colors mb-4"
                   >
                     Proceed to checkout
                     <ArrowRight className="w-5 h-5" />
-                  </Link>
+                  </button>
 
                   <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
                     <Lock className="w-4 h-4 text-emerald-600" />

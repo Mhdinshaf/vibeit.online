@@ -56,6 +56,7 @@ export default function App() {
         </Route>
 
         {/* Customer Auth Routes (no layout) */}
+        <Route path="/login" element={<CustomerLogin />} />
         <Route path="/auth/customer/login" element={<CustomerLogin />} />
         <Route path="/auth/customer/register" element={<CustomerRegister />} />
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
@@ -19,7 +19,7 @@ const CATEGORIES = [
   { name: 'Gents Clothing', icon: Briefcase, subcategories: ['T-Shirts', 'Trousers', 'Shirts', 'Shorts', 'Formal Wear'] },
 ];
 
-const FilterPanel = ({ searchParams, setParam, clearFilters }) => {
+const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect }) => {
   const [expandedCategory, setExpandedCategory] = useState(searchParams.get('category') || null);
   
   const category = searchParams.get('category');
@@ -108,16 +108,13 @@ const FilterPanel = ({ searchParams, setParam, clearFilters }) => {
                 {isExpanded && (
                   <div className="ml-4 mt-2 space-y-1">
                     {cat.subcategories.map((sub) => (
-                      <button
-                        key={sub}
-                        onClick={() => {
-                          setParam('category', cat.name);
-                          setParam('subcategory', sub);
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                          subcategory === sub
-                            ? 'bg-slate-100 text-slate-900 font-semibold'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                        <button
+                          key={sub}
+                          onClick={() => onSubcategorySelect(cat.name, sub)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                            subcategory === sub
+                              ? 'bg-slate-100 text-slate-900 font-semibold'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                         }`}
                       >
                         {sub}
@@ -169,6 +166,15 @@ const ShopPage = () => {
     setSearchParams({});
   };
 
+  const handleSubcategorySelect = (nextCategory, nextSubcategory) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('category', nextCategory);
+    newParams.set('subcategory', nextSubcategory);
+    newParams.delete('page');
+    setSearchParams(newParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Breadcrumb
   const breadcrumbs = ['All Products'];
   if (category) breadcrumbs.push(category);
@@ -180,6 +186,21 @@ const ShopPage = () => {
     { value: 'price-desc', label: 'Price: High to Low' },
     { value: 'newest', label: 'Newest First' },
   ];
+
+  const sortedProducts = useMemo(() => {
+    const products = Array.isArray(data?.products) ? [...data.products] : [];
+    const getPriceValue = (product) => Number(product?.price ?? 0);
+
+    if (sort === 'price-asc') {
+      return products.sort((a, b) => getPriceValue(a) - getPriceValue(b));
+    }
+
+    if (sort === 'price-desc') {
+      return products.sort((a, b) => getPriceValue(b) - getPriceValue(a));
+    }
+
+    return products;
+  }, [data?.products, sort]);
 
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-clip">
@@ -210,6 +231,7 @@ const ShopPage = () => {
                 searchParams={searchParams}
                 setParam={setParam}
                 clearFilters={clearFilters}
+                onSubcategorySelect={handleSubcategorySelect}
               />
             </div>
           </aside>
@@ -278,10 +300,10 @@ const ShopPage = () => {
                   </div>
                 ))}
               </div>
-            ) : data?.products && data.products.length > 0 ? (
+            ) : sortedProducts.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
-                  {data.products.map((product) => (
+                  {sortedProducts.map((product) => (
                     <ProductCard key={product._id} product={product} />
                   ))}
                 </div>
@@ -353,6 +375,7 @@ const ShopPage = () => {
                 searchParams={searchParams}
                 setParam={setParam}
                 clearFilters={clearFilters}
+                onSubcategorySelect={handleSubcategorySelect}
               />
             </div>
           </div>

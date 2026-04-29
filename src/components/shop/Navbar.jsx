@@ -94,6 +94,25 @@ const Navbar = () => {
             </nav>
 
             <div className="flex items-center gap-1 sm:gap-2">
+              <form
+                onSubmit={handleSearch}
+                className={`flex items-center overflow-hidden rounded-xl border bg-slate-50 dark:bg-slate-800 transition-all duration-300 ${
+                  searchOpen
+                    ? 'w-44 sm:w-56 border-slate-200 dark:border-slate-700 px-2 sm:px-3 py-1.5 opacity-100'
+                    : 'w-0 border-transparent px-0 py-0 opacity-0 pointer-events-none'
+                }`}
+              >
+                <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full min-w-0 bg-transparent border-none outline-none px-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  autoFocus={searchOpen}
+                />
+              </form>
+
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
                 className={`p-2.5 rounded-xl transition-all duration-300 ${
@@ -202,28 +221,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {searchOpen && (
-          <div className="border-t border-slate-200/80 dark:border-slate-700 bg-white dark:bg-slate-900">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1 min-w-0">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search for products..."
-                    className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:border-slate-900 dark:focus:border-slate-500 transition-colors text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                    autoFocus
-                  />
-                </div>
-                <button type="submit" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-700 transition-colors">
-                  Search
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
       </header>
 
       <div
