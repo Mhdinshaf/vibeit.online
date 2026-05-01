@@ -271,7 +271,11 @@ const api = axios.create({
 // Request interceptor - attach token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('vibeit_token');
+    // Try customer token first, then fall back to admin token
+    const customerToken = localStorage.getItem('vibeit_customer_token');
+    const adminToken = localStorage.getItem('vibeit_token');
+    const token = customerToken || adminToken;
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
