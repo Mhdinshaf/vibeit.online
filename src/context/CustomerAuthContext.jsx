@@ -12,31 +12,43 @@ const devError = (...args) => {
 
 export const CustomerAuthProvider = ({ children }) => {
   // Initialize customer from localStorage synchronously to avoid flash
-  const [customer, setCustomer] = useState(() => customerAuthService.getStoredCustomer());
-  const [loading, setLoading] = useState(true);
+  const [customer, setCustomer] = useState(() => {
+    try {
+      const customerData = localStorage.getItem('vibeit_customer_data');
+      if (customerData) {
+        return JSON.parse(customerData);
+      }
+    } catch (e) {
+      console.warn('Failed to initialize customer from localStorage:', e);
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState(false);
 
-  // Check authentication on mount - synchronous localStorage check first
+  // Mount effect - verify auth on component mount
   useEffect(() => {
     const token = localStorage.getItem('vibeit_customer_token');
     const customerData = localStorage.getItem('vibeit_customer_data');
     
-    console.log('🎲 CustomerAuthContext: Initial mount check', { hasToken: !!token, hasCustomerData: !!customerData });
+    console.log('🎲 CustomerAuthContext: Mount check', { hasToken: !!token, hasCustomerData: !!customerData, customerState: !!customer });
     
-    if (token && customerData) {
+    // If token exists but customer state is null, load it now
+    if (token && !customer && customerData) {
       try {
         const parsed = JSON.parse(customerData);
+        console.log('✅ CustomerAuthContext: Loading customer from storage on mount', { firstName: parsed.firstName, email: parsed.email });
         setCustomer(parsed);
-        console.log('✅ CustomerAuthContext: Customer set from initial localStorage', { firstName: parsed.firstName, email: parsed.email });
       } catch (e) {
         devError('Failed to parse customer data:', e);
         customerAuthService.logout();
         setCustomer(null);
       }
-    } else {
+    } else if (!token && customer) {
+      // Token removed, clear customer state
+      console.log('🔄 CustomerAuthContext: Token removed, clearing customer state');
       setCustomer(null);
     }
-    setLoading(false);
-  }, []);
+  }, [customer]);
 
   // Listen for custom auth update event (from GoogleAuthCallback or email login)
   useEffect(() => {
