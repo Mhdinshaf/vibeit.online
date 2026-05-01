@@ -224,7 +224,7 @@ const Navbar = () => {
       </header>
 
       <div
-        className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 z-30 md:hidden transition-opacity duration-300 ${
           mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -234,11 +234,11 @@ const Navbar = () => {
           aria-label="Close mobile menu overlay"
         />
         <aside
-          className={`absolute right-0 top-0 h-full w-[86vw] max-w-sm bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-xl transition-transform duration-300 ${
+          className={`absolute right-0 top-16 h-[calc(100vh-4rem)] w-[86vw] max-w-sm bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-xl transition-transform duration-300 overflow-y-auto ${
             mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          <div className="h-16 px-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between md:hidden">
             <span className="text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-200">MENU</span>
             <button
               onClick={() => setMobileMenuOpen(false)}
