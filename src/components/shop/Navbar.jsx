@@ -98,7 +98,7 @@ const Navbar = () => {
                 onSubmit={handleSearch}
                 className={`flex items-center overflow-hidden rounded-xl border bg-slate-50 dark:bg-slate-800 transition-all duration-300 ${
                   searchOpen
-                    ? 'w-44 sm:w-56 border-slate-200 dark:border-slate-700 px-2 sm:px-3 py-1.5 opacity-100'
+                    ? 'w-40 xs:w-48 sm:w-56 border-slate-200 dark:border-slate-700 px-2 sm:px-3 py-1.5 opacity-100'
                     : 'w-0 border-transparent px-0 py-0 opacity-0 pointer-events-none'
                 }`}
               >

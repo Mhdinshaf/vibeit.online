@@ -198,7 +198,7 @@ const CheckoutPage = () => {
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900 mb-8">Secure Checkout</h1>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8">
             {/* Left Column - Form */}
             <div className="lg:col-span-7 space-y-6">
               {!isAuthenticated() && (
@@ -232,7 +232,7 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <Mail className="w-5 h-5 text-white" />
@@ -253,7 +253,7 @@ const CheckoutPage = () => {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <MapPin className="w-5 h-5 text-white" />
@@ -354,7 +354,7 @@ const CheckoutPage = () => {
                 )}
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <Truck className="w-5 h-5 text-white" />
@@ -382,7 +382,7 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <CreditCard className="w-5 h-5 text-white" />
@@ -444,7 +444,7 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -497,7 +497,7 @@ const CheckoutPage = () => {
 
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-5">
-              <div className="lg:sticky lg:top-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="lg:sticky lg:top-24 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="bg-slate-900 px-6 py-4">
                   <h2 className="text-xl font-semibold text-white flex items-center gap-2">
                     <Package className="w-5 h-5" />

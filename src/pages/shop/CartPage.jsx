@@ -133,7 +133,7 @@ const CartPage = () => {
                   key={item.key}
                   className="bg-white rounded-2xl border border-slate-200 p-4 md:p-5 shadow-sm"
                 >
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
                     <Link
                       to={`/product/${item.product._id}`}
                       className="flex-shrink-0 self-start"
@@ -141,7 +141,7 @@ const CartPage = () => {
                       <img
                         src={getImageUrl(item.product.images?.[0])}
                         alt={item.product.name}
-                        className="w-24 h-24 md:w-28 md:h-28 rounded-xl object-cover border border-slate-200"
+                        className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl object-cover border border-slate-200"
                       />
                     </Link>
 
@@ -177,11 +177,11 @@ const CartPage = () => {
                               onClick={() =>
                                 handleQuantityChange(item.key, item.quantity - 1, item.product.stockQuantity)
                               }
-                              className="w-9 h-9 flex items-center justify-center bg-white rounded-lg hover:bg-slate-50 transition-colors"
+                              className="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center bg-white rounded-lg hover:bg-slate-50 transition-colors"
                             >
                               <Minus className="w-4 h-4 text-slate-600" />
                             </button>
-                            <span className="font-semibold text-slate-900 w-10 text-center">
+                            <span className="font-semibold text-slate-900 w-12 sm:w-10 text-center">
                               {item.quantity}
                             </span>
                             <button
@@ -189,7 +189,7 @@ const CartPage = () => {
                                 handleQuantityChange(item.key, item.quantity + 1, item.product.stockQuantity)
                               }
                               disabled={item.quantity >= item.product.stockQuantity}
-                              className="w-9 h-9 flex items-center justify-center bg-white rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center bg-white rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <Plus className="w-4 h-4 text-slate-600" />
                             </button>

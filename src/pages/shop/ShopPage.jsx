@@ -224,8 +224,8 @@ const ShopPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          <aside className="hidden lg:block w-72 flex-shrink-0">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
+          <aside className="hidden md:block lg:w-72 md:w-60 flex-shrink-0">
             <div className="sticky top-24">
               <FilterPanel
                 searchParams={searchParams}
@@ -258,7 +258,7 @@ const ShopPage = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setMobileFilterOpen(true)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                  className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
                 >
                   <Filter className="w-4 h-4 text-slate-600" />
                   <span className="text-sm font-medium text-slate-700">Filters</span>
@@ -355,7 +355,7 @@ const ShopPage = () => {
             className="fixed inset-0 bg-slate-900/45 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setMobileFilterOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-slate-50 z-50 overflow-y-auto lg:hidden shadow-2xl border-l border-slate-200">
+          <div className="fixed inset-y-0 right-0 w-80 sm:w-96 max-w-[85vw] bg-slate-50 z-50 overflow-y-auto md:hidden shadow-2xl border-l border-slate-200">
             <div className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">

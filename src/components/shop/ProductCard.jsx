@@ -67,12 +67,12 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
-        <div className="p-4 sm:p-5">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-slate-500 font-medium mb-2">
+        <div className="p-3 sm:p-4 md:p-5">
+          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.14em] text-slate-500 font-medium mb-2">
             {product.category}
           </p>
 
-          <h3 className="text-base font-semibold text-slate-900 line-clamp-2 mb-3 leading-snug">
+          <h3 className="text-sm sm:text-base font-semibold text-slate-900 line-clamp-2 mb-3 leading-snug">
             {product.name}
           </h3>
 
