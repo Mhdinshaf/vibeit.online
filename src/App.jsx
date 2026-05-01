@@ -60,7 +60,7 @@ export default function App() {
         <Route path="/login" element={<CustomerLogin />} />
         <Route path="/auth/customer/login" element={<CustomerLogin />} />
         <Route path="/auth/customer/register" element={<CustomerRegister />} />
-        <Route path="/auth/customer/callback" element={<GoogleAuthCallback />} />
+        <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
 
         {/* Protected Customer Routes */}
         <Route element={<ProtectedCustomerRoute />}>
