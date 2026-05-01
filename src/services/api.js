@@ -314,9 +314,23 @@ api.interceptors.response.use(
       });
     }
     if (error.response?.status === 401) {
-      localStorage.removeItem('vibeit_token');
-      localStorage.removeItem('vibeit_admin');
-      window.location.href = '/admin/login';
+      // Determine if this is a customer or admin request based on stored token
+      const customerToken = localStorage.getItem('vibeit_customer_token');
+      const adminToken = localStorage.getItem('vibeit_token');
+      
+      if (customerToken) {
+        // Customer 401 - clear customer token and redirect to customer login
+        console.log('🔐 API: 401 - Clearing customer token, redirecting to customer login');
+        localStorage.removeItem('vibeit_customer_token');
+        localStorage.removeItem('vibeit_customer_data');
+        window.location.href = '/login';
+      } else if (adminToken) {
+        // Admin 401 - clear admin token and redirect to admin login
+        console.log('🔐 API: 401 - Clearing admin token, redirecting to admin login');
+        localStorage.removeItem('vibeit_token');
+        localStorage.removeItem('vibeit_admin');
+        window.location.href = '/admin/login';
+      }
     }
     return Promise.reject(error);
   }
