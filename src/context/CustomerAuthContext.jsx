@@ -20,10 +20,13 @@ export const CustomerAuthProvider = ({ children }) => {
     const token = localStorage.getItem('vibeit_customer_token');
     const customerData = localStorage.getItem('vibeit_customer_data');
     
+    console.log('🎲 CustomerAuthContext: Initial mount check', { hasToken: !!token, hasCustomerData: !!customerData });
+    
     if (token && customerData) {
       try {
         const parsed = JSON.parse(customerData);
         setCustomer(parsed);
+        console.log('✅ CustomerAuthContext: Customer set from initial localStorage', { firstName: parsed.firstName, email: parsed.email });
       } catch (e) {
         devError('Failed to parse customer data:', e);
         customerAuthService.logout();
@@ -38,21 +41,29 @@ export const CustomerAuthProvider = ({ children }) => {
   // Listen for custom auth update event (from GoogleAuthCallback or email login)
   useEffect(() => {
     const handleAuthUpdated = (event) => {
+      console.log('🎯 CustomerAuthContext: Received vibeit:auth-updated event');
       const token = localStorage.getItem('vibeit_customer_token');
       const customerData = localStorage.getItem('vibeit_customer_data');
+      
+      console.log('📍 CustomerAuthContext: Checking localStorage', { hasToken: !!token, hasCustomerData: !!customerData });
       
       if (token && customerData) {
         try {
           const parsed = JSON.parse(customerData);
+          console.log('✅ CustomerAuthContext: Setting customer state from event', { firstName: parsed.firstName, email: parsed.email });
           setCustomer(parsed);
         } catch (err) {
           devError('Failed to parse customer data from auth event:', err);
           customerAuthService.logout();
           setCustomer(null);
         }
+      } else {
+        console.log('⚠️ CustomerAuthContext: Auth event received but no token/data in localStorage');
+        setCustomer(null);
       }
     };
 
+    console.log('🔧 CustomerAuthContext: Attaching vibeit:auth-updated listener');
     window.addEventListener('vibeit:auth-updated', handleAuthUpdated);
     return () => window.removeEventListener('vibeit:auth-updated', handleAuthUpdated);
   }, []);
@@ -60,6 +71,7 @@ export const CustomerAuthProvider = ({ children }) => {
   // Also watch for storage changes (handles cross-tab auth, or same-tab updates)
   useEffect(() => {
     const handleStorageChange = (e) => {
+      console.log('🔄 CustomerAuthContext: Storage change event', { key: e.key });
       if (e.key === 'vibeit_customer_data' || e.key === 'vibeit_customer_token') {
         const token = localStorage.getItem('vibeit_customer_token');
         const customerData = localStorage.getItem('vibeit_customer_data');
@@ -67,16 +79,19 @@ export const CustomerAuthProvider = ({ children }) => {
         if (token && customerData) {
           try {
             const parsed = JSON.parse(customerData);
+            console.log('✅ CustomerAuthContext: Setting customer state from storage event', { firstName: parsed.firstName, email: parsed.email });
             setCustomer(parsed);
           } catch (err) {
             devError('Failed to parse customer data from storage:', err);
           }
         } else {
+          console.log('ℹ️ CustomerAuthContext: Storage cleared, setting customer to null');
           setCustomer(null);
         }
       }
     };
 
+    console.log('🔧 CustomerAuthContext: Attaching storage listener');
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
@@ -104,8 +119,12 @@ export const CustomerAuthProvider = ({ children }) => {
    * @returns {Promise<object>}
    */
   const login = async (email, password) => {
+    console.log('🔑 CustomerAuthContext.login: Called for', email);
     const response = await customerAuthService.login(email, password);
+    console.log('🔑 CustomerAuthContext.login: Backend response', { hasCustomer: !!response.customer, token: response.token?.substring(0, 20) + '...' });
+    
     const customerData = response.customer || response;
+    console.log('🔑 CustomerAuthContext.login: Setting customer state', { firstName: customerData?.firstName, email: customerData?.email });
     setCustomer(customerData);
     
     // Emit auth updated event so any listeners know to refresh

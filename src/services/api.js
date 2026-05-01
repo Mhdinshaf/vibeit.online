@@ -278,6 +278,17 @@ api.interceptors.request.use(
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      if (config.url?.includes('orders')) {
+        console.log('🔐 API: Attaching token to orders request', { 
+          url: config.url, 
+          tokenSource: customerToken ? 'customer' : 'admin',
+          tokenPreview: token.substring(0, 20) + '...'
+        });
+      }
+    } else {
+      if (config.url?.includes('orders')) {
+        console.warn('⚠️ API: No token found for orders request!', { url: config.url });
+      }
     }
     return config;
   },
@@ -286,10 +297,22 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - handle 401 errors
+// Response interceptor - handle errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.config.url?.includes('orders')) {
+      console.log('✅ API: Orders response received', { status: response.status, orderCount: response.data?.orders?.length });
+    }
+    return response;
+  },
   (error) => {
+    if (error.config?.url?.includes('orders')) {
+      console.error('❌ API: Orders request failed', { 
+        status: error.response?.status, 
+        message: error.response?.data?.message || error.message,
+        url: error.config.url
+      });
+    }
     if (error.response?.status === 401) {
       localStorage.removeItem('vibeit_token');
       localStorage.removeItem('vibeit_admin');

@@ -16,6 +16,15 @@ const Navbar = () => {
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
   const { customer, logout } = useCustomerAuth();
 
+  // Debug: Log when customer value changes
+  useEffect(() => {
+    if (customer) {
+      console.log('🎭 Navbar: Customer logged in', { firstName: customer.firstName, email: customer.email });
+    } else {
+      console.log('🎭 Navbar: No customer (Guest mode)');
+    }
+  }, [customer]);
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     try {
