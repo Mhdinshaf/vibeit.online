@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, User, Phone, Loader2, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
@@ -27,11 +27,12 @@ const CustomerRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Redirect if already logged in
-  if (isAuthenticated()) {
-    navigate('/customer/dashboard');
-    return null;
-  }
+  // Redirect if already logged in - use useEffect
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate('/customer/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
