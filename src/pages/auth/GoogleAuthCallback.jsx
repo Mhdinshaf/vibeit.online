@@ -13,10 +13,7 @@ export default function GoogleAuthCallback() {
         const token = params.get('token');
         const customerData = params.get('customer');
 
-        console.log('🔵 GoogleAuthCallback: Starting', { hasToken: !!token, hasCustomerData: !!customerData });
-
         if (!token) {
-          console.error('No token found in callback URL');
           navigate('/login', { state: { error: 'Authentication failed: No token received' } });
           return;
         }
@@ -32,15 +29,13 @@ export default function GoogleAuthCallback() {
             customerId = payload.customerId;
             email = payload.email;
             firstName = payload.name;
-            console.log('📋 GoogleAuthCallback: Extracted from JWT', { customerId, email, firstName });
           }
         } catch (jwtError) {
-          console.warn('Failed to decode JWT payload:', jwtError);
+          // Continue with available data
         }
 
         // Store token in localStorage
         localStorage.setItem('vibeit_customer_token', token);
-        console.log('✅ GoogleAuthCallback: Token stored');
         
         // Build customer object from JWT + URL param data
         let customerObj = null;
@@ -58,31 +53,26 @@ export default function GoogleAuthCallback() {
             try {
               const parsedCustomer = JSON.parse(decodeURIComponent(customerData));
               customerObj = { ...customerObj, ...parsedCustomer };
-              console.log('✅ GoogleAuthCallback: Merged URL customer data');
             } catch (parseError) {
-              console.warn('Failed to parse customer data from URL param (may be too large):', parseError);
+              // Continue with JWT-extracted data
             }
           }
           
           localStorage.setItem('vibeit_customer_data', JSON.stringify(customerObj));
-          console.log('✅ GoogleAuthCallback: Customer data stored', { firstName: customerObj.firstName, email: customerObj.email });
         } else if (customerData) {
           // Fallback: try to parse customer from URL param
           try {
             customerObj = JSON.parse(decodeURIComponent(customerData));
             localStorage.setItem('vibeit_customer_data', JSON.stringify(customerObj));
-            console.log('✅ GoogleAuthCallback: Customer data stored from URL param', { firstName: customerObj.firstName, email: customerObj.email });
           } catch (parseError) {
-            console.warn('Failed to parse customer data from callback:', parseError);
+            // Continue without customer data
           }
         }
 
         // Initialize auth header for future requests
         customerAuthService.initializeAuthHeader();
-        console.log('✅ GoogleAuthCallback: Auth header initialized');
 
         // Emit custom event to notify auth context of the update
-        console.log('📢 GoogleAuthCallback: Emitting vibeit:auth-updated event');
         window.dispatchEvent(new CustomEvent('vibeit:auth-updated', {
           detail: { token, customerData: customerObj }
         }));
@@ -91,11 +81,9 @@ export default function GoogleAuthCallback() {
         const redirectPath = localStorage.getItem('vibeit_post_login_redirect') || '/customer/dashboard';
         localStorage.removeItem('vibeit_post_login_redirect');
 
-        console.log('🔀 GoogleAuthCallback: Redirecting to', redirectPath);
         // Redirect to the stored path
         navigate(redirectPath);
       } catch (error) {
-        console.error('Error handling Google callback:', error);
         navigate('/login', { state: { error: 'Authentication failed' } });
       }
     };
