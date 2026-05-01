@@ -22,7 +22,8 @@ export const CustomerAuthProvider = ({ children }) => {
     
     if (token && customerData) {
       try {
-        setCustomer(JSON.parse(customerData));
+        const parsed = JSON.parse(customerData);
+        setCustomer(parsed);
       } catch (e) {
         devError('Failed to parse customer data:', e);
         customerAuthService.logout();
@@ -32,6 +33,28 @@ export const CustomerAuthProvider = ({ children }) => {
       setCustomer(null);
     }
     setLoading(false);
+  }, []);
+
+  // Listen for custom auth update event (from GoogleAuthCallback)
+  useEffect(() => {
+    const handleAuthUpdated = (event) => {
+      const token = localStorage.getItem('vibeit_customer_token');
+      const customerData = localStorage.getItem('vibeit_customer_data');
+      
+      if (token && customerData) {
+        try {
+          const parsed = JSON.parse(customerData);
+          setCustomer(parsed);
+        } catch (err) {
+          devError('Failed to parse customer data from auth event:', err);
+          customerAuthService.logout();
+          setCustomer(null);
+        }
+      }
+    };
+
+    window.addEventListener('vibeit:auth-updated', handleAuthUpdated);
+    return () => window.removeEventListener('vibeit:auth-updated', handleAuthUpdated);
   }, []);
 
   /**

@@ -35,6 +35,11 @@ export default function GoogleAuthCallback() {
         // Initialize auth header for future requests
         customerAuthService.initializeAuthHeader();
 
+        // Emit custom event to notify auth context of the update
+        window.dispatchEvent(new CustomEvent('vibeit:auth-updated', {
+          detail: { token, customerData }
+        }));
+
         // Get redirect path from localStorage (set before Google redirect)
         const redirectPath = localStorage.getItem('vibeit_post_login_redirect') || '/customer/dashboard';
         localStorage.removeItem('vibeit_post_login_redirect');
