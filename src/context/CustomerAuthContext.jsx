@@ -35,7 +35,7 @@ export const CustomerAuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Listen for custom auth update event (from GoogleAuthCallback)
+  // Listen for custom auth update event (from GoogleAuthCallback or email login)
   useEffect(() => {
     const handleAuthUpdated = (event) => {
       const token = localStorage.getItem('vibeit_customer_token');
@@ -55,6 +55,30 @@ export const CustomerAuthProvider = ({ children }) => {
 
     window.addEventListener('vibeit:auth-updated', handleAuthUpdated);
     return () => window.removeEventListener('vibeit:auth-updated', handleAuthUpdated);
+  }, []);
+
+  // Also watch for storage changes (handles cross-tab auth, or same-tab updates)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'vibeit_customer_data' || e.key === 'vibeit_customer_token') {
+        const token = localStorage.getItem('vibeit_customer_token');
+        const customerData = localStorage.getItem('vibeit_customer_data');
+        
+        if (token && customerData) {
+          try {
+            const parsed = JSON.parse(customerData);
+            setCustomer(parsed);
+          } catch (err) {
+            devError('Failed to parse customer data from storage:', err);
+          }
+        } else {
+          setCustomer(null);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   /**
@@ -83,6 +107,12 @@ export const CustomerAuthProvider = ({ children }) => {
     const response = await customerAuthService.login(email, password);
     const customerData = response.customer || response;
     setCustomer(customerData);
+    
+    // Emit auth updated event so any listeners know to refresh
+    window.dispatchEvent(new CustomEvent('vibeit:auth-updated', {
+      detail: { customerData }
+    }));
+    
     return response;
   };
 

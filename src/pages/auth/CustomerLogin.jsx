@@ -58,8 +58,13 @@ const CustomerLogin = () => {
         return;
       }
 
-      await login(formData.email, formData.password);
+      const response = await login(formData.email, formData.password);
       toast.success('Login successful!');
+      
+      // Force re-render by reading fresh data from localStorage
+      // This ensures Navbar sees the updated customer before navigation
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       // Redirect to the original location or dashboard
       navigate(from);
     } catch (err) {
