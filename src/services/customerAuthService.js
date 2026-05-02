@@ -51,10 +51,8 @@ export const customerAuthService = {
    * @returns {Promise<{token: string, customer: object}>}
    */
   async login(email, password) {
-    console.log('🔑 customerAuthService.login: Starting email login for', email);
     try {
       const response = await api.post('/customer/auth/login', { email, password });
-      console.log('🔑 customerAuthService.login: Backend response received', { hasToken: !!response.data.token, hasCustomer: !!response.data.customer });
       
       const { token, customer } = response.data;
       
@@ -65,11 +63,9 @@ export const customerAuthService = {
       // Store in localStorage
       localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
       localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(customer));
-      console.log('✅ customerAuthService.login: Stored in localStorage', { email: customer?.email });
       
       // Set auth header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      console.log('✅ customerAuthService.login: Auth header set');
       
       return response.data;
     } catch (error) {

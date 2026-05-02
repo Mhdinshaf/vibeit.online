@@ -58,9 +58,7 @@ const CustomerLogin = () => {
         return;
       }
 
-      console.log('📧 CustomerLogin: Attempting email login for', formData.email);
       const response = await login(formData.email, formData.password);
-      console.log('✅ CustomerLogin: Login API response received', { hasCustomer: !!response.customer });
       
       toast.success('Login successful!');
       
@@ -68,7 +66,6 @@ const CustomerLogin = () => {
       // This ensures Navbar sees the updated customer before navigation
       await new Promise(resolve => setTimeout(resolve, 50));
       
-      console.log('🔀 CustomerLogin: Navigating to', from);
       // Redirect to the original location or dashboard
       navigate(from);
     } catch (err) {

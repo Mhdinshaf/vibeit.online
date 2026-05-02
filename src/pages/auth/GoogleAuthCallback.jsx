@@ -84,10 +84,8 @@ export default function GoogleAuthCallback() {
         // Add delay to ensure context has processed the storage update
         // This prevents a race condition where the route guard checks auth before the context updates
         // Also ensures Axios interceptor has time to set the Authorization header
-        console.log('⏳ GoogleAuthCallback: Waiting 500ms for context sync before redirect...');
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        console.log('✅ GoogleAuthCallback: Context synced, redirecting to', redirectPath);
         // Redirect to the stored path
         navigate(redirectPath);
       } catch {

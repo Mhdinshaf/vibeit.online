@@ -207,11 +207,6 @@ const AdminOrders = () => {
                         }
                         
                         devLog('📋 STATUS UPDATE:');
-                        console.log('  Order Number:', order.orderNumber);
-                        console.log('  Order _id:', order._id);
-                        console.log('  _id Type:', typeof order._id);
-                        console.log('  _id Length:', String(order._id).length);
-                        console.log('  New Status:', e.target.value);
                         
                         mutateOrderStatus({ id: order._id, nextStatus: e.target.value });
                       }}

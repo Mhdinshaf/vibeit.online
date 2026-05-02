@@ -277,20 +277,6 @@ api.interceptors.request.use(
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      // Detailed logging for debugging auth issues
-      console.log('🔐 API: Request with auth', { 
-        url: config.url, 
-        method: config.method,
-        tokenSource: customerToken ? 'customer' : 'admin',
-        tokenLength: token.length,
-        tokenPreview: token.substring(0, 20) + '...',
-        authHeader: `Bearer ${token.substring(0, 20)}...`
-      });
-    } else {
-      console.warn('⚠️ API: No auth token available for request', { 
-        url: config.url,
-        method: config.method
-      });
     }
     return config;
   },
@@ -302,9 +288,6 @@ api.interceptors.request.use(
 // Response interceptor - handle errors
 api.interceptors.response.use(
   (response) => {
-    if (response.config.url?.includes('orders')) {
-      console.log('✅ API: Orders response received', { status: response.status, orderCount: response.data?.orders?.length });
-    }
     return response;
   },
   (error) => {
@@ -319,16 +302,6 @@ api.interceptors.response.use(
       // Determine if this is a customer or admin request based on stored token
       const customerToken = localStorage.getItem('vibeit_customer_token');
       const adminToken = localStorage.getItem('vibeit_token');
-      
-      // Log the 401 error with context for debugging
-      console.log('🔐 API: 401 Unauthorized received', {
-        url: error.config?.url,
-        hasCustomerToken: !!customerToken,
-        hasAdminToken: !!adminToken,
-        tokenPrefix: customerToken ? customerToken.substring(0, 30) + '...' : 'none',
-        responseStatus: error.response?.status,
-        responseData: error.response?.data
-      });
       
       // Only clear token if:
       // 1. We have a token
@@ -345,23 +318,14 @@ api.interceptors.response.use(
       
       if (shouldClearCustomer && isRealAuthError) {
         // Customer 401 - clear customer token and redirect to customer login
-        console.log('🔐 API: Confirmed invalid token, clearing customer auth and redirecting to login');
         localStorage.removeItem('vibeit_customer_token');
         localStorage.removeItem('vibeit_customer_data');
         window.location.href = '/login';
       } else if (shouldClearAdmin && isRealAuthError) {
         // Admin 401 - clear admin token and redirect to admin login
-        console.log('🔐 API: Confirmed invalid token, clearing admin auth and redirecting to login');
         localStorage.removeItem('vibeit_token');
         localStorage.removeItem('vibeit_admin');
         window.location.href = '/admin/login';
-      } else if (shouldClearCustomer || shouldClearAdmin) {
-        // Uncertain 401 - don't clear, just log
-        console.warn('⚠️ API: 401 received but token authenticity uncertain, not clearing auth. This may indicate:');
-        console.warn('   - Clock skew between client and server');
-        console.warn('   - Token signature validation issue');
-        console.warn('   - Temporary backend validation failure');
-        console.warn('   - CORS header stripping Authorization');
       }
     }
     return Promise.reject(error);

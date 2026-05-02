@@ -15,23 +15,11 @@ const ProtectedCustomerRoute = () => {
   // Check both: token exists AND customer data loaded
   // This prevents redirects while customer state is being populated
   const token = localStorage.getItem('vibeit_customer_token');
-  const customerData = localStorage.getItem('vibeit_customer_data');
-  
-  console.log('🛡️ ProtectedCustomerRoute: Checking auth', { 
-    loading, 
-    isAuth: isAuthenticated(), 
-    hasToken: !!token, 
-    hasCustomerData: !!customerData, 
-    customerLoaded: !!customer,
-    willAllow: isAuthenticated() && (!!token)
-  });
 
   if (!isAuthenticated() || !token) {
-    console.log('🚫 ProtectedCustomerRoute: NOT authenticated, redirecting to /auth/customer/login');
     return <Navigate to="/auth/customer/login" replace />;
   }
 
-  console.log('✅ ProtectedCustomerRoute: Authenticated, allowing access');
   return <Outlet />;
 };
 

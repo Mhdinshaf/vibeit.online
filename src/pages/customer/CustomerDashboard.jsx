@@ -20,11 +20,9 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        console.log('📦 CustomerDashboard: Loading orders for customer:', customer?.email);
         setIsLoadingOrders(true);
         setOrderError(null);
         const response = await getOrders({ page: 1, limit: 500 });
-        console.log('✅ CustomerDashboard: Orders loaded successfully', { count: response?.orders?.length });
         if (response?.orders) {
           setOrders(response.orders);
         }
@@ -37,10 +35,7 @@ const CustomerDashboard = () => {
     };
 
     if (customer) {
-      console.log('🎯 CustomerDashboard: Customer detected, loading orders');
       loadOrders();
-    } else {
-      console.log('🎯 CustomerDashboard: No customer, skipping order load');
     }
   }, [customer, setOrders]);
 

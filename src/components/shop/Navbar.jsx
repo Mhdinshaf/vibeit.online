@@ -16,13 +16,9 @@ const Navbar = () => {
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
   const { customer, logout } = useCustomerAuth();
 
-  // Debug: Log when customer value changes
+  // Track customer authentication state
   useEffect(() => {
-    if (customer) {
-      console.log('🎭 Navbar: Customer logged in', { firstName: customer.firstName, email: customer.email });
-    } else {
-      console.log('🎭 Navbar: No customer (Guest mode)');
-    }
+    // No logging needed for production
   }, [customer]);
 
   useEffect(() => {
