@@ -381,8 +381,8 @@ export const deleteProductPermanent = async (id) => {
 // Order APIs
 export const createOrder = async (data) => {
   try {
-    devLog('log', '📤 POST /customer/orders - Creating order...');
-    const response = await api.post('/customer/orders', data);
+    devLog('log', '📤 POST /orders - Creating order...');
+    const response = await api.post('/orders', data);
     
     // CRITICAL: Verify backend returned _id
     const order = response.data;
@@ -433,7 +433,7 @@ export const createOrder = async (data) => {
         orderItems: normalizedItems,
       };
 
-      const retryResponse = await api.post('/customer/orders', retryPayload);
+      const retryResponse = await api.post('/orders', retryPayload);
       const retryOrder = retryResponse.data;
       
       // Verify retry response also has _id
@@ -470,7 +470,7 @@ export const getOrders = async (params) => {
     const requestParams = normalizedSearch
       ? { ...params, page: 1, limit: Math.max(Number(params?.limit || 20), 500) }
       : params;
-    const response = await api.get('/customer/orders', { params: requestParams });
+    const response = await api.get('/orders', { params: requestParams });
     const remotePayload = normalizeOrdersResponse(response.data);
     
     // ⚠️ CRITICAL CHECK: Log EXACT backend response before any processing
@@ -559,7 +559,7 @@ export const getOrderById = async (id) => {
   
   try {
     devLog('log', '🔍 Frontend - Getting order by ID:', id, 'Type:', typeof id, 'Length:', String(id).length);
-    const response = await api.get(`/customer/orders/${id}`);
+    const response = await api.get(`/orders/${id}`);
     const rawOrder = response?.data?.order || response?.data?.data?.order || response?.data?.data || response?.data;
     const order = normalizeOrderPayload(rawOrder);
     
@@ -607,7 +607,7 @@ export const updateOrderStatus = async (id, data) => {
   }
   
   try {
-    const url = `/customer/orders/${id}/status`;
+    const url = `/orders/${id}/status`;
     devLog('log', '🔄 UPDATE ORDER STATUS REQUEST:');
     devLog('log', '  URL:', url);
     devLog('log', '  ID Type:', typeof id, '| ID Value:', id);
@@ -642,7 +642,7 @@ export const getOrderStats = async () => {
   const localMetrics = getLocalOrderMetrics();
 
   try {
-    const response = await api.get('/customer/orders/stats');
+    const response = await api.get('/orders/stats');
     const remote = response.data || {};
 
     return {
