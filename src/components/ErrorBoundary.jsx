@@ -10,7 +10,7 @@ class ErrorBoundary extends Component {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch() {
     // You can log errors to a service here if needed
     // For now, we'll just update state
   }

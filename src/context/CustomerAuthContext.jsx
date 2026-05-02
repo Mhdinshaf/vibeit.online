@@ -3,29 +3,32 @@ import { customerAuthService } from '../services/customerAuthService';
 
 const CustomerAuthContext = createContext(null);
 
-// Helper for environment-aware logging
-const devError = (...args) => {
-  if (import.meta.env.DEV) {
-    console.error?.(...args);
+// Utility function to load stored customer
+const loadStoredCustomer = () => {
+  try {
+    const customerData = localStorage.getItem('vibeit_customer_data');
+    if (customerData) {
+      return JSON.parse(customerData);
+    }
+  } catch {
+    // Failed to initialize
   }
+  return null;
 };
 
-export const CustomerAuthProvider = ({ children }) => {
-  // Initialize customer from localStorage synchronously to avoid flash
-  const [customer, setCustomer] = useState(() => {
-    try {
-      const customerData = localStorage.getItem('vibeit_customer_data');
-      if (customerData) {
-        return JSON.parse(customerData);
-      }
-    } catch (e) {
-      // Failed to initialize
+const CustomerAuthProvider = ({ children }) => {
+  // Helper for environment-aware logging
+  const devError = (...args) => {
+    if (import.meta.env.DEV) {
+      console.error?.(...args);
     }
-    return null;
-  });
-  const [loading, setLoading] = useState(false);
+  };
+
+  // Initialize customer from localStorage synchronously to avoid flash
+  const [customer, setCustomer] = useState(() => loadStoredCustomer());
 
   // Mount effect - verify auth on component mount
+  // Note: setState in effect is intentional here for initial sync with localStorage
   useEffect(() => {
     const token = localStorage.getItem('vibeit_customer_token');
     const customerData = localStorage.getItem('vibeit_customer_data');
@@ -34,9 +37,10 @@ export const CustomerAuthProvider = ({ children }) => {
     if (token && !customer && customerData) {
       try {
         const parsed = JSON.parse(customerData);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCustomer(parsed);
-      } catch (e) {
-        devError('Failed to parse customer data:', e);
+      } catch {
+        devError('Failed to parse customer data');
         customerAuthService.logout();
         setCustomer(null);
       }
@@ -48,7 +52,7 @@ export const CustomerAuthProvider = ({ children }) => {
 
   // Listen for custom auth update event (from GoogleAuthCallback or email login)
   useEffect(() => {
-    const handleAuthUpdated = (event) => {
+    const handleAuthUpdated = () => {
       const token = localStorage.getItem('vibeit_customer_token');
       const customerData = localStorage.getItem('vibeit_customer_data');
       
@@ -70,8 +74,8 @@ export const CustomerAuthProvider = ({ children }) => {
 
   // Also watch for storage changes (handles cross-tab auth, or same-tab updates)
   useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'vibeit_customer_data' || e.key === 'vibeit_customer_token') {
+    const handleStorageChange = (storageEvent) => {
+      if (storageEvent.key === 'vibeit_customer_data' || storageEvent.key === 'vibeit_customer_token') {
         const token = localStorage.getItem('vibeit_customer_token');
         const customerData = localStorage.getItem('vibeit_customer_data');
         
@@ -166,7 +170,6 @@ export const CustomerAuthProvider = ({ children }) => {
 
   const value = {
     customer,
-    loading,
     register,
     login,
     startGoogleLogin,
@@ -182,10 +185,7 @@ export const CustomerAuthProvider = ({ children }) => {
   );
 };
 
-/**
- * Hook to use customer auth context
- * @returns {{customer: object, loading: boolean, register: Function, login: Function, logout: Function, updateProfile: Function, isAuthenticated: Function}}
- */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCustomerAuth = () => {
   const context = useContext(CustomerAuthContext);
   if (!context) {

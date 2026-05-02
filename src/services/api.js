@@ -11,7 +11,6 @@ const devLog = (level, ...args) => {
     console[level]?.(...args);
   }
 };
-const devWarn = (...args) => devLog('warn', ...args);
 const devError = (...args) => devLog('error', ...args);
 
 const isOfflineOrServerUnavailable = (error) => {
@@ -97,7 +96,7 @@ const normalizeOrderPayload = (payload) => {
   };
 };
 
-const createLocalOrder = (payload) => {
+const _createLocalOrder = (payload) => {
   const now = new Date().toISOString();
   
   // STRICT: Backend MUST return _id - no fallback
@@ -372,7 +371,7 @@ export const deleteProductPermanent = async (id) => {
     // Try permanent delete endpoint first
     const response = await api.delete(`/products/${id}/permanent`);
     return response.data;
-  } catch (error) {
+  } catch {
     // If permanent endpoint doesn't exist, fall back to regular delete
     // This sends a special flag to indicate hard delete
     const response = await api.delete(`/products/${id}`, {

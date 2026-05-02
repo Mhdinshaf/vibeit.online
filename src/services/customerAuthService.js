@@ -211,35 +211,31 @@ export const customerAuthService = {
    * @returns {Promise<{token: string, customer: object}>}
    */
   async handleGoogleCallbackToken(params) {
-    try {
-      const token = params.get('token');
-      const customerData = params.get('customer');
+    const token = params.get('token');
+    const customerData = params.get('customer');
 
-      if (!token) {
-        throw new Error('No token found in callback URL');
-      }
-
-      // Store token
-      localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
-
-      // Parse and store customer data if provided
-      if (customerData) {
-        try {
-          const parsedCustomer = JSON.parse(decodeURIComponent(customerData));
-          localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(parsedCustomer));
-        } catch (parseError) {
-          devWarn('Failed to parse customer data from callback:', parseError);
-        }
-      }
-
-      // Initialize auth header
-      this.initializeAuthHeader();
-
-      return { token, customer: this.getStoredCustomer() };
-    } catch (error) {
-      throw error;
+    if (!token) {
+      throw new Error('No token found in callback URL');
     }
-  },
+
+    // Store token
+    localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
+
+    // Parse and store customer data if provided
+    if (customerData) {
+      try {
+        const parsedCustomer = JSON.parse(decodeURIComponent(customerData));
+        localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(parsedCustomer));
+      } catch (parseError) {
+        devWarn('Failed to parse customer data from callback:', parseError);
+      }
+    }
+
+    // Initialize auth header
+    this.initializeAuthHeader();
+
+    return { token, customer: this.getStoredCustomer() };
+  }
 };
 
 // Initialize auth header on module load

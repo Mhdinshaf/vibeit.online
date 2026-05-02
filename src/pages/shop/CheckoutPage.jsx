@@ -66,13 +66,17 @@ const CheckoutPage = () => {
   // Auto-populate form with customer data
   useEffect(() => {
     if (customer) {
-      setForm((prev) => ({
-        ...prev,
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setForm({
         firstName: customer.firstName || '',
         lastName: customer.lastName || '',
         email: customer.email || '',
         phone: customer.phone || '',
-      }));
+        city: '',
+        district: '',
+        postalCode: '',
+        notes: '',
+      });
     }
   }, [customer]);
 

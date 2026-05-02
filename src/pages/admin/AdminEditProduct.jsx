@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Upload, X, Check, Package, Tag, DollarSign, Layers, Cloud, Loader2, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { ArrowLeft, Upload, X, Check, Package, Tag, DollarSign, Layers, Cloud, Loader2, Image as ImageIcon } from 'lucide-react';
 import { getProductById, updateProduct, uploadImages } from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -21,17 +21,21 @@ const CATEGORIES_WITH_SUBCATEGORIES = {
 const SIZE_OPTIONS = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
 
 // Premium Section Card Component
-const SectionCard = ({ icon: Icon, title, children }) => (
-  <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all duration-300">
-    <div className="flex items-center gap-3 mb-6">
-      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-        <Icon className="w-5 h-5 text-white" />
+// eslint-disable-next-line no-unused-vars
+const SectionCard = ({ icon: Icon, title, children }) => {
+  // Icon component prop is received and used
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
       </div>
-      <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+      {children}
     </div>
-    {children}
-  </div>
-);
+  );
+};
 
 // Premium Input Component
 const PremiumInput = ({ label, required, hint, ...props }) => (

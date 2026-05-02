@@ -30,7 +30,7 @@ export default function GoogleAuthCallback() {
             email = payload.email;
             firstName = payload.name;
           }
-        } catch (jwtError) {
+        } catch {
           // Continue with available data
         }
 
@@ -53,7 +53,7 @@ export default function GoogleAuthCallback() {
             try {
               const parsedCustomer = JSON.parse(decodeURIComponent(customerData));
               customerObj = { ...customerObj, ...parsedCustomer };
-            } catch (parseError) {
+            } catch {
               // Continue with JWT-extracted data
             }
           }
@@ -64,7 +64,7 @@ export default function GoogleAuthCallback() {
           try {
             customerObj = JSON.parse(decodeURIComponent(customerData));
             localStorage.setItem('vibeit_customer_data', JSON.stringify(customerObj));
-          } catch (parseError) {
+          } catch {
             // Continue without customer data
           }
         }
@@ -83,7 +83,7 @@ export default function GoogleAuthCallback() {
 
         // Redirect to the stored path
         navigate(redirectPath);
-      } catch (error) {
+      } catch {
         navigate('/login', { state: { error: 'Authentication failed' } });
       }
     };

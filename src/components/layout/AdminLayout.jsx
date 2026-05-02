@@ -4,36 +4,7 @@ import { LayoutDashboard, Package, ShoppingBag, Menu, X, LogOut, ExternalLink, S
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
-const AdminLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { admin, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    toast.success('Logged out successfully');
-    navigate('https://vibeitlk.vercel.app');
-  };
-
-  const navLinks = [
-    { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-    { to: '/admin/products', label: 'Products', icon: Package },
-    { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
-  ];
-
-  const getPageTitle = () => {
-    const path = location.pathname;
-    if (path === '/admin') return 'Dashboard';
-    if (path.startsWith('/admin/products/add')) return 'Add Product';
-    if (path.startsWith('/admin/products/edit')) return 'Edit Product';
-    if (path.startsWith('/admin/products')) return 'Products';
-    if (path.startsWith('/admin/orders/')) return 'Order Details';
-    if (path.startsWith('/admin/orders')) return 'Orders';
-    return 'Admin Panel';
-  };
-
-  const SidebarContent = () => (
+const SidebarContent = ({ location, navLinks, admin, handleLogout, setSidebarOpen }) => (
     <div className="flex flex-col h-full">
       {/* Logo Area */}
       <div className="p-6 border-b border-slate-800">
@@ -97,11 +68,40 @@ const AdminLayout = () => {
     </div>
   );
 
+const AdminLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { admin, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully');
+    navigate('https://vibeitlk.vercel.app');
+  };
+
+  const navLinks = [
+    { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+    { to: '/admin/products', label: 'Products', icon: Package },
+    { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
+  ];
+
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path === '/admin') return 'Dashboard';
+    if (path.startsWith('/admin/products/add')) return 'Add Product';
+    if (path.startsWith('/admin/products/edit')) return 'Edit Product';
+    if (path.startsWith('/admin/products')) return 'Products';
+    if (path.startsWith('/admin/orders/')) return 'Order Details';
+    if (path.startsWith('/admin/orders')) return 'Orders';
+    return 'Admin Panel';
+  };
+
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col w-64 bg-slate-900 fixed left-0 top-0 bottom-0 z-40">
-        <SidebarContent />
+        <SidebarContent location={location} navLinks={navLinks} admin={admin} handleLogout={handleLogout} setSidebarOpen={setSidebarOpen} />
       </aside>
 
       {/* Mobile Overlay */}
@@ -118,7 +118,7 @@ const AdminLayout = () => {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <SidebarContent />
+        <SidebarContent location={location} navLinks={navLinks} admin={admin} handleLogout={handleLogout} setSidebarOpen={setSidebarOpen} />
       </aside>
 
       {/* Main Content Area */}

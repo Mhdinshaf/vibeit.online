@@ -3,28 +3,30 @@ import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
 
-// Helper for environment-aware logging
-const devError = (...args) => {
-  if (import.meta.env.DEV) {
-    console.error?.(...args);
-  }
-};
-
 export const AuthProvider = ({ children }) => {
+  // Helper for environment-aware logging
+  const devError = (...args) => {
+    if (import.meta.env.DEV) {
+      console.error?.(...args);
+    }
+  };
+
   // Initialize admin from localStorage synchronously to avoid flash
   const [admin, setAdmin] = useState(() => authService.getStoredAdmin());
   const [loading, setLoading] = useState(true);
 
   // Check authentication on mount - synchronous localStorage check first
+  // Note: setState in effect is intentional here for mount-time sync with localStorage
   useEffect(() => {
     const token = localStorage.getItem('vibeit_token');
     const adminData = localStorage.getItem('vibeit_admin');
     
     if (token && adminData) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setAdmin(JSON.parse(adminData));
-      } catch (e) {
-        devError('Failed to parse admin data:', e);
+      } catch {
+        devError('Failed to parse admin data');
         authService.logout();
         setAdmin(null);
       }
@@ -79,10 +81,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-/**
- * Hook to use auth context
- * @returns {{admin: object, loading: boolean, login: Function, logout: Function, isAuthenticated: Function}}
- */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
