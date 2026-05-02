@@ -26,9 +26,12 @@ export const CustomerAuthProvider = ({ children }) => {
 
   // Initialize customer from localStorage synchronously to avoid flash
   const [customer, setCustomer] = useState(() => loadStoredCustomer());
+  const [loading, setLoading] = useState(true); // Track initialization state
 
   // Mount effect - verify auth on component mount
-  // Note: setState in effect is intentional here for initial sync with localStorage
+  // Note: Empty dependency array intentional - this should only run once on mount
+  // We intentionally check 'customer' without depending on it to avoid loops
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const token = localStorage.getItem('vibeit_customer_token');
     const customerData = localStorage.getItem('vibeit_customer_data');
@@ -37,7 +40,6 @@ export const CustomerAuthProvider = ({ children }) => {
     if (token && !customer && customerData) {
       try {
         const parsed = JSON.parse(customerData);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCustomer(parsed);
       } catch {
         devError('Failed to parse customer data');
@@ -48,7 +50,10 @@ export const CustomerAuthProvider = ({ children }) => {
       // Token removed, clear customer state
       setCustomer(null);
     }
-  }, [customer]);
+    
+    // Mark initialization as complete
+    setLoading(false);
+  }, []); // Empty dependency array - runs once on mount
 
   // Listen for custom auth update event (from GoogleAuthCallback or email login)
   useEffect(() => {
@@ -60,10 +65,13 @@ export const CustomerAuthProvider = ({ children }) => {
         try {
           const parsed = JSON.parse(customerData);
           setCustomer(parsed);
+          // Reset loading flag since we've just synced
+          setLoading(false);
         } catch (err) {
           devError('Failed to parse customer data from auth event:', err);
           customerAuthService.logout();
           setCustomer(null);
+          setLoading(false);
         }
       }
     };
@@ -170,6 +178,7 @@ export const CustomerAuthProvider = ({ children }) => {
 
   const value = {
     customer,
+    loading,
     register,
     login,
     startGoogleLogin,

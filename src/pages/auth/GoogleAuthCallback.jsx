@@ -81,6 +81,10 @@ export default function GoogleAuthCallback() {
         const redirectPath = localStorage.getItem('vibeit_post_login_redirect') || '/customer/dashboard';
         localStorage.removeItem('vibeit_post_login_redirect');
 
+        // Add a small delay to ensure context has processed the storage update
+        // This prevents a race condition where the route guard checks auth before the context updates
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         // Redirect to the stored path
         navigate(redirectPath);
       } catch {

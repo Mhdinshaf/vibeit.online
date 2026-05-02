@@ -317,13 +317,19 @@ api.interceptors.response.use(
       const customerToken = localStorage.getItem('vibeit_customer_token');
       const adminToken = localStorage.getItem('vibeit_token');
       
-      if (customerToken) {
+      // Additional check: verify token is actually invalid before clearing
+      // This prevents false 401s from immediately logging out users
+      const shouldClearCustomer = customerToken && error.config?.url && !error.config.url.includes('/auth/');
+      const shouldClearAdmin = adminToken && error.config?.url && !error.config.url.includes('/auth/');
+      
+      if (shouldClearCustomer) {
         // Customer 401 - clear customer token and redirect to customer login
         console.log('🔐 API: 401 - Clearing customer token, redirecting to customer login');
         localStorage.removeItem('vibeit_customer_token');
         localStorage.removeItem('vibeit_customer_data');
+        // Use navigate if available, otherwise fallback to href (will be caught by error handler)
         window.location.href = '/login';
-      } else if (adminToken) {
+      } else if (shouldClearAdmin) {
         // Admin 401 - clear admin token and redirect to admin login
         console.log('🔐 API: 401 - Clearing admin token, redirecting to admin login');
         localStorage.removeItem('vibeit_token');
