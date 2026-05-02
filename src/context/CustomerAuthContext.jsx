@@ -16,7 +16,7 @@ const loadStoredCustomer = () => {
   return null;
 };
 
-const CustomerAuthProvider = ({ children }) => {
+export const CustomerAuthProvider = ({ children }) => {
   // Helper for environment-aware logging
   const devError = (...args) => {
     if (import.meta.env.DEV) {
