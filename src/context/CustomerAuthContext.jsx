@@ -57,17 +57,35 @@ export const CustomerAuthProvider = ({ children }) => {
 
   // Listen for custom auth update event (from GoogleAuthCallback or email login)
   useEffect(() => {
-    const handleAuthUpdated = () => {
+    const handleAuthUpdated = (event) => {
+      console.log('📬 CustomerAuthContext: Received vibeit:auth-updated event', {
+        detail: event.detail,
+        timestamp: new Date().toISOString()
+      });
+      
       const token = localStorage.getItem('vibeit_customer_token');
       const customerData = localStorage.getItem('vibeit_customer_data');
+      
+      console.log('📬 CustomerAuthContext: Loading auth state from storage', {
+        hasToken: !!token,
+        tokenLength: token?.length,
+        hasCustomerData: !!customerData,
+        timestamp: new Date().toISOString()
+      });
       
       if (token && customerData) {
         try {
           const parsed = JSON.parse(customerData);
+          console.log('✅ CustomerAuthContext: Auth state synced, customer loaded:', {
+            email: parsed.email,
+            id: parsed._id,
+            timestamp: new Date().toISOString()
+          });
           setCustomer(parsed);
           // Reset loading flag since we've just synced
           setLoading(false);
         } catch (err) {
+          console.error('❌ CustomerAuthContext: Failed to parse customer data from auth event:', err);
           devError('Failed to parse customer data from auth event:', err);
           customerAuthService.logout();
           setCustomer(null);

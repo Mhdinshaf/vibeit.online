@@ -277,17 +277,20 @@ api.interceptors.request.use(
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      if (config.url?.includes('orders')) {
-        console.log('🔐 API: Attaching token to orders request', { 
-          url: config.url, 
-          tokenSource: customerToken ? 'customer' : 'admin',
-          tokenPreview: token.substring(0, 20) + '...'
-        });
-      }
+      // Detailed logging for debugging auth issues
+      console.log('🔐 API: Request with auth', { 
+        url: config.url, 
+        method: config.method,
+        tokenSource: customerToken ? 'customer' : 'admin',
+        tokenLength: token.length,
+        tokenPreview: token.substring(0, 20) + '...',
+        authHeader: `Bearer ${token.substring(0, 20)}...`
+      });
     } else {
-      if (config.url?.includes('orders')) {
-        console.warn('⚠️ API: No token found for orders request!', { url: config.url });
-      }
+      console.warn('⚠️ API: No auth token available for request', { 
+        url: config.url,
+        method: config.method
+      });
     }
     return config;
   },
@@ -317,24 +320,48 @@ api.interceptors.response.use(
       const customerToken = localStorage.getItem('vibeit_customer_token');
       const adminToken = localStorage.getItem('vibeit_token');
       
-      // Additional check: verify token is actually invalid before clearing
-      // This prevents false 401s from immediately logging out users
+      // Log the 401 error with context for debugging
+      console.log('🔐 API: 401 Unauthorized received', {
+        url: error.config?.url,
+        hasCustomerToken: !!customerToken,
+        hasAdminToken: !!adminToken,
+        tokenPrefix: customerToken ? customerToken.substring(0, 30) + '...' : 'none',
+        responseStatus: error.response?.status,
+        responseData: error.response?.data
+      });
+      
+      // Only clear token if:
+      // 1. We have a token
+      // 2. It's not an auth endpoint (those always return 401 for testing)
+      // 3. We have confirmation from backend (check response data)
       const shouldClearCustomer = customerToken && error.config?.url && !error.config.url.includes('/auth/');
       const shouldClearAdmin = adminToken && error.config?.url && !error.config.url.includes('/auth/');
       
-      if (shouldClearCustomer) {
+      // Additional safety: Check if the response indicates actual token invalidity
+      // (not just a transient error or clock skew issue)
+      const isRealAuthError = error.response?.data?.message?.toLowerCase().includes('invalid') ||
+                              error.response?.data?.message?.toLowerCase().includes('expired') ||
+                              error.response?.data?.message?.toLowerCase().includes('malformed');
+      
+      if (shouldClearCustomer && isRealAuthError) {
         // Customer 401 - clear customer token and redirect to customer login
-        console.log('🔐 API: 401 - Clearing customer token, redirecting to customer login');
+        console.log('🔐 API: Confirmed invalid token, clearing customer auth and redirecting to login');
         localStorage.removeItem('vibeit_customer_token');
         localStorage.removeItem('vibeit_customer_data');
-        // Use navigate if available, otherwise fallback to href (will be caught by error handler)
         window.location.href = '/login';
-      } else if (shouldClearAdmin) {
+      } else if (shouldClearAdmin && isRealAuthError) {
         // Admin 401 - clear admin token and redirect to admin login
-        console.log('🔐 API: 401 - Clearing admin token, redirecting to admin login');
+        console.log('🔐 API: Confirmed invalid token, clearing admin auth and redirecting to login');
         localStorage.removeItem('vibeit_token');
         localStorage.removeItem('vibeit_admin');
         window.location.href = '/admin/login';
+      } else if (shouldClearCustomer || shouldClearAdmin) {
+        // Uncertain 401 - don't clear, just log
+        console.warn('⚠️ API: 401 received but token authenticity uncertain, not clearing auth. This may indicate:');
+        console.warn('   - Clock skew between client and server');
+        console.warn('   - Token signature validation issue');
+        console.warn('   - Temporary backend validation failure');
+        console.warn('   - CORS header stripping Authorization');
       }
     }
     return Promise.reject(error);
