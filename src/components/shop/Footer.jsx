@@ -7,15 +7,15 @@ const Footer = () => {
 
   return (
     <footer className="mt-auto border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-700 dark:to-blue-600 text-white py-12 sm:py-14">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 text-white py-12 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="text-center md:text-left">
             <h3 className="text-2xl md:text-3xl font-bold tracking-tight">Need help with your order?</h3>
-            <p className="mt-2 text-blue-100">Our support team is ready on WhatsApp and email.</p>
+            <p className="mt-2 text-blue-100 dark:text-slate-300">Our support team is ready on WhatsApp and email.</p>
           </div>
           <Link
             to="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-slate-50 text-blue-600 dark:text-blue-700 px-8 py-3 font-bold transition-all shadow-lg hover:shadow-xl"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-blue-600 dark:text-white px-8 py-3 font-bold transition-all shadow-lg hover:shadow-xl"
           >
             Contact us
             <ArrowRight className="w-4 h-4" />
