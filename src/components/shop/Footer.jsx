@@ -6,18 +6,16 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto border-t" style={{ borderColor: '#67BAF4', backgroundColor: '#FAFAFA' }}>
-      <div className="text-white py-10 sm:py-12"
-        style={{ backgroundColor: '#1E466B' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+    <footer className="mt-auto border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-700 dark:to-blue-600 text-white py-12 sm:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="text-center md:text-left">
-            <h3 className="text-2xl md:text-3xl font-semibold tracking-tight">Need help with your order?</h3>
-            <p className="mt-2" style={{ color: '#67BAF4' }}>Our support team is ready on WhatsApp and email.</p>
+            <h3 className="text-2xl md:text-3xl font-bold tracking-tight">Need help with your order?</h3>
+            <p className="mt-2 text-blue-100">Our support team is ready on WhatsApp and email.</p>
           </div>
           <Link
             to="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-xl text-white px-6 py-3.5 font-medium transition-colors"
-            style={{ backgroundColor: '#67BAF4', color: '#1E466B' }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-slate-50 text-blue-600 dark:text-blue-700 px-8 py-3 font-bold transition-all shadow-lg hover:shadow-xl"
           >
             Contact us
             <ArrowRight className="w-4 h-4" />
@@ -25,25 +23,24 @@ const Footer = () => {
         </div>
       </div>
 
-      <div style={{ backgroundColor: '#FAFAFA', color: '#0D0D0D' }}>
+      <div className="bg-white dark:bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             <div className="lg:col-span-1">
               <Link to="/" className="flex items-center gap-3 mb-4">
-                <div className="w-11 h-11 rounded-xl overflow-hidden ring-1"
-                  style={{ backgroundColor: '#1E466B', borderColor: '#67BAF4' }}>
+                <div className="w-11 h-11 rounded-xl overflow-hidden ring-1 bg-gradient-to-br from-blue-600 to-blue-500 ring-slate-200 dark:ring-slate-700 flex items-center justify-center">
                   <img src={logo} alt="VIBEIT logo" className="w-full h-full object-cover" />
                 </div>
-                <span className="text-xl font-semibold tracking-tight" style={{ color: '#0D0D0D' }}>VIBEIT</span>
+                <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">VIBEIT</span>
               </Link>
-              <p className="leading-relaxed mb-5" style={{ color: '#0D0D0D' }}>
+              <p className="leading-relaxed mb-5 text-slate-600 dark:text-slate-300">
                 The Vibe of Online Shopping. Premium quality products delivered to your doorstep across Sri Lanka.
               </p>
-              <p className="text-sm" style={{ color: '#1E466B' }}>Sri Lanka • Island-wide delivery</p>
+              <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">Sri Lanka • Island-wide delivery</p>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4" style={{ color: '#0D0D0D' }}>Explore</h4>
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4 text-lg">Explore</h4>
               <ul className="space-y-3">
                 {[
                   { to: '/shop', label: 'Shop' },
@@ -54,8 +51,7 @@ const Footer = () => {
                   <li key={link.to}>
                     <Link
                       to={link.to}
-                      className="inline-flex items-center gap-2 transition-colors"
-                      style={{ color: '#0D0D0D' }}
+                      className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
                     >
                       <ArrowRight className="w-4 h-4" />
                       {link.label}
@@ -66,7 +62,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4" style={{ color: '#0D0D0D' }}>Support</h4>
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4 text-lg">Support</h4>
               <ul className="space-y-3">
                 {[
                   { to: '/shipping', label: 'Shipping Info' },
@@ -77,8 +73,7 @@ const Footer = () => {
                   <li key={link.to}>
                     <Link
                       to={link.to}
-                      className="inline-flex items-center gap-2 transition-colors"
-                      style={{ color: '#0D0D0D' }}
+                      className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
                     >
                       <ArrowRight className="w-4 h-4" />
                       {link.label}
@@ -89,17 +84,15 @@ const Footer = () => {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4" style={{ color: '#0D0D0D' }}>Contact</h4>
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4 text-lg">Contact</h4>
               <ul className="space-y-4">
                 <li>
                   <a
                     href="mailto:vibeit@gmail.com"
-                    className="flex items-center gap-3 transition-colors"
-                    style={{ color: '#0D0D0D' }}
+                    className="flex items-center gap-3 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
                   >
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: '#67BAF4', color: '#1E466B' }}>
-                      <Mail className="w-4 h-4" />
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <span>vibeit@gmail.com</span>
                   </a>
@@ -107,21 +100,18 @@ const Footer = () => {
                 <li>
                   <a
                     href="tel:+94753979659"
-                    className="flex items-center gap-3 transition-colors"
-                    style={{ color: '#0D0D0D' }}
+                    className="flex items-center gap-3 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
                   >
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: '#67BAF4', color: '#1E466B' }}>
-                      <Phone className="w-4 h-4" />
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <Phone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <span>+94 75 397 9659</span>
                   </a>
                 </li>
                 <li>
-                  <div className="flex items-center gap-3" style={{ color: '#0D0D0D' }}>
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: '#67BAF4', color: '#1E466B' }}>
-                      <MapPin className="w-4 h-4" />
+                  <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300 font-medium">
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <span>Colombo, Sri Lanka</span>
                   </div>
@@ -130,15 +120,14 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="border-t mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3"
-            style={{ borderColor: '#67BAF4' }}>
-            <p className="text-sm" style={{ color: '#1E466B' }}>
+          <div className="border-t border-slate-200 dark:border-slate-700 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
               &copy; {currentYear} VibeIt.lk. All rights reserved.
             </p>
-            <div className="flex items-center gap-4 text-xs" style={{ color: '#1E466B' }}>
-              <span>Secure Payments</span>
-              <span>Quality Products</span>
-              <span>Fast Delivery</span>
+            <div className="flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
+              <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">Secure Payments</span>
+              <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">Quality Products</span>
+              <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">Fast Delivery</span>
             </div>
           </div>
         </div>
@@ -148,11 +137,10 @@ const Footer = () => {
         href="https://wa.me/94753979659"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-5 right-5 text-white p-3.5 rounded-2xl shadow-lg transition-colors z-50 hover:scale-110"
-        style={{ backgroundColor: '#1E466B' }}
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 dark:from-green-600 dark:to-green-700 dark:hover:from-green-700 dark:hover:to-green-800 text-white p-4 rounded-full shadow-lg hover:shadow-2xl transition-all z-50 transform hover:scale-110"
         aria-label="Chat on WhatsApp"
       >
-        <MessageCircle className="w-5 h-5" />
+        <MessageCircle className="w-6 h-6" />
       </a>
     </footer>
   );
