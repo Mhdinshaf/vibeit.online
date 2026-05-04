@@ -21,9 +21,19 @@ export const authService = {
     const response = await API.post('/auth/login', { email, password });
     const { token, admin } = response.data;
     
+    console.log('🔐 Login response:', response.data);
+    console.log('🔐 Token extracted:', token);
+    console.log('🔐 Admin extracted:', admin);
+    
+    if (!token) {
+      throw new Error('Backend did not return a token. Response: ' + JSON.stringify(response.data));
+    }
+    
     // Store in localStorage
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem(ADMIN_KEY, JSON.stringify(admin));
+    
+    console.log('✅ Token saved to localStorage:', !!localStorage.getItem(TOKEN_KEY));
     
     return response.data;
   },
