@@ -326,13 +326,13 @@ api.interceptors.response.use(
       const shouldClearAdmin = adminToken && error.config?.url && !error.config.url.includes('/auth/');
       
       // Additional safety: Check if the response indicates actual token invalidity
-      // (not just a transient error or clock skew issue)
+      // Only clear token if message explicitly mentions invalid/expired/malformed token
+      // Do NOT clear on generic errors like "not found" or "deactivated"
       const errorMessage = error.response?.data?.message || '';
-      const isRealAuthError = errorMessage.toLowerCase().includes('invalid') ||
-                              errorMessage.toLowerCase().includes('expired') ||
-                              errorMessage.toLowerCase().includes('malformed') ||
-                              errorMessage.toLowerCase().includes('not found') ||
-                              errorMessage.toLowerCase().includes('deactivated');
+      const isRealAuthError = errorMessage.toLowerCase().includes('invalid token') ||
+                              errorMessage.toLowerCase().includes('expired token') ||
+                              errorMessage.toLowerCase().includes('malformed token') ||
+                              errorMessage.toLowerCase().includes('unauthorized');
       
       if (shouldClearCustomer && isRealAuthError) {
         // Customer 401 - clear customer token and redirect to customer login
