@@ -701,7 +701,17 @@ export const uploadImage = async (formData) => {
 
 export const uploadImages = async (formData) => {
   try {
+    // Get token for authorization
+    const customerToken = localStorage.getItem('vibeit_customer_token');
+    const adminToken = localStorage.getItem('vibeit_token');
+    const token = customerToken || adminToken;
+    
+    if (!token) {
+      throw new Error('No authentication token found. Please log in first.');
+    }
+    
     console.log('uploadImages: Posting to /upload/images endpoint');
+    console.log('uploadImages: Auth token present:', !!token);
     console.log('uploadImages: FormData entries:', Array.from(formData.entries()).map(([key, value]) => ({
       key,
       name: value.name || 'N/A',
@@ -726,8 +736,17 @@ export const uploadImages = async (formData) => {
       data: error.response?.data,
     });
     
+    if (error.message.includes('No authentication token')) {
+      throw error;
+    }
     if (error.code === 'ECONNABORTED') {
       throw new Error('Upload timeout - backend is too slow or not responding. Check your backend /upload/images endpoint.');
+    }
+    if (error.response?.status === 401) {
+      throw new Error('Unauthorized - your session may have expired. Please log in again.');
+    }
+    if (error.response?.status === 403) {
+      throw new Error('Forbidden - you do not have permission to upload images.');
     }
     if (error.response?.status === 404) {
       throw new Error('Upload endpoint not found. Backend /upload/images route missing.');
@@ -740,6 +759,9 @@ export const uploadImages = async (formData) => {
     }
     if (error.response?.status === 500) {
       throw new Error('Backend server error. Check backend logs.');
+    }
+    if (error.response?.status === 504) {
+      throw new Error('Backend gateway timeout. Please try again - the server may be temporarily busy.');
     }
     throw error;
   }
@@ -783,4 +805,4 @@ export const getDashboardStats = async () => {
   }
 };
 
-export default api;
+export default API;
