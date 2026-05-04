@@ -4,7 +4,7 @@ import { useCustomerStore } from '../../context/store';
 import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import api, { getProductById } from '../../services/api';
+import { getCustomerOrders, getProductById } from '../../services/api';
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
@@ -22,9 +22,9 @@ const CustomerDashboard = () => {
       try {
         setIsLoadingOrders(true);
         setOrderError(null);
-        // Use /customer/orders endpoint to get only this customer's orders
-        const response = await api.get('/customer/orders', { params: { page: 1, limit: 500 } });
-        const orders = response?.data?.orders || [];
+        // Use getCustomerOrders to fetch only this customer's orders
+        const response = await getCustomerOrders({ page: 1, limit: 500 });
+        const orders = response?.orders || [];
         setOrders(orders);
       } catch (error) {
         console.error('❌ CustomerDashboard: Failed to load orders:', error);

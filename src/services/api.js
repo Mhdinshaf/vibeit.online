@@ -270,23 +270,17 @@ const api = axios.create({
 // Request interceptor - attach token
 api.interceptors.request.use(
   (config) => {
-    // Use admin token for admin routes, customer token for customer routes
-    const isAdminRoute = config.url?.includes('/orders') || 
-                         config.url?.includes('/products') ||
-                         config.url?.includes('/analytics') ||
-                         config.url?.includes('/customers') ||
-                         config.url?.includes('/admin');
-    
     const customerToken = localStorage.getItem('vibeit_customer_token');
     const adminToken = localStorage.getItem('vibeit_token');
     
-    // Select appropriate token based on route
-    const token = isAdminRoute ? adminToken : (customerToken || adminToken);
+    // Use whichever token is available (customer > admin priority if both exist)
+    const token = customerToken || adminToken;
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      if (isAdminRoute && config.url?.includes('/orders')) {
-        console.log('📤 Using ADMIN token for orders request');
+      if (config.url?.includes('/orders')) {
+        const tokenType = customerToken ? 'CUSTOMER' : 'ADMIN';
+        console.log(`📤 Using ${tokenType} token for orders request`);
       }
     } else {
       console.warn('⚠️ No token found for request to:', config.url);
@@ -574,6 +568,41 @@ export const getOrders = async (params) => {
       total: filtered.length,
       page,
       pages: Math.max(1, Math.ceil(filtered.length / limit)),
+    };
+  }
+};
+
+// Get orders for the logged-in customer
+export const getCustomerOrders = async (params = {}) => {
+  try {
+    devLog('log', '📤 GET /customer/orders - Fetching customer orders...');
+    const requestParams = {
+      page: params?.page || 1,
+      limit: params?.limit || 500,
+      ...params,
+    };
+    const response = await api.get('/customer/orders', { params: requestParams });
+    const orders = response?.data?.orders || [];
+    
+    devLog('log', '✅ Customer orders loaded:', orders.length);
+    return {
+      orders,
+      total: response?.data?.total || orders.length,
+      page: requestParams.page,
+      limit: requestParams.limit,
+    };
+  } catch (error) {
+    if (!isOfflineOrServerUnavailable(error)) {
+      throw error;
+    }
+    
+    // Return cached customer orders if offline
+    devLog('log', '⚠️ Offline or server unavailable, returning empty orders');
+    return {
+      orders: [],
+      total: 0,
+      page: 1,
+      limit: 500,
     };
   }
 };
