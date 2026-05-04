@@ -155,6 +155,8 @@ const AdminAddProduct = () => {
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
     });
+    // Clear imageUrls when manually removing images to ensure fresh state
+    setImageUrls([]);
   };
 
   const handleUploadImages = async () => {
@@ -247,7 +249,7 @@ const AdminAddProduct = () => {
     }
 
     const productData = {
-      name: formData.title,
+      title: formData.title,
       description: formData.description,
       category: formData.category,
       subcategory: formData.subcategory,
@@ -258,7 +260,7 @@ const AdminAddProduct = () => {
       sizes: formData.sizes,
       tags: formData.tags ? formData.tags.split(',').map((tag) => tag.trim()).filter(Boolean) : [],
       isFeatured: formData.isFeatured,
-      images: finalImageUrls,
+      imageUrls: finalImageUrls,
     };
     handleCreateProduct(productData);
   };

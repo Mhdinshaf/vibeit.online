@@ -112,7 +112,7 @@ const AdminEditProduct = () => {
   };
 
   // Fetch existing product
-  const { data: product, isLoading: isLoadingProduct } = useQuery({
+  const { data: product, isLoading: isLoadingProduct, error: productError } = useQuery({
     queryKey: ['product', id],
     queryFn: () => getProductById(id),
   });
@@ -364,7 +364,7 @@ const AdminEditProduct = () => {
 
     // Prepare data
     const productData = {
-      name: formData.title,
+      title: formData.title,
       description: formData.description,
       category: formData.category,
       subcategory: formData.subcategory,
@@ -377,7 +377,7 @@ const AdminEditProduct = () => {
         ? formData.tags.split(',').map((tag) => tag.trim()).filter(Boolean)
         : [],
       isFeatured: formData.isFeatured,
-      images: finalImageUrls,
+      imageUrls: finalImageUrls,
     };
 
     handleUpdateProduct(productData);
@@ -392,6 +392,30 @@ const AdminEditProduct = () => {
             <Package className="w-8 h-8 text-white" />
           </div>
           <p className="text-gray-500 font-medium">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (productError || !product) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl border border-red-200 p-8 text-center max-w-md">
+          <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Package className="w-6 h-6 text-red-600" />
+          </div>
+          <p className="text-red-600 font-semibold mb-2">Product Not Found</p>
+          <p className="text-gray-500 text-sm mb-4">
+            {productError?.message || 'The product you are trying to edit does not exist or has been deleted.'}
+          </p>
+          <Link
+            to="/admin/products"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Products
+          </Link>
         </div>
       </div>
     );

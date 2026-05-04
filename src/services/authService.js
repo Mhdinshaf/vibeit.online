@@ -1,4 +1,4 @@
-import api from './api';
+import API from './api';
 
 const TOKEN_KEY = 'vibeit_token';
 const ADMIN_KEY = 'vibeit_admin';
@@ -18,7 +18,7 @@ export const authService = {
    * @returns {Promise<{token: string, admin: object}>}
    */
   async login(email, password) {
-    const response = await api.post('/auth/login', { email, password });
+    const response = await API.post('/auth/login', { email, password });
     const { token, admin } = response.data;
     
     // Store in localStorage
@@ -41,7 +41,7 @@ export const authService = {
    * @returns {Promise<object>}
    */
   async getMe() {
-    const response = await api.get('/auth/me');
+    const response = await API.get('/auth/me');
     return response.data;
   },
 

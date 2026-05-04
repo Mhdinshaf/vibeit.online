@@ -262,7 +262,7 @@ const getLocalOrderMetrics = () => {
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  timeout: 30000, // 30 seconds - most file uploads should complete within this
+  timeout: 0, // No timeout by default - individual requests can set their own
   connectTimeout: 5000, // 5 seconds to connect
   maxContentLength: 50 * 1024 * 1024, // 50MB max file size
   maxBodyLength: 50 * 1024 * 1024, // 50MB max body size
@@ -280,14 +280,17 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    // Set default timeout for regular requests (not uploads)
+    // Upload requests can override this in their config
+    if (!config.timeout) {
+      config.timeout = 30000; // 30 seconds default for regular requests
+    }
+    
     // Handle FormData - let axios set Content-Type header automatically with boundary
+    // Do NOT set Content-Type: axios will automatically detect FormData and set proper boundary
     if (config.data instanceof FormData) {
-      // Remove Content-Type to let axios handle it
-      if (config.headers && config.headers['Content-Type']) {
-        delete config.headers['Content-Type'];
-      }
-      // Ensure we don't override it
-      config.headers['Content-Type'] = undefined;
+      // Remove Content-Type header if it exists to let axios handle it
+      delete config.headers['Content-Type'];
     }
     
     return config;
@@ -324,9 +327,12 @@ api.interceptors.response.use(
       
       // Additional safety: Check if the response indicates actual token invalidity
       // (not just a transient error or clock skew issue)
-      const isRealAuthError = error.response?.data?.message?.toLowerCase().includes('invalid') ||
-                              error.response?.data?.message?.toLowerCase().includes('expired') ||
-                              error.response?.data?.message?.toLowerCase().includes('malformed');
+      const errorMessage = error.response?.data?.message || '';
+      const isRealAuthError = errorMessage.toLowerCase().includes('invalid') ||
+                              errorMessage.toLowerCase().includes('expired') ||
+                              errorMessage.toLowerCase().includes('malformed') ||
+                              errorMessage.toLowerCase().includes('not found') ||
+                              errorMessage.toLowerCase().includes('deactivated');
       
       if (shouldClearCustomer && isRealAuthError) {
         // Customer 401 - clear customer token and redirect to customer login
@@ -352,6 +358,11 @@ export const getProducts = async (params) => {
 
 export const getProductById = async (id) => {
   const response = await api.get(`/products/${id}`);
+  return response.data;
+};
+
+export const getCategories = async () => {
+  const response = await api.get('/products/categories');
   return response.data;
 };
 
@@ -701,17 +712,8 @@ export const uploadImage = async (formData) => {
 
 export const uploadImages = async (formData) => {
   try {
-    // Get token for authorization
-    const customerToken = localStorage.getItem('vibeit_customer_token');
-    const adminToken = localStorage.getItem('vibeit_token');
-    const token = customerToken || adminToken;
-    
-    if (!token) {
-      throw new Error('No authentication token found. Please log in first.');
-    }
-    
+    // Token is handled by axios request interceptor - no need to fetch it here
     console.log('uploadImages: Posting to /upload/images endpoint');
-    console.log('uploadImages: Auth token present:', !!token);
     console.log('uploadImages: FormData entries:', Array.from(formData.entries()).map(([key, value]) => ({
       key,
       name: value.name || 'N/A',
@@ -736,9 +738,6 @@ export const uploadImages = async (formData) => {
       data: error.response?.data,
     });
     
-    if (error.message.includes('No authentication token')) {
-      throw error;
-    }
     if (error.code === 'ECONNABORTED') {
       throw new Error('Upload timeout - backend is too slow or not responding. Check your backend /upload/images endpoint.');
     }
