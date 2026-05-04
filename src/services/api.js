@@ -271,13 +271,26 @@ const api = axios.create({
 // Request interceptor - attach token
 api.interceptors.request.use(
   (config) => {
-    // Try customer token first, then fall back to admin token
+    // Use admin token for admin routes, customer token for customer routes
+    const isAdminRoute = config.url?.includes('/orders') || 
+                         config.url?.includes('/products') ||
+                         config.url?.includes('/analytics') ||
+                         config.url?.includes('/customers') ||
+                         config.url?.includes('/admin');
+    
     const customerToken = localStorage.getItem('vibeit_customer_token');
     const adminToken = localStorage.getItem('vibeit_token');
-    const token = customerToken || adminToken;
+    
+    // Select appropriate token based on route
+    const token = isAdminRoute ? adminToken : (customerToken || adminToken);
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      if (isAdminRoute && config.url?.includes('/orders')) {
+        console.log('📤 Using ADMIN token for orders request');
+      }
+    } else {
+      console.warn('⚠️ No token found for request to:', config.url);
     }
     
     // Set default timeout for regular requests (not uploads)
