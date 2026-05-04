@@ -28,7 +28,7 @@ const AdminOrders = () => {
   const [paymentMethod, setPaymentMethod] = useState('all');
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, isError } = useQuery({
     queryKey: ['admin-orders', page, status, paymentMethod, search],
     queryFn: () => getOrders({ page, limit: 10, status, paymentMethod, search }),
     refetchInterval: 5000,
@@ -107,6 +107,22 @@ const AdminOrders = () => {
         {[...Array(5)].map((_, i) => (
           <div key={i} className="h-24 rounded-2xl bg-gray-100 animate-pulse" />
         ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    devError('❌ ERROR LOADING ORDERS:', error);
+    return (
+      <div className="bg-white rounded-2xl border border-red-200 p-8 text-center">
+        <p className="text-red-600 font-semibold mb-2">Error loading orders</p>
+        <p className="text-gray-600 text-sm mb-4">{error?.message || 'Failed to fetch orders'}</p>
+        <button
+          onClick={() => queryClient.invalidateQueries({ queryKey: ['admin-orders'] })}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -255,30 +271,29 @@ const AdminOrders = () => {
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-          <button
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            disabled={page <= 1}
-            className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            ← Previous
-          </button>
-          <div className="text-center">
-            <span className="text-sm text-gray-500">
-              Page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages}</span>
-            </span>
-            <p className="text-xs text-gray-400 mt-1">Total orders: {totalOrders}</p>
-          </div>
-          <button
-            onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-            disabled={page >= totalPages}
-            className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            Next →
-          </button>
+      {/* Pagination - Always show pagination controls for better UX */}
+      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+        <button
+          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          disabled={page <= 1}
+          className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          ← Previous
+        </button>
+        <div className="text-center">
+          <span className="text-sm text-gray-500">
+            Page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages}</span>
+          </span>
+          <p className="text-xs text-gray-400 mt-1">Total orders: {totalOrders}</p>
         </div>
-      )}
+        <button
+          onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          disabled={page >= totalPages}
+          className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          Next →
+        </button>
+      </div>
     </div>
   );
 };
