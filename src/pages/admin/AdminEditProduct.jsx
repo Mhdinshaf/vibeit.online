@@ -85,6 +85,32 @@ const AdminEditProduct = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  // Validation constants
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+
+  // Helper function to validate file
+  const validateFile = (file) => {
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      return { valid: false, error: `${file.name} exceeds 5MB limit` };
+    }
+    
+    // Check MIME type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return { valid: false, error: `${file.name} must be PNG, JPG, or WEBP` };
+    }
+    
+    // Check file extension as backup
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(extension)) {
+      return { valid: false, error: `${file.name} has invalid extension` };
+    }
+    
+    return { valid: true };
+  };
+
   // Fetch existing product
   const { data: product, isLoading: isLoadingProduct } = useQuery({
     queryKey: ['product', id],
@@ -119,6 +145,13 @@ const AdminEditProduct = () => {
     if (img.url) return img.url;
     return null;
   };
+
+  // Cleanup preview URLs on component unmount
+  useEffect(() => {
+    return () => {
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [imagePreviewUrls]);
 
   // Prefill form when product loads
   useEffect(() => {
@@ -183,10 +216,31 @@ const AdminEditProduct = () => {
       return;
     }
 
-    // Generate preview URLs
-    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    // Validate each file
+    const validFiles = [];
+    const invalidFiles = [];
+
+    files.forEach((file) => {
+      const validation = validateFile(file);
+      if (validation.valid) {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(validation.error);
+      }
+    });
+
+    // Show error for any invalid files
+    if (invalidFiles.length > 0) {
+      toast.error(invalidFiles[0]);
+      return;
+    }
+
+    if (validFiles.length === 0) return;
+
+    // Generate preview URLs for valid files
+    const newPreviews = validFiles.map((file) => URL.createObjectURL(file));
     
-    setImageFiles((prev) => [...prev, ...files]);
+    setImageFiles((prev) => [...prev, ...validFiles]);
     setImagePreviewUrls((prev) => [...prev, ...newPreviews]);
   };
 
@@ -215,24 +269,48 @@ const AdminEditProduct = () => {
     try {
       const formDataObj = new FormData();
       imageFiles.forEach((file) => {
+        console.log('Adding file to upload:', file.name, 'Size:', file.size);
         formDataObj.append('images', file);
       });
 
+      console.log('Starting upload...');
       const response = await uploadImages(formDataObj);
-      // uploadImages returns response.data, so access urls directly
-      const urls = response.urls || response.data?.urls || response;
-      const uploadedUrls = Array.isArray(urls) ? urls : [];
+      console.log('Upload response:', response);
+
+      // Extract URLs from response - can be array or object with urls property
+      let uploadedUrls = [];
+      if (response && response.urls && Array.isArray(response.urls)) {
+        uploadedUrls = response.urls;
+      } else if (Array.isArray(response)) {
+        // If response is array of objects with url property
+        uploadedUrls = response.map(item => item.url || item).filter(Boolean);
+      } else if (response && response.data && Array.isArray(response.data)) {
+        uploadedUrls = response.data;
+      } else {
+        console.warn('Unexpected response format:', response);
+        uploadedUrls = [];
+      }
+
+      if (uploadedUrls.length === 0) {
+        toast.error('No URLs returned from upload');
+        return null;
+      }
       
+      console.log('Extracted URLs:', uploadedUrls);
       setImageUrls((prev) => [...prev, ...uploadedUrls]);
       setImageFiles([]);
       setImagePreviewUrls([]);
+      console.log('Upload successful, URLs:', uploadedUrls);
       toast.success('Images uploaded successfully');
       return uploadedUrls;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Upload failed');
+      console.error('Upload error:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Upload failed';
+      toast.error(errorMsg);
       return null;
     } finally {
       setIsUploading(false);
+      console.log('Upload finished');
     }
   };
 

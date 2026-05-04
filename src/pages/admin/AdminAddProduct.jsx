@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
@@ -38,6 +38,32 @@ const AdminAddProduct = () => {
   const queryClient = useQueryClient();
   const fileInputRef = useRef(null);
 
+  // Validation constants
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+
+  // Helper function to validate file
+  const validateFile = (file) => {
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      return { valid: false, error: `${file.name} exceeds 5MB limit` };
+    }
+    
+    // Check MIME type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return { valid: false, error: `${file.name} must be PNG, JPG, or WEBP` };
+    }
+    
+    // Check file extension as backup
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(extension)) {
+      return { valid: false, error: `${file.name} has invalid extension` };
+    }
+    
+    return { valid: true };
+  };
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -56,6 +82,13 @@ const AdminAddProduct = () => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
   const [imageUrls, setImageUrls] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Cleanup preview URLs on component unmount
+  useEffect(() => {
+    return () => {
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [imagePreviewUrls]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -88,8 +121,31 @@ const AdminAddProduct = () => {
       toast.error('Maximum 5 images allowed');
       return;
     }
-    const newPreviews = files.map((file) => URL.createObjectURL(file));
-    setImageFiles((prev) => [...prev, ...files]);
+
+    // Validate each file
+    const validFiles = [];
+    const invalidFiles = [];
+
+    files.forEach((file) => {
+      const validation = validateFile(file);
+      if (validation.valid) {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(validation.error);
+      }
+    });
+
+    // Show error for any invalid files
+    if (invalidFiles.length > 0) {
+      toast.error(invalidFiles[0]);
+      return;
+    }
+
+    if (validFiles.length === 0) return;
+
+    // Create preview URLs for valid files
+    const newPreviews = validFiles.map((file) => URL.createObjectURL(file));
+    setImageFiles((prev) => [...prev, ...validFiles]);
     setImagePreviewUrls((prev) => [...prev, ...newPreviews]);
   };
 
@@ -109,18 +165,53 @@ const AdminAddProduct = () => {
     setIsUploading(true);
     try {
       const formDataObj = new FormData();
-      imageFiles.forEach((file) => formDataObj.append('images', file));
+      imageFiles.forEach((file) => {
+        console.log('Adding file to upload:', file.name, 'Size:', file.size);
+        formDataObj.append('images', file);
+      });
+      
+      console.log('Starting upload...');
       const response = await uploadImages(formDataObj);
-      const urls = response.urls || response.data?.urls || response;
-      const uploadedUrls = Array.isArray(urls) ? urls : [];
+      console.log('Upload response:', response);
+      
+      // Extract URLs from response - can be array or object with urls property
+      let uploadedUrls = [];
+      if (response && response.urls && Array.isArray(response.urls)) {
+        uploadedUrls = response.urls;
+      } else if (Array.isArray(response)) {
+        // If response is array of objects with url property
+        uploadedUrls = response.map(item => item.url || item).filter(Boolean);
+      } else if (response && response.data && Array.isArray(response.data)) {
+        uploadedUrls = response.data;
+      } else {
+        console.warn('Unexpected response format:', response);
+        uploadedUrls = [];
+      }
+      
+      if (uploadedUrls.length === 0) {
+        toast.error('No URLs returned from upload');
+        return null;
+      }
+      
+      console.log('Extracted URLs:', uploadedUrls);
       setImageUrls(uploadedUrls);
+      
+      // Clean up file state and preview URLs after successful upload
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+      setImageFiles([]);
+      setImagePreviewUrls([]);
+      
+      console.log('Upload successful, URLs:', uploadedUrls);
       toast.success('Images uploaded successfully');
       return uploadedUrls;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Upload failed');
+      console.error('Upload error:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Upload failed';
+      toast.error(errorMsg);
       return null;
     } finally {
       setIsUploading(false);
+      console.log('Upload finished');
     }
   };
 
@@ -499,7 +590,7 @@ const AdminAddProduct = () => {
                 <button
                   type="button"
                   onClick={handleUploadImages}
-                  disabled={imageFiles.length === 0 || isUploading || imageUrls.length > 0}
+                  disabled={imageFiles.length === 0 || isUploading}
                   className="w-full mt-4 px-6 py-3.5 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-200"
                 >
                   {isUploading ? (

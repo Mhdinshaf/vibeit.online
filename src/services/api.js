@@ -262,9 +262,10 @@ const getLocalOrderMetrics = () => {
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  timeout: 30000, // 30 seconds - most file uploads should complete within this
+  connectTimeout: 5000, // 5 seconds to connect
+  maxContentLength: 50 * 1024 * 1024, // 50MB max file size
+  maxBodyLength: 50 * 1024 * 1024, // 50MB max body size
 });
 
 // Request interceptor - attach token
@@ -278,6 +279,17 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Handle FormData - let axios set Content-Type header automatically with boundary
+    if (config.data instanceof FormData) {
+      // Remove Content-Type to let axios handle it
+      if (config.headers && config.headers['Content-Type']) {
+        delete config.headers['Content-Type'];
+      }
+      // Ensure we don't override it
+      config.headers['Content-Type'] = undefined;
+    }
+    
     return config;
   },
   (error) => {
@@ -688,12 +700,49 @@ export const uploadImage = async (formData) => {
 };
 
 export const uploadImages = async (formData) => {
-  const response = await api.post('/upload/images', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  return response.data;
+  try {
+    console.log('uploadImages: Posting to /upload/images endpoint');
+    console.log('uploadImages: FormData entries:', Array.from(formData.entries()).map(([key, value]) => ({
+      key,
+      name: value.name || 'N/A',
+      size: value.size || 'N/A',
+      type: value.type || 'N/A',
+    })));
+    
+    const response = await api.post('/upload/images', formData, {
+      timeout: 60000, // 60 seconds for file upload
+    });
+    
+    console.log('uploadImages: Response received:', response.status, response.data);
+    return response.data;
+  } catch (error) {
+    console.error('uploadImages: Request failed', {
+      code: error.code,
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: error.config?.url,
+      method: error.config?.method,
+      data: error.response?.data,
+    });
+    
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Upload timeout - backend is too slow or not responding. Check your backend /upload/images endpoint.');
+    }
+    if (error.response?.status === 404) {
+      throw new Error('Upload endpoint not found. Backend /upload/images route missing.');
+    }
+    if (error.response?.status === 413) {
+      throw new Error('File too large. Maximum file size is 5MB per image.');
+    }
+    if (error.response?.status === 400) {
+      throw new Error(error.response?.data?.message || 'Invalid file upload request.');
+    }
+    if (error.response?.status === 500) {
+      throw new Error('Backend server error. Check backend logs.');
+    }
+    throw error;
+  }
 };
 
 // Analytics API
