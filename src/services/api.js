@@ -710,7 +710,7 @@ export const uploadImages = async (formData) => {
     })));
     
     const response = await api.post('/upload/images', formData, {
-      timeout: 60000, // 60 seconds for file upload
+      timeout: 120000, // 120 seconds for file upload (matches backend timeout)
     });
     
     console.log('uploadImages: Response received:', response.status, response.data);
