@@ -3,7 +3,6 @@ import axios from 'axios';
 const ORDER_DB_KEY = 'vibeit_orders_db';
 const ORDER_SYNC_KEY = 'vibeit_orders_sync';
 export const ORDER_SYNC_EVENT = 'vibeit:orders-updated';
-const API = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
 // Helper for environment-aware logging
 const devLog = (level, ...args) => {
@@ -817,4 +816,4 @@ export const getDashboardStats = async () => {
   }
 };
 
-export default API;
+export default api;
