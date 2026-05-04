@@ -19,21 +19,29 @@ export const authService = {
    */
   async login(email, password) {
     const response = await API.post('/auth/login', { email, password });
-    const { token, admin } = response.data;
+    const responseData = response.data;
     
-    console.log('🔐 Login response:', response.data);
+    console.log('🔐 FULL Login response:', responseData);
+    
+    // Handle different response formats from backend
+    let token = responseData.token || responseData.accessToken || responseData.jwtToken;
+    let adminData = responseData.admin || responseData.user || responseData;
+    
     console.log('🔐 Token extracted:', token);
-    console.log('🔐 Admin extracted:', admin);
+    console.log('🔐 Admin data extracted:', adminData);
     
     if (!token) {
-      throw new Error('Backend did not return a token. Response: ' + JSON.stringify(response.data));
+      console.error('❌ NO TOKEN IN RESPONSE!', 'Available keys:', Object.keys(responseData));
+      throw new Error('Backend did not return a token. Response keys: ' + Object.keys(responseData).join(', '));
     }
     
     // Store in localStorage
     localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(ADMIN_KEY, JSON.stringify(admin));
+    localStorage.setItem(ADMIN_KEY, JSON.stringify(adminData));
     
-    console.log('✅ Token saved to localStorage:', !!localStorage.getItem(TOKEN_KEY));
+    console.log('✅ Token saved to localStorage');
+    console.log('✅ Admin data saved to localStorage');
+    console.log('✅ Token in storage is now:', localStorage.getItem(TOKEN_KEY) ? 'EXISTS' : 'MISSING');
     
     return response.data;
   },
