@@ -30,7 +30,7 @@ const AdminOrders = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-orders', page, status, paymentMethod, search],
-    queryFn: () => getOrders({ page, limit: 20, status, paymentMethod, search }),
+    queryFn: () => getOrders({ page, limit: 10, status, paymentMethod, search }),
     refetchInterval: 5000,
   });
 
@@ -92,6 +92,14 @@ const AdminOrders = () => {
 
   const orders = data?.orders || data?.data?.orders || (Array.isArray(data) ? data : []);
   const totalPages = data?.pages || data?.totalPages || 1;
+  const totalOrders = data?.total || data?.data?.total || orders.length;
+
+  // Debug logging
+  useEffect(() => {
+    if (data) {
+      devLog('📊 ORDER DATA:', { totalPages, totalOrders, ordersCount: orders.length, page });
+    }
+  }, [data, page]);
 
   if (isLoading) {
     return (
@@ -248,23 +256,26 @@ const AdminOrders = () => {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
           <button
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={page <= 1}
             className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
           >
-            Previous
+            ← Previous
           </button>
-          <span className="text-sm text-gray-500">
-            Page <span className="font-semibold text-gray-900">{page}</span> of {totalPages}
-          </span>
+          <div className="text-center">
+            <span className="text-sm text-gray-500">
+              Page <span className="font-semibold text-gray-900">{page}</span> of <span className="font-semibold text-gray-900">{totalPages}</span>
+            </span>
+            <p className="text-xs text-gray-400 mt-1">Total orders: {totalOrders}</p>
+          </div>
           <button
             onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
             disabled={page >= totalPages}
             className="px-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
           >
-            Next
+            Next →
           </button>
         </div>
       )}
