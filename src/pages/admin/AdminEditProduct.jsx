@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Upload, X, Check, Package, Tag, DollarSign, Layers, Cloud, Loader2, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Upload, X, Check, Package, Tag, DollarSign, Layers, Cloud, Loader2, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { getProductById, updateProduct, uploadImages } from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -157,9 +157,9 @@ const AdminEditProduct = () => {
   useEffect(() => {
     // getProductById returns response.data directly, so product is the actual product object
     const p = product?.data || product;
-    if (p && p.name) {
+    if (p && (p.title || p.name)) {
       setFormData({
-        title: p.name || '',
+        title: p.title || p.name || '',
         description: p.description || '',
         category: p.category || '',
         subcategory: p.subcategory || '',
@@ -171,9 +171,10 @@ const AdminEditProduct = () => {
         tags: p.tags?.join(', ') || '',
         isFeatured: p.isFeatured || false,
       });
-      // Handle images - normalize to URL strings
-      if (p.images && p.images.length > 0) {
-        const normalizedUrls = p.images.map(img => getImageUrl(img)).filter(Boolean);
+      // Handle images - normalize to URL strings (check both imageUrls and images)
+      const images = p.imageUrls || p.images || [];
+      if (images && images.length > 0) {
+        const normalizedUrls = images.map(img => getImageUrl(img)).filter(Boolean);
         setImageUrls(normalizedUrls);
       }
     }
