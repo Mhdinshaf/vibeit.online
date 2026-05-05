@@ -55,19 +55,16 @@ const Navbar = () => {
     <>
       <a 
         href="#main-content" 
-        className="absolute -top-10 left-4 z-[9999] text-white px-4 py-2 rounded focus:top-4 transition-all duration-300 font-semibold"
-        style={{ backgroundColor: '#1E466B' }}
+        className="absolute -top-10 left-4 z-[9999] text-white bg-blue-600 px-4 py-2 rounded-lg font-semibold focus:top-4 transition-all duration-300 shadow-md"
       >
         Skip to main content
       </a>
 
-      <header className="sticky top-0 z-50 border-b bg-white dark:bg-[#050b18] dark:border-slate-800 transition-colors duration-300" 
-        style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
+      <header className="sticky top-0 z-50 glass-effect transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-16 sm:h-[4.5rem] flex items-center justify-between gap-3">
             <NavLink to="/" className="flex items-center gap-3 min-w-0 shrink-0 group">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden ring-1 shadow-sm flex items-center justify-center"
-                style={{ backgroundColor: '#1E466B', borderColor: '#67BAF4' }}>
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm flex items-center justify-center bg-slate-900 dark:bg-slate-800">
                 <img
                   src={logo}
                   alt="VIBEIT logo"
@@ -82,22 +79,18 @@ const Navbar = () => {
               </div>
             </NavLink>
 
-            <nav className="hidden md:flex items-center gap-1 rounded-full border px-2 py-1 shadow-sm bg-white dark:bg-slate-900 dark:border-slate-700 transition-colors duration-300"
-              style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
+            <nav className="hidden md:flex items-center gap-1 rounded-full border px-2 py-1 shadow-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 transition-colors duration-300">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) =>
-                    `px-4 lg:px-5 py-2 text-sm font-medium rounded-full transition-colors duration-300 ${
+                    `px-4 lg:px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
                       isActive
-                        ? 'text-white'
-                        : 'text-blue-600 dark:text-white hover:text-white dark:hover:text-white'
+                        ? 'bg-slate-900 text-white dark:bg-blue-600 shadow-md'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
                     }`
                   }
-                  style={({ isActive }) => ({
-                    backgroundColor: isActive ? '#1E466B' : 'transparent',
-                  })}
                 >
                   {link.label}
                 </NavLink>
@@ -107,14 +100,11 @@ const Navbar = () => {
             <div className="flex items-center gap-1 sm:gap-2">
               <form
                 onSubmit={handleSearch}
-                className={`flex items-center overflow-hidden rounded-xl border transition-all duration-300 bg-slate-50 dark:bg-slate-800 ${
+                className={`flex items-center overflow-hidden rounded-xl border transition-all duration-300 bg-slate-50 dark:bg-slate-800/50 ${
                   searchOpen
-                    ? 'w-40 xs:w-48 sm:w-56 px-2 sm:px-3 py-1.5 opacity-100'
+                    ? 'w-40 xs:w-48 sm:w-56 px-2 sm:px-3 py-1.5 opacity-100 border-blue-500/50 dark:border-blue-400/50 ring-2 ring-blue-500/20 dark:ring-blue-400/20'
                     : 'w-0 border-transparent px-0 py-0 opacity-0 pointer-events-none'
                 }`}
-                style={{
-                  borderColor: searchOpen ? '#67BAF4' : 'transparent'
-                }}
               >
                 <Search className="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400" />
                 <input
@@ -129,11 +119,11 @@ const Navbar = () => {
 
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="p-2.5 rounded-xl transition-all duration-300 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
-                style={{
-                  backgroundColor: searchOpen ? '#1E466B' : 'transparent',
-                  color: searchOpen ? '#fff' : undefined
-                }}
+                className={`p-2.5 rounded-xl transition-all duration-300 ${
+                  searchOpen 
+                    ? 'bg-slate-900 text-white dark:bg-blue-600 shadow-md' 
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
@@ -146,8 +136,7 @@ const Navbar = () => {
               >
                 <ShoppingCart className="w-5 h-5" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1 text-xs font-semibold rounded-full text-white flex items-center justify-center shadow-sm"
-                    style={{ backgroundColor: '#1E466B' }}>
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1 text-xs font-semibold rounded-full text-white bg-blue-600 flex items-center justify-center shadow-sm">
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
                 )}
@@ -166,34 +155,25 @@ const Navbar = () => {
                 <div className="hidden md:block relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-white transition-colors"
-                    style={{ backgroundColor: '#1E466B' }}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-white bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500 transition-all shadow-sm hover:shadow-md"
                     aria-label="Customer Profile"
                   >
-                    <div className="w-6 h-6 rounded-full text-white text-xs font-semibold flex items-center justify-center"
-                      style={{ backgroundColor: '#67BAF4' }}>
+                    <div className="w-6 h-6 rounded-full text-white bg-blue-500/50 text-xs font-semibold flex items-center justify-center">
                       {customer.firstName?.charAt(0).toUpperCase()}
                     </div>
                     <span className="text-sm font-medium">{customer.firstName}</span>
                   </button>
 
                   {profileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 border rounded-xl shadow-lg py-1 z-50 overflow-hidden bg-white dark:bg-slate-900 dark:border-slate-700 transition-colors duration-300"
-                      style={{ 
-                        borderColor: theme === 'dark' ? undefined : '#67BAF4'
-                      }}>
-                      <div className="px-4 py-3 border-b dark:border-slate-700 transition-colors duration-300"
-                        style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
+                    <div className="absolute right-0 mt-2 w-56 border rounded-xl shadow-xl py-1 z-50 overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 transition-all duration-300">
+                      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 transition-colors duration-300">
                         <p className="text-sm font-semibold text-slate-900 dark:text-white">{customer.firstName} {customer.lastName}</p>
                         <p className="text-xs text-blue-600 dark:text-blue-400">{customer.email}</p>
                       </div>
                       <NavLink
                         to="/customer/dashboard"
                         onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 transition-colors border-b dark:border-slate-700 text-slate-900 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
-                        style={{ 
-                          borderColor: theme === 'dark' ? undefined : '#67BAF4'
-                        }}
+                        className="flex items-center gap-3 px-4 py-3 transition-colors border-b border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50"
                       >
                         <Settings className="w-4 h-4" />
                         <span>Dashboard</span>
@@ -214,8 +194,7 @@ const Navbar = () => {
               ) : (
                 <button
                   onClick={() => navigate('/auth/customer/login')}
-                  className="hidden md:flex items-center gap-2 px-4 py-2.5 text-white rounded-xl transition-colors text-sm font-medium"
-                  style={{ backgroundColor: '#1E466B' }}
+                  className="hidden md:flex items-center gap-2 px-4 py-2.5 text-white bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl transition-all shadow-sm hover:shadow-md text-sm font-medium"
                   aria-label="Customer Login"
                 >
                   <User className="w-4 h-4" />
@@ -225,7 +204,7 @@ const Navbar = () => {
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2.5 md:hidden rounded-xl transition-colors text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="p-2.5 md:hidden rounded-xl transition-colors text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={mobileMenuOpen}
               >
@@ -248,20 +227,15 @@ const Navbar = () => {
       >
         <button
           onClick={() => setMobileMenuOpen(false)}
-          className="absolute inset-0 backdrop-blur-sm"
-          style={{ backgroundColor: 'rgba(13, 13, 13, 0.45)' }}
+          className="absolute inset-0 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
           aria-label="Close mobile menu overlay"
         />
         <aside
-          className={`absolute right-0 top-16 h-[calc(100vh-4rem)] w-[86vw] max-w-sm border-l shadow-xl transition-transform duration-300 overflow-y-auto bg-white dark:bg-slate-900 dark:border-slate-700 ${
+          className={`absolute right-0 top-16 h-[calc(100vh-4rem)] w-[86vw] max-w-sm border-l border-slate-200 dark:border-slate-700 shadow-2xl transition-transform duration-300 overflow-y-auto bg-white dark:bg-slate-900 ${
             mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
-          style={{ 
-            borderColor: theme === 'dark' ? undefined : '#67BAF4'
-          }}
         >
-          <div className="px-4 py-3 border-b flex items-center justify-between md:hidden dark:border-slate-700 transition-colors duration-300"
-            style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
+          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between md:hidden transition-colors duration-300">
             <span className="text-sm font-semibold tracking-wide text-slate-900 dark:text-white">MENU</span>
             <button
               onClick={() => setMobileMenuOpen(false)}
@@ -280,19 +254,15 @@ const Navbar = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   `block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    isActive ? 'text-white' : 'text-blue-600 dark:text-white'
+                    isActive ? 'bg-slate-900 text-white dark:bg-blue-600' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`
                 }
-                style={({ isActive }) => ({
-                  backgroundColor: isActive ? '#1E466B' : 'transparent',
-                })}
               >
                 {link.label}
               </NavLink>
             ))}
 
-            <div className="pt-3 mt-3 border-t dark:border-slate-700 transition-colors duration-300"
-              style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
+            <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 transition-colors duration-300">
               <button
                 onClick={toggleTheme}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -332,8 +302,7 @@ const Navbar = () => {
                     setMobileMenuOpen(false);
                     navigate('/auth/customer/login');
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white text-sm font-medium transition-colors"
-                  style={{ backgroundColor: '#1E466B' }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-sm font-medium transition-colors shadow-sm hover:shadow-md"
                 >
                   <User className="w-4 h-4" />
                   Customer Login

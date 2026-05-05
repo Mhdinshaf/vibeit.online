@@ -28,10 +28,10 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
   const maxPrice = searchParams.get('maxPrice') || '';
 
   return (
-    <div className="rounded-2xl border border-slate-100 dark:border-slate-800 p-5 sm:p-6">
+    <div className="premium-card p-5 sm:p-6 border-0 dark:border dark:border-slate-700">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 dark:from-blue-600 dark:to-blue-500 text-white flex items-center justify-center shadow-sm">
             <SlidersHorizontal className="w-4 h-4 text-white" />
           </div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Filters</h3>
@@ -92,8 +92,8 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-colors ${
                     isSelected
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-700 hover:bg-slate-100'
+                      ? 'bg-slate-900 text-white dark:bg-blue-600 dark:text-white shadow-md'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50'
                   }`}
                   >
                     <span className="flex items-center gap-2">
@@ -113,8 +113,8 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
                           onClick={() => onSubcategorySelect(cat.name, sub)}
                           className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                             subcategory === sub
-                              ? 'bg-slate-100 text-slate-900 font-semibold'
-                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/30 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         {sub}
@@ -203,7 +203,7 @@ const ShopPage = () => {
   }, [data, sort]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#050b18] overflow-x-clip transition-colors">
+    <div className="min-h-screen overflow-x-clip transition-colors">
       <Helmet>
         <title>Shop All Products | VIBEIT - Fashion, Tech & Home</title>
         <meta name="description" content="Browse all products at VIBEIT. Find fashion, tech gadgets, home essentials and more. Filter by category, price, and more. Fast delivery across Sri Lanka." />
@@ -211,7 +211,7 @@ const ShopPage = () => {
         <meta property="og:description" content="Browse our complete collection of fashion, tech gadgets, and home essentials." />
         <meta property="og:url" content="https://vibeitlk.vercel.app/shop" />
       </Helmet>
-      <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+      <div className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#050b18]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
           <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 dark:text-slate-400 mb-2">Shop collection</p>
           <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white">
@@ -289,12 +289,12 @@ const ShopPage = () => {
                 {[...Array(8)].map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white rounded-2xl border border-slate-200 overflow-hidden animate-pulse"
+                    className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-pulse"
                   >
-                    <div className="aspect-square bg-slate-200" />
+                    <div className="aspect-square bg-slate-200 dark:bg-slate-700" />
                     <div className="p-4 space-y-3">
-                      <div className="h-4 bg-slate-200 rounded w-3/4" />
-                      <div className="h-4 bg-slate-200 rounded w-1/2" />
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
                     </div>
                   </div>
                 ))}
@@ -338,7 +338,7 @@ const ShopPage = () => {
                 <p className="text-slate-500 dark:text-slate-400 mb-6">Try adjusting your filters or search terms</p>
                 <button
                   onClick={clearFilters}
-                  className="inline-flex items-center gap-2 bg-slate-900 dark:bg-blue-600 text-white font-medium px-6 py-3 rounded-xl hover:bg-slate-700 dark:hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center gap-2 bg-slate-900 dark:bg-blue-600 text-white font-medium px-6 py-3 rounded-xl hover:bg-slate-800 dark:hover:bg-blue-500 transition-colors shadow-md"
                 >
                 Clear All Filters
                 </button>

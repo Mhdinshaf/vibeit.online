@@ -94,7 +94,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-[#050b18] overflow-x-hidden transition-all">
+    <div className="overflow-x-hidden">
       <Helmet>
         <title>VIBEIT - Shop Fashion, Tech & Home Online in Sri Lanka | Free Delivery</title>
         <meta name="description" content="Shop online at VIBEIT Sri Lanka. Premium fashion, tech gadgets, home essentials & more. Cash on delivery available across Sri Lanka. Free gifts on orders above රු5000!" />
@@ -130,7 +130,7 @@ const HomePage = () => {
       </Helmet>
 
       {/* Hero Section with Carousel */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 py-8 sm:py-12 lg:py-16">
+      <section className="relative overflow-hidden bg-gradient-to-b from-slate-100/50 to-transparent dark:from-slate-900/50 dark:to-transparent py-8 sm:py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Carousel */}
           <div className="relative mb-6 sm:mb-8 rounded-2xl lg:rounded-3xl overflow-hidden shadow-lg bg-gradient-to-br from-slate-200 dark:from-slate-800">
@@ -184,7 +184,7 @@ const HomePage = () => {
           {/* Promo Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Featured Product Spotlight */}
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-900 dark:to-blue-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-md">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-500 dark:from-blue-900/80 dark:to-blue-800/80 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-blue-400/20">
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <p className="text-xs sm:text-sm font-semibold opacity-90">Featured</p>
@@ -196,7 +196,7 @@ const HomePage = () => {
             </div>
 
             {/* Sale Promotion Card */}
-            <div className="bg-gradient-to-br from-orange-500 to-red-600 dark:from-orange-900 dark:to-red-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-md">
+            <div className="bg-gradient-to-br from-orange-500 to-red-600 dark:from-orange-900/80 dark:to-red-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-orange-400/20">
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <p className="text-xs sm:text-sm font-semibold opacity-90">Limited</p>
@@ -285,7 +285,7 @@ const HomePage = () => {
                 <Link
                   key={idx}
                   to="/shop"
-                  className={`bg-gradient-to-br ${banner.bgGradient} rounded-xl sm:rounded-2xl h-40 sm:h-48 flex items-end p-4 sm:p-6 group overflow-hidden relative`}
+                  className={`bg-gradient-to-br ${banner.bgGradient} rounded-xl sm:rounded-2xl h-40 sm:h-48 flex items-end p-4 sm:p-6 group overflow-hidden relative shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-white/10`}
                 >
                   <div className="absolute top-0 right-0 opacity-20 group-hover:opacity-30 transition-opacity">
                     <IconComponent className="w-20 h-20 sm:w-24 sm:h-24" />
@@ -323,7 +323,7 @@ const HomePage = () => {
                 <Link
                   key={idx}
                   to="/shop"
-                  className={`bg-gradient-to-br ${brand.color} dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 flex flex-col items-center gap-2 hover:shadow-md transition-all group`}
+                  className={`bg-gradient-to-br ${brand.color} dark:from-slate-800 dark:to-slate-700/80 rounded-xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-slate-200/50 dark:border-slate-600/30 group`}
                 >
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-white/50 dark:bg-slate-600/50 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-slate-700 dark:text-slate-200" />
