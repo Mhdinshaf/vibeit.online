@@ -291,18 +291,15 @@ html.dark {
 }
 
 html.dark body {
-  background-color: #020617;
+  background-color: #050b18;
   color: #e2e8f0;
 }
 
 html.dark #root {
-  background-color: #020617;
+  background-color: #050b18;
 }
 
-/* Global dark theme surfaces */
-html.dark .bg-white {
-  background-color: #0f172a;
-}
+/* Note: DO NOT override .bg-white in dark mode - let Tailwind dark: variants handle it */
 
 html.dark .bg-gray-50,
 html.dark .bg-slate-50 {

@@ -6,7 +6,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950">
+    <footer className="mt-auto border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-[#050b18]">
       <div className="bg-gradient-to-r from-blue-600 to-blue-500 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 text-white py-12 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="text-center md:text-left">
@@ -23,7 +23,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-950">
+      <div className="bg-white dark:bg-[#050b18]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             <div className="lg:col-span-1">

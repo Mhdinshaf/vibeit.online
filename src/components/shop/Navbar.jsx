@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, LogOut, Settings, Sun, Moon } from 'lucide-react';
 import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import logo from '../../assets/favicon.jpeg';
 
 const Navbar = () => {
@@ -10,25 +11,16 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [theme, setTheme] = useState('light');
   const navigate = useNavigate();
   const items = useCartStore((state) => state.items);
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
   const { customer, logout } = useCustomerAuth();
+  const { theme, toggleTheme, isInitialized } = useTheme();
 
   // Track customer authentication state
   useEffect(() => {
     // No logging needed for production
   }, [customer]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    try {
-      localStorage.setItem('vibeit-theme', theme);
-    } catch {
-      // ignore localStorage write errors
-    }
-  }, [theme]);
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -55,6 +47,10 @@ const Navbar = () => {
     { to: '/contact', label: 'CONTACT' },
   ];
 
+  if (!isInitialized) {
+    return null;
+  }
+
   return (
     <>
       <a 
@@ -65,8 +61,8 @@ const Navbar = () => {
         Skip to main content
       </a>
 
-      <header className="sticky top-0 z-50 border-b" 
-        style={{ borderColor: '#67BAF4', backgroundColor: '#fff' }}>
+      <header className="sticky top-0 z-50 border-b bg-white dark:bg-[#050b18] dark:border-slate-800 transition-colors duration-300" 
+        style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-16 sm:h-[4.5rem] flex items-center justify-between gap-3">
             <NavLink to="/" className="flex items-center gap-3 min-w-0 shrink-0 group">
@@ -79,15 +75,15 @@ const Navbar = () => {
                 />
               </div>
               <div className="leading-none">
-                <span className="block text-lg sm:text-xl font-semibold tracking-tight" 
-                  style={{ color: '#0D0D0D' }}>VIBEIT</span>
-                <span className="block text-[10px] sm:text-[11px] mt-1 tracking-[0.2em]"
-                  style={{ color: '#1E466B' }}>PREMIUM STORE</span>
+                <span className="block text-lg sm:text-xl font-semibold tracking-tight text-slate-900 dark:text-white" 
+                >VIBEIT</span>
+                <span className="block text-[10px] sm:text-[11px] mt-1 tracking-[0.2em] text-blue-600 dark:text-blue-400"
+                >PREMIUM STORE</span>
               </div>
             </NavLink>
 
-            <nav className="hidden md:flex items-center gap-1 rounded-full border px-2 py-1 shadow-sm"
-              style={{ borderColor: '#67BAF4', backgroundColor: '#fff' }}>
+            <nav className="hidden md:flex items-center gap-1 rounded-full border px-2 py-1 shadow-sm bg-white dark:bg-slate-900 dark:border-slate-700 transition-colors duration-300"
+              style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
               {navLinks.map((link) => (
                 <NavLink
                   key={link.to}
@@ -96,12 +92,11 @@ const Navbar = () => {
                     `px-4 lg:px-5 py-2 text-sm font-medium rounded-full transition-colors duration-300 ${
                       isActive
                         ? 'text-white'
-                        : 'hover:text-white'
+                        : 'text-blue-600 dark:text-white hover:text-white dark:hover:text-white'
                     }`
                   }
                   style={({ isActive }) => ({
                     backgroundColor: isActive ? '#1E466B' : 'transparent',
-                    color: isActive ? '#fff' : '#0D0D0D'
                   })}
                 >
                   {link.label}
@@ -112,41 +107,32 @@ const Navbar = () => {
             <div className="flex items-center gap-1 sm:gap-2">
               <form
                 onSubmit={handleSearch}
-                className={`flex items-center overflow-hidden rounded-xl border transition-all duration-300 ${
+                className={`flex items-center overflow-hidden rounded-xl border transition-all duration-300 bg-slate-50 dark:bg-slate-800 ${
                   searchOpen
                     ? 'w-40 xs:w-48 sm:w-56 px-2 sm:px-3 py-1.5 opacity-100'
                     : 'w-0 border-transparent px-0 py-0 opacity-0 pointer-events-none'
                 }`}
                 style={{
-                  backgroundColor: '#FAFAFA',
                   borderColor: searchOpen ? '#67BAF4' : 'transparent'
                 }}
               >
-                <Search className="w-4 h-4 shrink-0" style={{ color: '#1E466B' }} />
+                <Search className="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="w-full min-w-0 bg-transparent border-none outline-none px-2 text-sm placeholder-opacity-70"
-                  style={{
-                    color: '#0D0D0D',
-                    backgroundColor: '#FAFAFA'
-                  }}
+                  className="w-full min-w-0 bg-transparent border-none outline-none px-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   autoFocus={searchOpen}
                 />
               </form>
 
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
-                className={`p-2.5 rounded-xl transition-all duration-300 ${
-                  searchOpen 
-                    ? 'text-white'
-                    : ''
-                }`}
+                className="p-2.5 rounded-xl transition-all duration-300 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
                 style={{
                   backgroundColor: searchOpen ? '#1E466B' : 'transparent',
-                  color: searchOpen ? '#fff' : '#0D0D0D'
+                  color: searchOpen ? '#fff' : undefined
                 }}
                 aria-label="Search"
               >
@@ -155,10 +141,7 @@ const Navbar = () => {
 
               <NavLink
                 to="/cart"
-                className="relative p-2.5 rounded-xl transition-all duration-300"
-                style={{
-                  color: '#0D0D0D'
-                }}
+                className="relative p-2.5 rounded-xl transition-all duration-300 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
                 aria-label="Shopping Cart"
               >
                 <ShoppingCart className="w-5 h-5" />
@@ -171,16 +154,8 @@ const Navbar = () => {
               </NavLink>
 
               <button
-                onClick={() => {
-                  setTheme(theme === 'dark' ? 'light' : 'dark');
-                  try {
-                    localStorage.setItem('vibeit-theme-manual', 'true');
-                  } catch {
-                    // ignore localStorage write errors
-                  }
-                }}
-                className="inline-flex p-2.5 rounded-xl transition-colors"
-                style={{ color: '#1E466B' }}
+                onClick={toggleTheme}
+                className="inline-flex p-2.5 rounded-xl transition-colors text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                 aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
                 title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
               >
@@ -203,23 +178,21 @@ const Navbar = () => {
                   </button>
 
                   {profileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 border rounded-xl shadow-lg py-1 z-50 overflow-hidden"
+                    <div className="absolute right-0 mt-2 w-56 border rounded-xl shadow-lg py-1 z-50 overflow-hidden bg-white dark:bg-slate-900 dark:border-slate-700 transition-colors duration-300"
                       style={{ 
-                        backgroundColor: '#fff',
-                        borderColor: '#67BAF4'
+                        borderColor: theme === 'dark' ? undefined : '#67BAF4'
                       }}>
-                      <div className="px-4 py-3 border-b"
-                        style={{ borderColor: '#67BAF4' }}>
-                        <p className="text-sm font-semibold" style={{ color: '#0D0D0D' }}>{customer.firstName} {customer.lastName}</p>
-                        <p className="text-xs" style={{ color: '#1E466B' }}>{customer.email}</p>
+                      <div className="px-4 py-3 border-b dark:border-slate-700 transition-colors duration-300"
+                        style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">{customer.firstName} {customer.lastName}</p>
+                        <p className="text-xs text-blue-600 dark:text-blue-400">{customer.email}</p>
                       </div>
                       <NavLink
                         to="/customer/dashboard"
                         onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 transition-colors border-b"
+                        className="flex items-center gap-3 px-4 py-3 transition-colors border-b dark:border-slate-700 text-slate-900 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                         style={{ 
-                          color: '#0D0D0D',
-                          borderColor: '#67BAF4'
+                          borderColor: theme === 'dark' ? undefined : '#67BAF4'
                         }}
                       >
                         <Settings className="w-4 h-4" />
@@ -230,8 +203,7 @@ const Navbar = () => {
                           logout();
                           setProfileDropdownOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 transition-colors"
-                        style={{ color: '#d32f2f' }}
+                        className="w-full flex items-center gap-3 px-4 py-3 transition-colors text-red-600 dark:text-red-400 hover:bg-slate-50 dark:hover:bg-slate-800"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Logout</span>
@@ -253,8 +225,7 @@ const Navbar = () => {
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2.5 md:hidden rounded-xl transition-colors"
-                style={{ color: '#0D0D0D' }}
+                className="p-2.5 md:hidden rounded-xl transition-colors text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
                 aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={mobileMenuOpen}
               >
@@ -282,21 +253,19 @@ const Navbar = () => {
           aria-label="Close mobile menu overlay"
         />
         <aside
-          className={`absolute right-0 top-16 h-[calc(100vh-4rem)] w-[86vw] max-w-sm border-l shadow-xl transition-transform duration-300 overflow-y-auto ${
+          className={`absolute right-0 top-16 h-[calc(100vh-4rem)] w-[86vw] max-w-sm border-l shadow-xl transition-transform duration-300 overflow-y-auto bg-white dark:bg-slate-900 dark:border-slate-700 ${
             mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           style={{ 
-            backgroundColor: '#fff',
-            borderColor: '#67BAF4'
+            borderColor: theme === 'dark' ? undefined : '#67BAF4'
           }}
         >
-          <div className="px-4 py-3 border-b flex items-center justify-between md:hidden"
-            style={{ borderColor: '#67BAF4' }}>
-            <span className="text-sm font-semibold tracking-wide" style={{ color: '#0D0D0D' }}>MENU</span>
+          <div className="px-4 py-3 border-b flex items-center justify-between md:hidden dark:border-slate-700 transition-colors duration-300"
+            style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
+            <span className="text-sm font-semibold tracking-wide text-slate-900 dark:text-white">MENU</span>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-lg"
-              style={{ color: '#0D0D0D' }}
+              className="p-2 rounded-lg text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
               aria-label="Close mobile menu"
             >
               <X className="w-5 h-5" />
@@ -311,31 +280,22 @@ const Navbar = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   `block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    isActive ? 'text-white' : ''
+                    isActive ? 'text-white' : 'text-blue-600 dark:text-white'
                   }`
                 }
                 style={({ isActive }) => ({
                   backgroundColor: isActive ? '#1E466B' : 'transparent',
-                  color: isActive ? '#fff' : '#0D0D0D'
                 })}
               >
                 {link.label}
               </NavLink>
             ))}
 
-            <div className="pt-3 mt-3 border-t"
-              style={{ borderColor: '#67BAF4' }}>
+            <div className="pt-3 mt-3 border-t dark:border-slate-700 transition-colors duration-300"
+              style={{ borderColor: theme === 'dark' ? undefined : '#67BAF4' }}>
               <button
-                onClick={() => {
-                  setTheme(theme === 'dark' ? 'light' : 'dark');
-                  try {
-                    localStorage.setItem('vibeit-theme-manual', 'true');
-                  } catch {
-                    // ignore localStorage write errors
-                  }
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors"
-                style={{ color: '#0D0D0D' }}
+                onClick={toggleTheme}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
                 aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
               >
                 {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -344,15 +304,13 @@ const Navbar = () => {
 
               {customer ? (
                 <>
-                  <div className="px-4 pb-2 text-sm"
-                    style={{ color: '#1E466B' }}>
+                  <div className="px-4 pb-2 text-sm text-blue-600 dark:text-blue-400">
                     {customer.firstName} {customer.lastName}
                   </div>
                   <NavLink
                     to="/customer/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors"
-                    style={{ color: '#0D0D0D' }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-slate-900 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
                     <Settings className="w-4 h-4" />
                     Dashboard
@@ -362,8 +320,7 @@ const Navbar = () => {
                       logout();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors"
-                    style={{ color: '#d32f2f' }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
                     <LogOut className="w-4 h-4" />
                     Logout
