@@ -211,7 +211,7 @@ const HomePage = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-4 sm:py-6 lg:py-8 bg-white dark:bg-slate-950 border-y border-slate-200 dark:border-slate-800">
+      <section className="py-4 sm:py-6 lg:py-8 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Explore Popular Categories" subtitle="Shop by Category" linkTo="/shop" />
 
@@ -239,7 +239,7 @@ const HomePage = () => {
       </section>
 
       {/* Today's Best Deals Section */}
-      <section className="py-6 sm:py-8 lg:py-10 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      <section className="py-6 sm:py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-4 h-4 text-orange-500" />
@@ -274,7 +274,7 @@ const HomePage = () => {
       </section>
 
       {/* Promotional Banners Section */}
-      <section className="py-6 sm:py-8 lg:py-10 bg-white dark:bg-slate-950">
+      <section className="py-6 sm:py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-3">Special Collections</h3>
 
@@ -305,7 +305,7 @@ const HomePage = () => {
       </section>
 
       {/* Official Brand Stores Section */}
-      <section className="py-6 sm:py-8 lg:py-10 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      <section className="py-6 sm:py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Official Brand Stores" subtitle="Verified Sellers" linkTo="/shop" />
 
@@ -337,7 +337,7 @@ const HomePage = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-6 sm:py-8 lg:py-10 bg-white dark:bg-slate-950">
+      <section className="py-6 sm:py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Fresh Arrivals with Premium Finish" subtitle="Featured Collection" linkTo="/shop" />
 
@@ -369,7 +369,7 @@ const HomePage = () => {
       </section>
 
       {/* Limited Time Deals Section */}
-      <section className="py-6 sm:py-8 lg:py-10 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      <section className="py-6 sm:py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-2">
             <Zap className="w-4 h-4 text-orange-500" />

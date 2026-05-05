@@ -28,7 +28,7 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
   const maxPrice = searchParams.get('maxPrice') || '';
 
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
+    <div className="rounded-2xl border border-slate-100 dark:border-slate-800 p-5 sm:p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center">
@@ -237,7 +237,7 @@ const ShopPage = () => {
           </aside>
 
           <div className="flex-1">
-            <nav className="flex flex-wrap items-center gap-2 text-sm mb-5 sm:mb-6 bg-white dark:bg-slate-900 rounded-xl px-4 py-3 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <nav className="flex flex-wrap items-center gap-2 text-sm mb-5 sm:mb-6 border-b border-slate-100 dark:border-slate-800 py-3">
               {breadcrumbs.map((crumb, index) => (
                 <span key={crumb} className="flex items-center gap-2">
                   {index > 0 && <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />}
@@ -258,16 +258,15 @@ const ShopPage = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setMobileFilterOpen(true)}
-                  className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                  className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-transparent border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
                 >
-                  <Filter className="w-4 h-4 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-700">Filters</span>
+                <Filter className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Filters</span>
                 </button>
 
-                <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl">
+                <div className="flex items-center gap-2 px-4 py-2 bg-transparent border border-slate-200 dark:border-slate-700 rounded-xl">
                   <Package className="w-4 h-4 text-slate-600" />
-                  <p className="text-sm font-medium text-slate-700">
-                    {isLoading ? 'Loading...' : `${data?.total || 0} products`}
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{isLoading ? 'Loading...' : `${data?.total || 0} products`}
                   </p>
                 </div>
               </div>
@@ -275,7 +274,7 @@ const ShopPage = () => {
               <select
                 value={sort}
                 onChange={(e) => setParam('sort', e.target.value)}
-                className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:border-slate-900 transition-colors cursor-pointer"
+                className="px-4 py-2.5 bg-transparent border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 focus:border-slate-900 dark:focus:border-blue-500 transition-colors cursor-pointer"
               >
                 {sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -331,17 +330,17 @@ const ShopPage = () => {
                 )}
               </>
             ) : (
-              <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">
+              <div className="text-center py-20 border-b border-slate-100 dark:border-slate-800">
                 <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Package className="w-10 h-10 text-slate-400" />
+                  <Package className="w-10 h-10 text-slate-400 dark:text-slate-500" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">No products found</h3>
-                <p className="text-slate-500 mb-6">Try adjusting your filters or search terms</p>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No products found</h3>
+                <p className="text-slate-500 dark:text-slate-400 mb-6">Try adjusting your filters or search terms</p>
                 <button
                   onClick={clearFilters}
-                  className="inline-flex items-center gap-2 bg-slate-900 text-white font-medium px-6 py-3 rounded-xl hover:bg-slate-700 transition-colors"
+                  className="inline-flex items-center gap-2 bg-slate-900 dark:bg-blue-600 text-white font-medium px-6 py-3 rounded-xl hover:bg-slate-700 dark:hover:bg-blue-700 transition-colors"
                 >
-                  Clear All Filters
+                Clear All Filters
                 </button>
               </div>
             )}
@@ -355,7 +354,7 @@ const ShopPage = () => {
             className="fixed inset-0 bg-slate-900/45 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setMobileFilterOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-80 sm:w-96 max-w-[85vw] bg-slate-50 z-50 overflow-y-auto md:hidden shadow-2xl border-l border-slate-200">
+          <div className="fixed inset-y-0 right-0 w-80 sm:w-96 max-w-[85vw] bg-white dark:bg-[#050b18] z-50 overflow-y-auto md:hidden shadow-2xl border-l border-slate-200 dark:border-slate-700">
             <div className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
@@ -386,3 +385,5 @@ const ShopPage = () => {
 };
 
 export default ShopPage;
+
+

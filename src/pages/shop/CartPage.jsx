@@ -131,7 +131,7 @@ const CartPage = () => {
               {items.map((item) => (
                 <div 
                   key={item.key}
-                  className="bg-white rounded-2xl border border-slate-200 p-4 md:p-5 shadow-sm"
+                  className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 md:p-5 shadow-sm"
                 >
                   <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
                     <Link
@@ -229,7 +229,7 @@ const CartPage = () => {
 
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-8">
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
                 <div className="bg-slate-900 dark:bg-blue-600 px-6 py-4">
                   <h2 className="text-xl font-semibold text-white">Order Summary</h2>
                 </div>
@@ -241,13 +241,13 @@ const CartPage = () => {
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-600">Subtotal</span>
+                      <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
                       <span className="font-semibold text-slate-900">
                         රු{subtotal.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-600">Shipping</span>
+                      <span className="text-slate-600 dark:text-slate-400">Shipping</span>
                       <span className="font-semibold">
                         {shippingCost === 0 ? (
                           <span className="text-emerald-600 flex items-center gap-1">
@@ -303,7 +303,7 @@ const CartPage = () => {
                   </div>
                 </div>
 
-                <div className="bg-slate-50 px-6 py-4 border-t border-slate-100">
+                <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700">
                   <p className="text-xs text-slate-500 text-center">
                     We accept Bank Transfer and Cash on Delivery
                   </p>
@@ -318,3 +318,4 @@ const CartPage = () => {
 };
 
 export default CartPage;
+

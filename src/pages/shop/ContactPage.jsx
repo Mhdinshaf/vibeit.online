@@ -57,7 +57,7 @@ const ContactPage = () => {
         <meta property="og:url" content="https://vibeitlk.vercel.app/contact" />
       </Helmet>
 
-      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
+      <section className="border-b border-slate-200 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 text-center">
           <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 dark:text-slate-400 mb-3">Contact</p>
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 dark:text-white">Talk to the VIBEIT team</h1>
@@ -75,7 +75,7 @@ const ContactPage = () => {
             { icon: MapPin, title: 'Location', value: 'Colombo, Sri Lanka', href: null },
             { icon: Clock, title: 'Hours', value: '9 AM - 9 PM Daily', href: null },
           ].map((item) => (
-            <article key={item.title} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm">
+            <article key={item.title} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
               <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center">
                 <item.icon className="w-5 h-5" />
               </div>
@@ -94,58 +94,58 @@ const ContactPage = () => {
 
       <section className="pb-12 sm:pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-          <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
+          <div className="border-b border-slate-100 dark:border-slate-800 py-6 sm:py-8">
             <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Send us a message</h2>
             <p className="mt-2 text-slate-600 dark:text-slate-300">Fill this form and we will respond as soon as possible.</p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Your Name</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Your Name</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-900 transition-colors"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-slate-900 dark:focus:border-blue-500 transition-colors text-slate-900 dark:text-white"
                     placeholder="John Doe"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Email Address</label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-900 transition-colors"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-slate-900 dark:focus:border-blue-500 transition-colors text-slate-900 dark:text-white"
                     placeholder="john@example.com"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Subject</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Subject</label>
                 <input
                   type="text"
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-900 transition-colors"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-slate-900 dark:focus:border-blue-500 transition-colors text-slate-900 dark:text-white"
                   placeholder="How can we help?"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Message</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Message</label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   required
                   rows="5"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-900 transition-colors resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-slate-900 dark:focus:border-blue-500 transition-colors resize-none text-slate-900 dark:text-white"
                   placeholder="Your message..."
                 />
               </div>
@@ -165,7 +165,7 @@ const ContactPage = () => {
           </div>
 
           <div className="flex flex-col gap-5">
-            <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
+            <div className="border-b border-slate-100 dark:border-slate-800 py-6 sm:py-8">
               <div className="w-11 h-11 rounded-xl bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center">
                 <MessageCircle className="w-5 h-5" />
               </div>
@@ -185,7 +185,7 @@ const ContactPage = () => {
               </a>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
+            <div className="border-b border-slate-100 dark:border-slate-800 py-6 sm:py-8">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Quick help</h3>
               <ul className="mt-4 space-y-3">
                 {[
@@ -216,3 +216,4 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
+

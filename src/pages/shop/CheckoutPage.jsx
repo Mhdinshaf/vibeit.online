@@ -193,13 +193,13 @@ const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-[#050b18] py-6 sm:py-8 overflow-x-clip transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex items-center gap-2 text-sm mb-8 bg-white rounded-xl px-4 py-3 border border-slate-200 shadow-sm">
-          <Link to="/cart" className="text-slate-500 hover:text-slate-900 transition-colors">Cart</Link>
-          <ChevronRight className="w-4 h-4 text-slate-300" />
+        <nav className="flex items-center gap-2 text-sm mb-8 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
+          <Link to="/cart" className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Cart</Link>
+          <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
           <span className="text-slate-900 font-semibold">Checkout</span>
         </nav>
 
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900 mb-8">Secure Checkout</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white mb-8">Secure Checkout</h1>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8">
@@ -236,12 +236,12 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
+              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <Mail className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-lg font-semibold text-slate-900">Contact Information</h2>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Contact Information</h2>
                 </div>
                 <CheckoutInput
                   icon={Mail}
@@ -252,28 +252,28 @@ const CheckoutPage = () => {
                   onChange={(e) => setField('email', e.target.value)}
                   placeholder="your@email.com"
                 />
-                <p className="text-xs text-slate-500 mt-2 ml-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 ml-1">
                   We'll send order confirmation to this email
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
+              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <MapPin className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-lg font-semibold text-slate-900">Shipping Address</h2>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Shipping Address</h2>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
                       District <span className="text-red-500">*</span>
                     </label>
                     <select
                       required
                       value={form.district}
                       onChange={(e) => setField('district', e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-slate-900"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors text-slate-900 dark:text-white"
                     >
                       <option value="">Select District</option>
                       {SRI_LANKA_DISTRICTS.map((district) => (
@@ -358,7 +358,7 @@ const CheckoutPage = () => {
                 )}
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
+              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <Truck className="w-5 h-5 text-white" />
@@ -386,7 +386,7 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
+              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
                     <CreditCard className="w-5 h-5 text-white" />
@@ -448,7 +448,7 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 md:p-6 shadow-sm">
+              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -585,3 +585,5 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
+
+
