@@ -26,18 +26,18 @@ const devError = (...args) => {
 // Premium Input Component
 const CheckoutInput = ({ icon: Icon, label, required, ...props }) => (
   <div>
-    <label className="block text-sm font-medium text-slate-700 mb-2">
+    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <div className="relative">
       {Icon && (
         <div className="absolute left-3 top-1/2 -translate-y-1/2">
-          <Icon className="w-5 h-5 text-slate-400" />
+          <Icon className="w-5 h-5 text-slate-400 dark:text-slate-500" />
         </div>
       )}
       <input
         {...props}
-        className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-slate-900 placeholder-slate-400`}
+        className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500`}
       />
     </div>
   </div>
@@ -191,7 +191,7 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-6 sm:py-8 overflow-x-clip">
+    <div className="min-h-screen bg-white dark:bg-[#050b18] py-6 sm:py-8 overflow-x-clip transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav className="flex items-center gap-2 text-sm mb-8 bg-white rounded-xl px-4 py-3 border border-slate-200 shadow-sm">
           <Link to="/cart" className="text-slate-500 hover:text-slate-900 transition-colors">Cart</Link>
@@ -206,16 +206,16 @@ const CheckoutPage = () => {
             {/* Left Column - Form */}
             <div className="lg:col-span-7 space-y-6">
               {!isAuthenticated() && (
-                <div className="bg-slate-100 rounded-2xl border border-slate-200 p-4 md:p-6">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 md:p-6">
                   <div className="flex items-start gap-3">
-                    <User className="w-5 h-5 text-slate-700 flex-shrink-0 mt-0.5" />
+                    <User className="w-5 h-5 text-slate-700 dark:text-slate-300 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
-                      <h3 className="font-semibold text-slate-900 mb-1">Have an account?</h3>
-                      <p className="text-sm text-slate-600 mb-3">Log in to auto-fill your information and access your order history anytime.</p>
+                      <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Have an account?</h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">Log in to auto-fill your information and access your order history anytime.</p>
                       <button
                         type="button"
                         onClick={() => navigate('/auth/customer/login')}
-                        className="text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors"
+                        className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors"
                       >
                         Sign in now →
                       </button>
@@ -225,12 +225,12 @@ const CheckoutPage = () => {
               )}
 
               {isAuthenticated() && (
-                <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-4 md:p-6">
+                <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-200 dark:border-emerald-700/50 p-4 md:p-6">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-1">Welcome, {customer?.firstName}!</h3>
-                      <p className="text-sm text-slate-600">Your information is auto-filled. You can track this order in your dashboard after purchase.</p>
+                      <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Welcome, {customer?.firstName}!</h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-300">Your information is auto-filled. You can track this order in your dashboard after purchase.</p>
                     </div>
                   </div>
                 </div>

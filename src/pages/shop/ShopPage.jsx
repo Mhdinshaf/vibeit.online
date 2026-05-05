@@ -28,24 +28,24 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
   const maxPrice = searchParams.get('maxPrice') || '';
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center">
             <SlidersHorizontal className="w-4 h-4 text-white" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900">Filters</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Filters</h3>
         </div>
         <button
           onClick={clearFilters}
-          className="text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors"
+          className="text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium transition-colors"
         >
           Clear All
         </button>
       </div>
 
-      <div className="mb-6 pb-6 border-b border-slate-100">
-        <h4 className="font-semibold text-slate-900 mb-4">Price Range</h4>
+      <div className="mb-6 pb-6 border-b border-slate-100 dark:border-slate-700">
+        <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Price Range</h4>
         <div className="flex gap-3">
           <div className="flex-1">
             <input
@@ -53,24 +53,24 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
               placeholder="Min"
               value={minPrice}
               onChange={(e) => setParam('minPrice', e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-slate-900 focus:bg-white transition-colors"
+              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors"
             />
           </div>
-          <div className="flex items-center text-slate-400">—</div>
+          <div className="flex items-center text-slate-400 dark:text-slate-600">—</div>
           <div className="flex-1">
             <input
               type="number"
               placeholder="Max"
               value={maxPrice}
               onChange={(e) => setParam('maxPrice', e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-slate-900 focus:bg-white transition-colors"
+              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors"
             />
           </div>
         </div>
       </div>
 
       <div>
-        <h4 className="font-semibold text-slate-900 mb-4">Categories</h4>
+        <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Categories</h4>
         <div className="space-y-1">
           {CATEGORIES.map((cat) => {
             const isExpanded = expandedCategory === cat.name;
@@ -97,7 +97,7 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
                   }`}
                   >
                     <span className="flex items-center gap-2">
-                      <cat.icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-slate-500'}`} />
+                      <cat.icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                       <span className="font-medium">{cat.name}</span>
                     </span>
                   <ChevronDown
@@ -203,7 +203,7 @@ const ShopPage = () => {
   }, [data, sort]);
 
   return (
-    <div className="min-h-screen bg-slate-50 overflow-x-clip">
+    <div className="min-h-screen bg-white dark:bg-[#050b18] overflow-x-clip transition-colors">
       <Helmet>
         <title>Shop All Products | VIBEIT - Fashion, Tech & Home</title>
         <meta name="description" content="Browse all products at VIBEIT. Find fashion, tech gadgets, home essentials and more. Filter by category, price, and more. Fast delivery across Sri Lanka." />
@@ -211,14 +211,14 @@ const ShopPage = () => {
         <meta property="og:description" content="Browse our complete collection of fashion, tech gadgets, and home essentials." />
         <meta property="og:url" content="https://vibeitlk.vercel.app/shop" />
       </Helmet>
-      <div className="border-b border-slate-200 bg-white">
+      <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-          <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 mb-2">Shop collection</p>
-          <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">
+          <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 dark:text-slate-400 mb-2">Shop collection</p>
+          <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white">
             {category || 'Shop All Products'}
           </h1>
           {subcategory && (
-            <p className="text-slate-600 text-lg mt-2">{subcategory}</p>
+            <p className="text-slate-600 dark:text-slate-300 text-lg mt-2">{subcategory}</p>
           )}
         </div>
       </div>
@@ -237,15 +237,15 @@ const ShopPage = () => {
           </aside>
 
           <div className="flex-1">
-            <nav className="flex flex-wrap items-center gap-2 text-sm mb-5 sm:mb-6 bg-white rounded-xl px-4 py-3 border border-slate-200 shadow-sm">
+            <nav className="flex flex-wrap items-center gap-2 text-sm mb-5 sm:mb-6 bg-white dark:bg-slate-900 rounded-xl px-4 py-3 border border-slate-200 dark:border-slate-700 shadow-sm">
               {breadcrumbs.map((crumb, index) => (
                 <span key={crumb} className="flex items-center gap-2">
-                  {index > 0 && <ChevronRight className="w-4 h-4 text-slate-300" />}
+                  {index > 0 && <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />}
                   <span
                     className={
                       index === breadcrumbs.length - 1
-                        ? 'text-slate-900 font-semibold'
-                        : 'text-slate-500'
+                        ? 'text-slate-900 dark:text-white font-semibold'
+                        : 'text-slate-500 dark:text-slate-400'
                     }
                   >
                     {crumb}

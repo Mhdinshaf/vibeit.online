@@ -65,15 +65,15 @@ const CartPage = () => {
   // Empty State
   if (!items || items.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center py-16">
+      <div className="min-h-screen bg-white dark:bg-[#050b18] flex items-center justify-center py-16">
         <div className="text-center max-w-md mx-auto px-4">
-          <div className="w-28 h-28 bg-white border border-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-            <ShoppingBag className="w-14 h-14 text-slate-500" />
+          <div className="w-28 h-28 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <ShoppingBag className="w-14 h-14 text-slate-500 dark:text-slate-400" />
           </div>
-          <h1 className="text-3xl font-semibold text-slate-900 mb-3">
+          <h1 className="text-3xl font-semibold text-slate-900 dark:text-white mb-3">
             Your cart is empty
           </h1>
-          <p className="text-slate-600 mb-8">
+          <p className="text-slate-600 dark:text-slate-300 mb-8">
             Looks like you haven't added anything to your cart yet
           </p>
           <Link 
@@ -89,10 +89,10 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-6 sm:py-8 overflow-x-clip">
+    <div className="min-h-screen bg-white dark:bg-[#050b18] py-6 sm:py-8 overflow-x-clip transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {freeShippingRemaining > 0 && (
-          <div className="bg-slate-900 rounded-2xl p-4 mb-6 sm:mb-8 text-white">
+          <div className="bg-slate-900 dark:bg-blue-600 rounded-2xl p-4 mb-6 sm:mb-8 text-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center">
                 <Truck className="w-5 h-5" />
@@ -115,9 +115,9 @@ const CartPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           <div className="lg:col-span-7">
             <div className="flex items-center justify-between mb-5 sm:mb-6">
-              <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
+              <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-white">
                 Shopping Cart
-                <span className="text-slate-500 ml-2">({itemCount})</span>
+                <span className="text-slate-500 dark:text-slate-400 ml-2">({itemCount})</span>
               </h1>
               <button
                 onClick={handleClearCart}
@@ -141,7 +141,7 @@ const CartPage = () => {
                       <img
                         src={getImageUrl(item.product.images?.[0])}
                         alt={item.product.name}
-                        className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl object-cover border border-slate-200"
+                        className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
                       />
                     </Link>
 
@@ -156,12 +156,12 @@ const CartPage = () => {
                           </Link>
                           <div className="flex items-center gap-2 mt-1">
                             {item.product.category && (
-                              <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-lg">
+                              <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-lg">
                                 {item.product.category}
                               </span>
                             )}
                             {item.size && (
-                              <span className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-lg font-medium">
+                              <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-2 py-1 rounded-lg font-medium">
                                 Size: {item.size}
                               </span>
                             )}
@@ -181,7 +181,7 @@ const CartPage = () => {
                             >
                               <Minus className="w-4 h-4 text-slate-600" />
                             </button>
-                            <span className="font-semibold text-slate-900 w-12 sm:w-10 text-center">
+                            <span className="font-semibold text-slate-900 dark:text-white w-12 sm:w-10 text-center">
                               {item.quantity}
                             </span>
                             <button
@@ -195,7 +195,7 @@ const CartPage = () => {
                             </button>
                           </div>
 
-                          <p className="font-semibold text-slate-900 text-lg">
+                          <p className="font-semibold text-slate-900 dark:text-white text-lg">
                             රු{(item.price * item.quantity).toLocaleString()}
                           </p>
 
@@ -229,13 +229,13 @@ const CartPage = () => {
 
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-8">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="bg-slate-900 px-6 py-4">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div className="bg-slate-900 dark:bg-blue-600 px-6 py-4">
                   <h2 className="text-xl font-semibold text-white">Order Summary</h2>
                 </div>
 
                 <div className="p-6">
-                  <div className="flex items-center justify-between text-slate-600 mb-4">
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300 mb-4">
                     <span>{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>
                   </div>
 
@@ -270,18 +270,18 @@ const CartPage = () => {
                   </div>
 
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
                       Promo Code
                     </label>
                     <div className="flex gap-2">
                       <input
                         type="text"
                         placeholder="Enter code"
-                        className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-sm"
+                        className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors text-sm text-slate-900 dark:text-white"
                       />
                       <button
                         onClick={() => toast('Promo codes coming soon!', { icon: '🎁' })}
-                        className="px-4 py-3 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-colors"
+                        className="px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                       >
                         <Gift className="w-5 h-5" />
                       </button>

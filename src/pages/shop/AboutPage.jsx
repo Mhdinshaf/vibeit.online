@@ -4,7 +4,7 @@ import { Target, Heart, Award, Truck, Shield, Headphones, ArrowRight } from 'luc
 
 const AboutPage = () => {
   return (
-    <div className="bg-slate-50 overflow-x-clip">
+    <div className="bg-white dark:bg-[#050b18] overflow-x-clip transition-colors">
       <Helmet>
         <title>About VIBEIT - Sri Lanka's Online Store</title>
         <meta name="description" content="Learn about VIBEIT - Sri Lanka's trusted online shopping destination for fashion, tech gadgets, home essentials and more. Quality products, fast delivery, cash on delivery." />
@@ -13,11 +13,11 @@ const AboutPage = () => {
         <meta property="og:url" content="https://vibeitlk.vercel.app/about" />
       </Helmet>
 
-      <section className="border-b border-slate-200 bg-white">
+      <section className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 text-center">
-          <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 mb-3">About us</p>
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900">Built for modern shopping in Sri Lanka</h1>
-          <p className="mt-4 text-slate-600 text-base sm:text-lg max-w-2xl mx-auto">
+          <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 dark:text-slate-400 mb-3">About us</p>
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 dark:text-white">Built for modern shopping in Sri Lanka</h1>
+          <p className="mt-4 text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-2xl mx-auto">
             We focus on quality products, clean shopping experiences, and reliable delivery island-wide.
           </p>
         </div>
@@ -26,16 +26,16 @@ const AboutPage = () => {
       <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">The Vibe of Online Shopping</h2>
-            <p className="mt-5 text-slate-600 leading-relaxed">
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">The Vibe of Online Shopping</h2>
+            <p className="mt-5 text-slate-600 dark:text-slate-300 leading-relaxed">
               VibeIt.lk started with one goal: make premium products easier to access with fair pricing and dependable support.
             </p>
-            <p className="mt-4 text-slate-600 leading-relaxed">
+            <p className="mt-4 text-slate-600 dark:text-slate-300 leading-relaxed">
               From a small operation in Colombo, we now serve customers across Sri Lanka with a careful product selection and fast service.
             </p>
             <Link
               to="/shop"
-              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3.5 text-white font-medium hover:bg-slate-700 transition-colors"
+              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-slate-900 dark:bg-blue-600 px-6 py-3.5 text-white font-medium hover:bg-slate-700 dark:hover:bg-blue-700 transition-colors"
             >
               Explore products
               <ArrowRight className="w-4 h-4" />
@@ -58,11 +58,11 @@ const AboutPage = () => {
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 bg-white border-y border-slate-200">
+      <section className="py-12 sm:py-16 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">Our Values</h2>
-            <p className="mt-3 text-slate-600">Principles that shape every order and every customer interaction.</p>
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">Our Values</h2>
+            <p className="mt-3 text-slate-600 dark:text-slate-300">Principles that shape every order and every customer interaction.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -86,7 +86,7 @@ const AboutPage = () => {
       <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">Why customers choose us</h2>
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">Why customers choose us</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
