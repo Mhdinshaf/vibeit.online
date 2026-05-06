@@ -321,16 +321,14 @@ api.interceptors.response.use(
       });
     }
     if (error.response?.status === 401) {
-      // Determine if this is a customer or admin request based on stored token
       const customerToken = localStorage.getItem('vibeit_customer_token');
       const adminToken = localStorage.getItem('vibeit_token');
       
-      // Only clear token if:
-      // 1. We have a token
-      // 2. It's not an auth endpoint (those always return 401 for testing)
-      // 3. We have confirmation from backend (check response data)
-      const shouldClearCustomer = customerToken && error.config?.url && !error.config.url.includes('/auth/');
-      const shouldClearAdmin = adminToken && error.config?.url && !error.config.url.includes('/auth/');
+      // Determine token based on endpoint
+      const isAdminEndpoint = error.config?.url?.includes('/admin') || error.config?.url?.includes('/analytics');
+      
+      const shouldClearCustomer = customerToken && !isAdminEndpoint && error.config?.url && !error.config.url.includes('/auth/');
+      const shouldClearAdmin = adminToken && isAdminEndpoint && error.config?.url && !error.config.url.includes('/auth/');
       
       // Additional safety: Check if the response indicates actual token invalidity
       // Only clear token if message explicitly mentions invalid/expired/malformed token
@@ -339,18 +337,19 @@ api.interceptors.response.use(
       const isRealAuthError = errorMessage.toLowerCase().includes('invalid token') ||
                               errorMessage.toLowerCase().includes('expired token') ||
                               errorMessage.toLowerCase().includes('malformed token') ||
-                              errorMessage.toLowerCase().includes('unauthorized');
+                              errorMessage.toLowerCase().includes('unauthorized') ||
+                              errorMessage.toLowerCase().includes('not authorized');
       
-      if (shouldClearCustomer && isRealAuthError) {
-        // Customer 401 - clear customer token and redirect to customer login
-        localStorage.removeItem('vibeit_customer_token');
-        localStorage.removeItem('vibeit_customer_data');
-        window.location.href = '/login';
-      } else if (shouldClearAdmin && isRealAuthError) {
+      if (shouldClearAdmin && isRealAuthError) {
         // Admin 401 - clear admin token and redirect to admin login
         localStorage.removeItem('vibeit_token');
         localStorage.removeItem('vibeit_admin');
         window.location.href = '/admin/login';
+      } else if (shouldClearCustomer && isRealAuthError) {
+        // Customer 401 - clear customer token and redirect to customer login
+        localStorage.removeItem('vibeit_customer_token');
+        localStorage.removeItem('vibeit_customer_data');
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);
