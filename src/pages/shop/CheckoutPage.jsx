@@ -6,6 +6,7 @@ import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { createOrder } from '../../services/api';
 import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
+import { getPromoConfig, validatePromoCode } from '../../utils/promotions';
 import toast from 'react-hot-toast';
 
 const SRI_LANKA_DISTRICTS = [
@@ -82,6 +83,20 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
   const [showNotes, setShowNotes] = useState(false);
   const [isOrderFinalizing, setIsOrderFinalizing] = useState(false);
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [showPromoInput, setShowPromoInput] = useState(false);
+
+  // Load promo config + get delivered order count for validation
+  const promoConfig = getPromoConfig();
+  const customerOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
+  const customerEmail = customer?.email?.toLowerCase();
+  const deliveredOrderCount = customerOrders.filter(o =>
+    o.shippingAddress?.email?.toLowerCase() === customerEmail &&
+    ['Delivered', 'delivered'].includes(o.status)
+  ).length;
+
+  const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
 
   const setField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -95,8 +110,23 @@ const CheckoutPage = () => {
     return '/placeholder.jpg';
   };
 
-  const shippingFee = subtotal >= 5000 ? 0 : 400;
-  const total = subtotal + shippingFee;
+  const baseShippingFee = subtotal >= 5000 ? 0 : 400;
+  const shippingFee = freeDeliveryEnabled || appliedPromo?.discountType === 'freeDelivery' ? 0 : baseShippingFee;
+  const discountAmount = appliedPromo?.discountType === 'percent'
+    ? Math.round((subtotal * appliedPromo.discountValue) / 100)
+    : 0;
+  const total = subtotal + shippingFee - discountAmount;
+
+  const applyPromoCode = () => {
+    if (!promoInput.trim()) return;
+    const promo = validatePromoCode(promoInput, deliveredOrderCount, promoConfig);
+    if (promo) {
+      setAppliedPromo(promo);
+      toast.success(`✅ ${promo.description} applied!`);
+    } else {
+      toast.error('Invalid or unearned promo code. Check your rewards in the dashboard.');
+    }
+  };
 
   const { mutate: placeOrder, isPending } = useMutation({
     mutationFn: createOrder,
@@ -161,7 +191,6 @@ const CheckoutPage = () => {
 
     // Prepare order data
     const orderData = {
-      // Send both keys for backend compatibility (`items` and `orderItems`)
       items: normalizedOrderItems,
       orderItems: normalizedOrderItems,
       shippingAddress: {
@@ -177,6 +206,8 @@ const CheckoutPage = () => {
       paymentMethod,
       shippingFee,
       subtotal,
+      discount: discountAmount,
+      promoCode: appliedPromo?.promoCode || null,
       total,
       notes: form.notes,
     };
@@ -445,6 +476,44 @@ const CheckoutPage = () => {
                 )}
               </div>
 
+              {/* Promo Code */}
+              <div className="bg-white rounded-md border border-slate-200 p-5 shadow-sm mb-6">
+                <button type="button" onClick={() => setShowPromoInput(p => !p)}
+                  className="flex items-center justify-between w-full text-sm font-semibold text-slate-700">
+                  <span>🎟️ Have a promo code?</span>
+                  <span className="text-slate-400 text-xs">{showPromoInput ? '▲' : '▼'}</span>
+                </button>
+                {showPromoInput && (
+                  <div className="mt-4">
+                    {appliedPromo ? (
+                      <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+                        <div>
+                          <p className="text-sm font-semibold text-emerald-800">✅ {appliedPromo.promoCode} applied</p>
+                          <p className="text-xs text-emerald-600">{appliedPromo.description}</p>
+                        </div>
+                        <button type="button" onClick={() => { setAppliedPromo(null); setPromoInput(''); }}
+                          className="text-xs text-red-500 hover:text-red-700 font-medium">Remove</button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input type="text" value={promoInput} onChange={e => setPromoInput(e.target.value.toUpperCase())}
+                          placeholder="Enter promo code (e.g. VIBE10)"
+                          className="flex-1 px-3 py-2.5 border border-slate-300 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), applyPromoCode())}
+                        />
+                        <button type="button" onClick={applyPromoCode}
+                          className="px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-md hover:bg-slate-700 transition-colors">
+                          Apply
+                        </button>
+                      </div>
+                    )}
+                    {freeDeliveryEnabled && !appliedPromo && (
+                      <p className="text-xs text-emerald-600 mt-2">🎉 Free delivery is currently active for all orders!</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className="bg-slate-100 rounded-xl p-4 border border-slate-200">
                 <div className="flex items-start gap-3">
                   <Shield className="w-5 h-5 text-slate-700 flex-shrink-0 mt-0.5" />
@@ -522,20 +591,22 @@ const CheckoutPage = () => {
                     <span className="text-slate-600">Shipping</span>
                     <span className="font-bold">
                       {shippingFee === 0 ? (
-                        <span className="text-blue-600 flex items-center gap-1">
-                          FREE
-                        </span>
+                        <span className="text-blue-600 flex items-center gap-1">FREE</span>
                       ) : (
                         <span className="text-slate-900">Rs {shippingFee}</span>
                       )}
                     </span>
                   </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-emerald-600">Discount ({appliedPromo?.promoCode})</span>
+                      <span className="font-bold text-emerald-600">-Rs {discountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
                   <div className="border-t border-slate-200 pt-4 mt-2">
                     <div className="flex justify-between items-center">
                       <span className="text-base font-bold text-slate-900 uppercase">Total</span>
-                      <span className="text-2xl font-bold text-slate-900">
-                        Rs {total.toLocaleString()}
-                      </span>
+                      <span className="text-2xl font-bold text-slate-900">Rs {total.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>

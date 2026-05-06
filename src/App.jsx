@@ -33,6 +33,8 @@ const AdminAddProduct = lazy(() => import('./pages/admin/AdminAddProduct'));
 const AdminEditProduct = lazy(() => import('./pages/admin/AdminEditProduct'));
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
 const AdminOrderDetail = lazy(() => import('./pages/admin/AdminOrderDetail'));
+const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'));
+const AdminPromotions = lazy(() => import('./pages/admin/AdminPromotions'));
 
 // Loading Spinner
 const LoadingSpinner = () => (
@@ -83,6 +85,8 @@ export default function App() {
             <Route path="/admin/products/edit/:id" element={<Suspense fallback={<LoadingSpinner />}><AdminEditProduct /></Suspense>} />
             <Route path="/admin/orders" element={<Suspense fallback={<LoadingSpinner />}><AdminOrders /></Suspense>} />
             <Route path="/admin/orders/:id" element={<Suspense fallback={<LoadingSpinner />}><AdminOrderDetail /></Suspense>} />
+            <Route path="/admin/customers" element={<Suspense fallback={<LoadingSpinner />}><AdminCustomers /></Suspense>} />
+            <Route path="/admin/promotions" element={<Suspense fallback={<LoadingSpinner />}><AdminPromotions /></Suspense>} />
           </Route>
         </Route>
       </Routes>

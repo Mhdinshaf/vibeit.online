@@ -1,10 +1,100 @@
 import { useState, useEffect } from 'react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useCustomerStore } from '../../context/store';
-import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search, ChevronLeft, ChevronRight, Gift, Lock, Copy, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getCustomerOrders, getProductById } from '../../services/api';
+import { getPromoConfig, getEarnedPromos, getNextMilestone, PROMO_CONFIG_EVENT } from '../../utils/promotions';
+
+const RewardsCard = ({ deliveredOrderCount, promoConfig }) => {
+  const [copied, setCopied] = useState(null);
+  const promos = getEarnedPromos(deliveredOrderCount, promoConfig);
+  const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig);
+  const prevMilestone = [...promos].reverse().find(p => p.earned);
+  const progressFrom = prevMilestone ? prevMilestone.minOrders : 0;
+  const progressTo = nextMilestone ? nextMilestone.minOrders : (prevMilestone ? prevMilestone.minOrders : 5);
+  const progressPct = nextMilestone
+    ? Math.min(100, ((deliveredOrderCount - progressFrom) / (progressTo - progressFrom)) * 100)
+    : 100;
+
+  const copyCode = (code) => {
+    navigator.clipboard.writeText(code);
+    setCopied(code);
+    toast.success(`Copied ${code} to clipboard!`);
+    setTimeout(() => setCopied(null), 2500);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-sm">
+          <Gift className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">Your Rewards</h2>
+          <p className="text-sm text-slate-500">{deliveredOrderCount} delivered orders</p>
+        </div>
+      </div>
+
+      {promoConfig.freeDeliveryEnabled && (
+        <div className="mb-5 flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+          <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-emerald-800">🎉 Free Delivery Active!</p>
+            <p className="text-xs text-emerald-600">Admin has enabled free delivery for all orders right now.</p>
+          </div>
+        </div>
+      )}
+
+      {nextMilestone && (
+        <div className="mb-5">
+          <div className="flex justify-between text-xs text-slate-500 mb-2">
+            <span>{deliveredOrderCount} orders</span>
+            <span>{progressTo} orders to unlock <strong>{nextMilestone.promoCode}</strong></span>
+          </div>
+          <div className="w-full bg-slate-100 rounded-full h-2.5">
+            <div className="h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
+              style={{ width: `${progressPct}%` }} />
+          </div>
+          <p className="text-xs text-slate-500 mt-2">
+            {nextMilestone.minOrders - deliveredOrderCount} more deliveries to unlock <strong>{nextMilestone.description}</strong>
+          </p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {promos.map(promo => (
+          <div key={promo.id}
+            className={`rounded-xl border p-4 transition-all ${promo.earned
+              ? 'border-blue-200 bg-blue-50'
+              : 'border-slate-200 bg-slate-50 opacity-60'}`}>
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className={`text-sm font-semibold ${promo.earned ? 'text-slate-900' : 'text-slate-500'}`}>
+                  {promo.label}
+                </p>
+                <p className="text-xs text-slate-500 mt-0.5">{promo.description}</p>
+                <p className="text-xs text-slate-400 mt-1">{promo.minOrders}+ delivered orders</p>
+              </div>
+              {promo.earned ? (
+                <button onClick={() => copyCode(promo.promoCode)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+                  {copied === promo.promoCode ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied === promo.promoCode ? 'Copied!' : promo.promoCode}
+                </button>
+              ) : (
+                <div className="flex items-center gap-1 text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
@@ -16,9 +106,9 @@ const CustomerDashboard = () => {
   const [orderError, setOrderError] = useState(null);
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [resolvedItemNames, setResolvedItemNames] = useState({});
-  
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
+  const [promoConfig, setPromoConfig] = useState(getPromoConfig());
   
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -37,6 +127,14 @@ const CustomerDashboard = () => {
       });
     }
   }, [customer]);
+
+  useEffect(() => {
+    const handler = () => setPromoConfig(getPromoConfig());
+    window.addEventListener(PROMO_CONFIG_EVENT, handler);
+    return () => window.removeEventListener(PROMO_CONFIG_EVENT, handler);
+  }, []);
+
+  const deliveredOrderCount = orders.filter(o => ['Delivered', 'delivered'].includes(o.status)).length;
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
@@ -296,47 +394,52 @@ const CustomerDashboard = () => {
             )}
 
             {!isLoadingOrders && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-600 text-sm font-medium">Total Orders</p>
-                      <p className="text-3xl font-semibold text-slate-900 mt-2">{orders.length}</p>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                  <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-slate-600 text-sm font-medium">Total Orders</p>
+                        <p className="text-3xl font-semibold text-slate-900 mt-2">{orders.length}</p>
+                      </div>
+                      <div className="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center">
+                        <ShoppingBag className="w-5 h-5 text-white" />
+                      </div>
                     </div>
-                    <div className="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center">
-                      <ShoppingBag className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
-                </article>
+                  </article>
 
-                <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-600 text-sm font-medium">Active Orders</p>
-                      <p className="text-3xl font-semibold text-slate-900 mt-2">
-                        {orders.filter((o) => ['pending', 'confirmed', 'processing', 'shipped'].includes(o.status)).length}
-                      </p>
+                  <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-slate-600 text-sm font-medium">Active Orders</p>
+                        <p className="text-3xl font-semibold text-slate-900 mt-2">
+                          {orders.filter((o) => ['pending', 'confirmed', 'processing', 'shipped'].includes(o.status)).length}
+                        </p>
+                      </div>
+                      <div className="w-11 h-11 bg-amber-500 rounded-xl flex items-center justify-center">
+                        <ShoppingBag className="w-5 h-5 text-white" />
+                      </div>
                     </div>
-                    <div className="w-11 h-11 bg-amber-500 rounded-xl flex items-center justify-center">
-                      <ShoppingBag className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
-                </article>
+                  </article>
 
-                <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm sm:col-span-2 xl:col-span-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-600 text-sm font-medium">Delivered</p>
-                      <p className="text-3xl font-semibold text-slate-900 mt-2">
-                        {orders.filter((o) => o.status === 'delivered').length}
-                      </p>
+                  <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm sm:col-span-2 xl:col-span-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-slate-600 text-sm font-medium">Delivered</p>
+                        <p className="text-3xl font-semibold text-slate-900 mt-2">
+                          {deliveredOrderCount}
+                        </p>
+                      </div>
+                      <div className="w-11 h-11 bg-emerald-600 rounded-xl flex items-center justify-center">
+                        <ShoppingBag className="w-5 h-5 text-white" />
+                      </div>
                     </div>
-                    <div className="w-11 h-11 bg-emerald-600 rounded-xl flex items-center justify-center">
-                      <ShoppingBag className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
-                </article>
-              </div>
+                  </article>
+                </div>
+
+                {/* Rewards Card */}
+                <RewardsCard deliveredOrderCount={deliveredOrderCount} promoConfig={promoConfig} />
+              </>
             )}
           </div>
         )}

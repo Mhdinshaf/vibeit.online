@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingBag, Menu, X, LogOut, ExternalLink, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Menu, X, LogOut, ExternalLink, Users, Gift } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -84,6 +84,8 @@ const AdminLayout = () => {
     { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
     { to: '/admin/products', label: 'Products', icon: Package },
     { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
+    { to: '/admin/customers', label: 'Customers', icon: Users },
+    { to: '/admin/promotions', label: 'Promotions', icon: Gift },
   ];
 
   const getPageTitle = () => {
@@ -94,6 +96,8 @@ const AdminLayout = () => {
     if (path.startsWith('/admin/products')) return 'Products';
     if (path.startsWith('/admin/orders/')) return 'Order Details';
     if (path.startsWith('/admin/orders')) return 'Orders';
+    if (path.startsWith('/admin/customers')) return 'Customers';
+    if (path.startsWith('/admin/promotions')) return 'Promotions';
     return 'Admin Panel';
   };
 
