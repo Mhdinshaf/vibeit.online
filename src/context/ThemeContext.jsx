@@ -4,54 +4,17 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('light');
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(true);
 
   useEffect(() => {
-    // Check for saved preference first
-    const savedTheme = localStorage.getItem('vibeit-theme');
-    const hasManualTheme = localStorage.getItem('vibeit-theme-manual') === 'true';
-    
-    let initialTheme = 'light';
-
-    if (hasManualTheme && savedTheme) {
-      initialTheme = savedTheme;
-    } else {
-      // Check system preference
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        initialTheme = 'dark';
-      }
-    }
-
-    setTheme(initialTheme);
-    applyTheme(initialTheme);
-    setIsInitialized(true);
+    // Enforce light theme for SimplyTek UI
+    setTheme('light');
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('vibeit-theme', 'light');
   }, []);
 
-  const applyTheme = (newTheme) => {
-    const htmlElement = document.documentElement;
-    
-    if (newTheme === 'dark') {
-      htmlElement.classList.add('dark');
-    } else {
-      htmlElement.classList.remove('dark');
-    }
-
-    try {
-      localStorage.setItem('vibeit-theme', newTheme);
-    } catch {
-      // Ignore localStorage errors
-    }
-  };
-
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    applyTheme(newTheme);
-    try {
-      localStorage.setItem('vibeit-theme-manual', 'true');
-    } catch {
-      // Ignore localStorage errors
-    }
+    // Theme toggle disabled
   };
 
   return (
