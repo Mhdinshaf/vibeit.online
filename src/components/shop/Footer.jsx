@@ -27,7 +27,11 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             <div className="lg:col-span-1">
-              <Link to="/" className="flex items-center gap-3 mb-4">
+              <Link 
+                to="/" 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="flex items-center gap-3 mb-4"
+              >
                 <div className="w-11 h-11 rounded-md overflow-hidden ring-1 bg-blue-600 ring-slate-200 flex items-center justify-center">
                   <img src={logo} alt="VIBEIT logo" className="w-full h-full object-cover" />
                 </div>

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
-import { Filter, X, ChevronRight, ChevronDown, Package, SlidersHorizontal, Home, Smartphone, Flame, Watch, Droplets, Sparkles, Gift, Bike, Shirt, Briefcase } from 'lucide-react';
+import { Filter, X, ChevronRight, ChevronLeft, ChevronDown, Package, SlidersHorizontal, Home, Smartphone, Flame, Watch, Droplets, Sparkles, Gift, Bike, Shirt, Briefcase } from 'lucide-react';
 import { getProducts } from '../../services/api';
 import ProductCard from '../../components/shop/ProductCard';
 
@@ -312,23 +312,58 @@ const ShopPage = () => {
                 </div>
 
                 {data.totalPages > 1 && (
-                  <div className="flex flex-wrap items-center justify-center gap-3 mt-10">
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-10">
                     <button
-                      onClick={() => setParam('page', String(Math.max(1, Number(page) - 1)))}
+                      onClick={() => {
+                        const newPage = Math.max(1, Number(page) - 1);
+                        setParam('page', String(newPage));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                       disabled={Number(page) <= 1}
-                      className="px-4 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+                      className="px-3 py-1.5 border border-slate-200 rounded-md text-sm font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors flex items-center gap-1"
                     >
-                      Previous
+                      <ChevronLeft className="w-4 h-4" /> Prev
                     </button>
-                    <span className="px-4 py-2 text-sm font-medium text-slate-600">
-                      Page <span className="text-slate-900 font-semibold">{page}</span> of {data.totalPages}
-                    </span>
+                    
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      {Array.from({ length: data.totalPages }, (_, i) => i + 1)
+                        .filter(p => p === 1 || p === data.totalPages || (p >= Number(page) - 1 && p <= Number(page) + 1))
+                        .reduce((acc, p, i, arr) => {
+                          if (i > 0 && p - arr[i - 1] > 1) acc.push('...');
+                          acc.push(p);
+                          return acc;
+                        }, [])
+                        .map((p, idx) => p === '...' ? (
+                          <span key={`ellipsis-${idx}`} className="px-1 sm:px-2 py-1 text-slate-400">...</span>
+                        ) : (
+                          <button
+                            key={p}
+                            onClick={() => {
+                              setParam('page', String(p));
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium transition-colors ${
+                              Number(page) === p
+                                ? 'bg-blue-600 text-white border border-blue-600 shadow-sm'
+                                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        ))
+                      }
+                    </div>
+
                     <button
-                      onClick={() => setParam('page', String(Number(page) + 1))}
+                      onClick={() => {
+                        const newPage = Math.min(data.totalPages, Number(page) + 1);
+                        setParam('page', String(newPage));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                       disabled={Number(page) >= data.totalPages}
-                      className="px-4 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+                      className="px-3 py-1.5 border border-slate-200 rounded-md text-sm font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors flex items-center gap-1"
                     >
-                      Next
+                      Next <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 )}
