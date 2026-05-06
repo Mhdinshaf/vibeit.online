@@ -22,32 +22,32 @@ const HomePage = () => {
 
   const heroImages = [
     {
-      url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop',
-      alt: 'Premium shopping experience',
+      url: '/hero_fashion.png',
+      alt: 'Premium fashion experience',
     },
     {
-      url: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=800&h=600&fit=crop',
-      alt: 'Fashion collections',
+      url: '/hero_tech.png',
+      alt: 'Tech gadgets and devices',
     },
     {
-      url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=600&fit=crop',
-      alt: 'Tech gadgets',
+      url: '/hero_home.png',
+      alt: 'Luxury home accessories',
     },
     {
-      url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop',
-      alt: 'Premium products',
+      url: '/hero_luxury.png',
+      alt: 'Premium watches and perfumes',
     },
   ];
 
   const categories = [
-    { name: 'Electronics', icon: Laptop, color: 'from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20' },
-    { name: 'Fashion', icon: Shirt, color: 'from-pink-100 to-pink-50 dark:from-pink-900/30 dark:to-pink-800/20' },
-    { name: 'Watches', icon: Watch, color: 'from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20' },
-    { name: 'Home', icon: Home, color: 'from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/20' },
-    { name: 'Luxury', icon: Sparkles, color: 'from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/20' },
-    { name: 'Hot Deals', icon: Flame, color: 'from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-800/20' },
-    { name: 'Shoes', icon: Footprints, color: 'from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20' },
-    { name: 'Gifts', icon: Gift, color: 'from-rose-100 to-rose-50 dark:from-rose-900/30 dark:to-rose-800/20' },
+    { name: 'Tech Gadgets', icon: Laptop, color: 'from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20' },
+    { name: 'Ladies Dresses', icon: Shirt, color: 'from-pink-100 to-pink-50 dark:from-pink-900/30 dark:to-pink-800/20' },
+    { name: 'Gents Clothing', icon: Briefcase, color: 'from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20' },
+    { name: 'Home Accessories', icon: Home, color: 'from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/20' },
+    { name: 'Watches', icon: Watch, color: 'from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/20' },
+    { name: 'Trending Items', icon: Flame, color: 'from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-800/20' },
+    { name: 'Creams and Skincare', icon: Droplets, color: 'from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20' },
+    { name: 'Toys', icon: Gift, color: 'from-rose-100 to-rose-50 dark:from-rose-900/30 dark:to-rose-800/20' },
   ];
 
   const promotionalBanners = [
@@ -222,7 +222,7 @@ const HomePage = () => {
               return (
                 <Link
                   key={category.name}
-                  to={`/shop?category=${category.name.toLowerCase()}`}
+                  to={`/shop?category=${encodeURIComponent(category.name)}`}
                   className={`flex flex-col items-center gap-2 flex-shrink-0 transition-all duration-300 group`}
                 >
                   <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-110`}>
@@ -284,7 +284,7 @@ const HomePage = () => {
               return (
                 <Link
                   key={idx}
-                  to="/shop"
+                  to={`/shop`}
                   className={`bg-gradient-to-br ${banner.bgGradient} rounded-xl sm:rounded-2xl h-40 sm:h-48 flex items-end p-4 sm:p-6 group overflow-hidden relative shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-white/10`}
                 >
                   <div className="absolute top-0 right-0 opacity-20 group-hover:opacity-30 transition-opacity">
@@ -311,18 +311,18 @@ const HomePage = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {[
-              { name: 'Tech Hub', icon: Laptop, color: 'from-blue-100 to-blue-50' },
-              { name: 'Fashion Plus', icon: Shirt, color: 'from-pink-100 to-pink-50' },
-              { name: 'Home & Living', icon: Home, color: 'from-green-100 to-green-50' },
-              { name: 'Premium Watch', icon: Watch, color: 'from-purple-100 to-purple-50' },
-              { name: 'Luxury Goods', icon: Sparkles, color: 'from-yellow-100 to-yellow-50' },
-              { name: 'Outlet Store', icon: ShoppingCart, color: 'from-red-100 to-red-50' },
+              { name: 'Tech Gadgets', icon: Laptop, color: 'from-blue-100 to-blue-50' },
+              { name: 'Ladies Dresses', icon: Shirt, color: 'from-pink-100 to-pink-50' },
+              { name: 'Home Accessories', icon: Home, color: 'from-green-100 to-green-50' },
+              { name: 'Watches', icon: Watch, color: 'from-purple-100 to-purple-50' },
+              { name: 'Perfumes', icon: Sparkles, color: 'from-yellow-100 to-yellow-50' },
+              { name: 'Trending Items', icon: Flame, color: 'from-red-100 to-red-50' },
             ].map((brand, idx) => {
               const IconComponent = brand.icon;
               return (
                 <Link
                   key={idx}
-                  to="/shop"
+                  to={`/shop?category=${encodeURIComponent(brand.name)}`}
                   className={`bg-gradient-to-br ${brand.color} dark:from-slate-800 dark:to-slate-700/80 rounded-xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-slate-200/50 dark:border-slate-600/30 group`}
                 >
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-white/50 dark:bg-slate-600/50 flex items-center justify-center group-hover:scale-110 transition-transform">

@@ -7,6 +7,7 @@ import AdminLayout from './components/layout/AdminLayout';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import CustomerLayout from './components/layout/CustomerLayout';
 import ProtectedCustomerRoute from './components/layout/ProtectedCustomerRoute';
+import ScrollToTop from './components/layout/ScrollToTop';
 
 // Shop Pages
 import HomePage from './pages/shop/HomePage';
@@ -43,6 +44,7 @@ const LoadingSpinner = () => (
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Store Routes */}
         <Route element={<StoreLayout />}>

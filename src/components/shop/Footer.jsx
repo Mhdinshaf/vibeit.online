@@ -65,12 +65,12 @@ const Footer = () => {
               <h4 className="font-bold text-slate-900 dark:text-white mb-4 text-lg">Support</h4>
               <ul className="space-y-3">
                 {[
-                  { to: '/shipping', label: 'Shipping Info' },
-                  { to: '/returns', label: 'Returns & Exchanges' },
-                  { to: '/faq', label: 'FAQs' },
+                  { to: '/shop', label: 'Shipping Info' },
+                  { to: '/shop', label: 'Returns & Exchanges' },
+                  { to: '/contact', label: 'FAQs' },
                   { to: '/shop', label: 'Shop Now' },
-                ].map((link) => (
-                  <li key={link.to}>
+                ].map((link, idx) => (
+                  <li key={`${link.to}-${idx}`}>
                     <Link
                       to={link.to}
                       className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
