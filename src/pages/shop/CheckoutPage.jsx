@@ -20,7 +20,6 @@ const SRI_LANKA_DISTRICTS = [
 // Helper for environment-aware logging
 const devError = (...args) => {
   if (import.meta.env.DEV) {
-    console.error?.(...args);
   }
 };
 

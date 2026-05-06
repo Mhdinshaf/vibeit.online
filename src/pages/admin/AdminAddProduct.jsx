@@ -168,13 +168,9 @@ const AdminAddProduct = () => {
     try {
       const formDataObj = new FormData();
       imageFiles.forEach((file) => {
-        console.log('Adding file to upload:', file.name, 'Size:', file.size);
         formDataObj.append('images', file);
       });
-      
-      console.log('Starting upload...');
       const response = await uploadImages(formDataObj);
-      console.log('Upload response:', response);
       
       // Extract URLs from response - can be array or object with urls property
       let uploadedUrls = [];
@@ -186,7 +182,6 @@ const AdminAddProduct = () => {
       } else if (response && response.data && Array.isArray(response.data)) {
         uploadedUrls = response.data;
       } else {
-        console.warn('Unexpected response format:', response);
         uploadedUrls = [];
       }
       
@@ -194,26 +189,20 @@ const AdminAddProduct = () => {
         toast.error('No URLs returned from upload');
         return null;
       }
-      
-      console.log('Extracted URLs:', uploadedUrls);
       setImageUrls(uploadedUrls);
       
       // Clean up file state and preview URLs after successful upload
       imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
       setImageFiles([]);
       setImagePreviewUrls([]);
-      
-      console.log('Upload successful, URLs:', uploadedUrls);
       toast.success('Images uploaded successfully');
       return uploadedUrls;
     } catch (error) {
-      console.error('Upload error:', error);
       const errorMsg = error.response?.data?.message || error.message || 'Upload failed';
       toast.error(errorMsg);
       return null;
     } finally {
       setIsUploading(false);
-      console.log('Upload finished');
     }
   };
 

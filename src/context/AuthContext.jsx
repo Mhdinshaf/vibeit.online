@@ -4,12 +4,7 @@ import { authService } from '../services/authService';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  // Helper for environment-aware logging
-  const devError = (...args) => {
-    if (import.meta.env.DEV) {
-      console.error?.(...args);
-    }
-  };
+
 
   // Initialize admin from localStorage synchronously to avoid flash
   const [admin, setAdmin] = useState(() => authService.getStoredAdmin());
@@ -26,7 +21,6 @@ export const AuthProvider = ({ children }) => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setAdmin(JSON.parse(adminData));
       } catch {
-        devError('Failed to parse admin data');
         authService.logout();
         setAdmin(null);
       }

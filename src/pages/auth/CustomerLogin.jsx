@@ -70,7 +70,6 @@ const CustomerLogin = () => {
       navigate(from);
     } catch (err) {
       const errorMsg = err.message || 'Login failed. Please try again.';
-      console.error('❌ CustomerLogin: Login failed', errorMsg);
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {

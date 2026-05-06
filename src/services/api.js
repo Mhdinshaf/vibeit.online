@@ -279,12 +279,6 @@ api.interceptors.request.use(
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      if (config.url?.includes('/orders')) {
-        const tokenType = customerToken ? 'CUSTOMER' : 'ADMIN';
-        console.log(`📤 Using ${tokenType} token for orders request`);
-      }
-    } else {
-      console.warn('⚠️ No token found for request to:', config.url);
     }
     
     // Set default timeout for regular requests (not uploads)
@@ -313,13 +307,6 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.config?.url?.includes('orders')) {
-      console.error('❌ API: Orders request failed', { 
-        status: error.response?.status, 
-        message: error.response?.data?.message || error.message,
-        url: error.config.url
-      });
-    }
     if (error.response?.status === 401) {
       const customerToken = localStorage.getItem('vibeit_customer_token');
       const adminToken = localStorage.getItem('vibeit_token');
@@ -753,32 +740,11 @@ export const uploadImage = async (formData) => {
 
 export const uploadImages = async (formData) => {
   try {
-    // Token is handled by axios request interceptor - no need to fetch it here
-    console.log('uploadImages: Posting to /upload/images endpoint');
-    console.log('uploadImages: FormData entries:', Array.from(formData.entries()).map(([key, value]) => ({
-      key,
-      name: value.name || 'N/A',
-      size: value.size || 'N/A',
-      type: value.type || 'N/A',
-    })));
-    
     const response = await api.post('/upload/images', formData, {
-      timeout: 120000, // 120 seconds for file upload (matches backend timeout)
+      timeout: 120000,
     });
-    
-    console.log('uploadImages: Response received:', response.status, response.data);
     return response.data;
   } catch (error) {
-    console.error('uploadImages: Request failed', {
-      code: error.code,
-      message: error.message,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      url: error.config?.url,
-      method: error.config?.method,
-      data: error.response?.data,
-    });
-    
     if (error.code === 'ECONNABORTED') {
       throw new Error('Upload timeout - backend is too slow or not responding. Check your backend /upload/images endpoint.');
     }

@@ -17,12 +17,6 @@ const loadStoredCustomer = () => {
 };
 
 export const CustomerAuthProvider = ({ children }) => {
-  // Helper for environment-aware logging
-  const devError = (...args) => {
-    if (import.meta.env.DEV) {
-      console.error?.(...args);
-    }
-  };
 
   // Initialize customer from localStorage synchronously to avoid flash
   const [customer, setCustomer] = useState(() => loadStoredCustomer());
@@ -42,7 +36,6 @@ export const CustomerAuthProvider = ({ children }) => {
         const parsed = JSON.parse(customerData);
         setCustomer(parsed);
       } catch {
-        devError('Failed to parse customer data');
         customerAuthService.logout();
         setCustomer(null);
       }
@@ -67,9 +60,7 @@ export const CustomerAuthProvider = ({ children }) => {
           setCustomer(parsed);
           // Reset loading flag since we've just synced
           setLoading(false);
-        } catch (err) {
-          console.error('❌ CustomerAuthContext: Failed to parse customer data from auth event:', err);
-          devError('Failed to parse customer data from auth event:', err);
+        } catch {
           customerAuthService.logout();
           setCustomer(null);
           setLoading(false);

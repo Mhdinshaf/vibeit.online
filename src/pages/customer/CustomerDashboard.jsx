@@ -144,7 +144,6 @@ const CustomerDashboard = () => {
       toast.success('Profile updated successfully');
       setIsEditingProfile(false);
     } catch (error) {
-      console.error('Profile update failed:', error);
       toast.error(error.response?.data?.message || error.message || 'Failed to update profile');
     } finally {
       setIsSavingProfile(false);
@@ -161,7 +160,6 @@ const CustomerDashboard = () => {
         const orders = response?.orders || [];
         setOrders(orders);
       } catch (error) {
-        console.error('❌ CustomerDashboard: Failed to load orders:', error);
         setOrderError('Failed to load orders. Please try again later.');
       } finally {
         setIsLoadingOrders(false);

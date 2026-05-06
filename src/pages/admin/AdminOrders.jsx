@@ -11,13 +11,11 @@ const STATUSES = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
 // Helper for environment-aware logging
 const devLog = (...args) => {
   if (import.meta.env.DEV) {
-    console.log?.(...args);
   }
 };
 
 const devError = (...args) => {
   if (import.meta.env.DEV) {
-    console.error?.(...args);
   }
 };
 

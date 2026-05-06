@@ -3,12 +3,6 @@ import api from './api';
 const CUSTOMER_TOKEN_KEY = 'vibeit_customer_token';
 const CUSTOMER_DATA_KEY = 'vibeit_customer_data';
 
-// Helper for environment-aware logging
-const devWarn = (...args) => {
-  if (import.meta.env.DEV) {
-    console.warn?.(...args);
-  }
-};
 
 export const customerAuthService = {
   /**
@@ -69,7 +63,6 @@ export const customerAuthService = {
       
       return response.data;
     } catch (error) {
-      console.error('❌ customerAuthService.login: Error', error.response?.data || error.message);
       throw error.response?.data || error;
     }
   },
@@ -182,9 +175,7 @@ export const customerAuthService = {
       
       const parsed = JSON.parse(customer);
       return parsed;
-    } catch (error) {
-      devWarn('⚠️ Corrupted customer data in localStorage, clearing it:', error.message);
-      // Clear the corrupted data to prevent repeated errors
+    } catch {
       localStorage.removeItem(CUSTOMER_DATA_KEY);
       localStorage.removeItem(CUSTOMER_TOKEN_KEY);
       return null;
