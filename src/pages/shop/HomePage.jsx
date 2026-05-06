@@ -40,14 +40,14 @@ const HomePage = () => {
   ];
 
   const categories = [
-    { name: 'Tech Gadgets', icon: Laptop, color: 'from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20' },
-    { name: 'Ladies Dresses', icon: Shirt, color: 'from-pink-100 to-pink-50 dark:from-pink-900/30 dark:to-pink-800/20' },
-    { name: 'Gents Clothing', icon: Briefcase, color: 'from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20' },
-    { name: 'Home Accessories', icon: Home, color: 'from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/20' },
-    { name: 'Watches', icon: Watch, color: 'from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/20' },
-    { name: 'Trending Items', icon: Flame, color: 'from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-800/20' },
-    { name: 'Creams and Skincare', icon: Droplets, color: 'from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20' },
-    { name: 'Toys', icon: Gift, color: 'from-rose-100 to-rose-50 dark:from-rose-900/30 dark:to-rose-800/20' },
+    { name: 'Tech Gadgets', icon: Laptop, color: 'bg-blue-50 text-blue-600' },
+    { name: 'Ladies Dresses', icon: Shirt, color: 'bg-pink-50 text-pink-600' },
+    { name: 'Gents Clothing', icon: Briefcase, color: 'bg-slate-100 text-slate-700' },
+    { name: 'Home Accessories', icon: Home, color: 'bg-green-50 text-green-600' },
+    { name: 'Watches', icon: Watch, color: 'bg-amber-50 text-amber-600' },
+    { name: 'Trending Items', icon: Flame, color: 'bg-red-50 text-red-600' },
+    { name: 'Creams and Skincare', icon: Droplets, color: 'bg-cyan-50 text-cyan-600' },
+    { name: 'Toys', icon: Gift, color: 'bg-purple-50 text-purple-600' },
   ];
 
   const promotionalBanners = [
@@ -55,22 +55,22 @@ const HomePage = () => {
       title: 'Tech Paradise',
       description: 'Latest gadgets & electronics',
       icon: Laptop,
-      bgGradient: 'from-blue-500 via-blue-600 to-blue-700 dark:from-blue-900 dark:to-blue-800',
+      bgGradient: 'bg-blue-600',
       textColor: 'text-white'
     },
     {
       title: 'Fashion Forward',
       description: 'Trendy clothing & accessories',
       icon: Shirt,
-      bgGradient: 'from-pink-500 via-purple-600 to-purple-700 dark:from-purple-900 dark:to-purple-800',
+      bgGradient: 'bg-slate-900',
       textColor: 'text-white'
     },
     {
       title: 'Home Essentials',
       description: 'Make your space beautiful',
       icon: Home,
-      bgGradient: 'from-green-500 via-emerald-600 to-teal-700 dark:from-green-900 dark:to-emerald-800',
-      textColor: 'text-white'
+      bgGradient: 'bg-blue-50',
+      textColor: 'text-slate-900'
     },
   ];
 
@@ -130,88 +130,80 @@ const HomePage = () => {
       </Helmet>
 
       {/* Hero Section with Carousel */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-100/50 to-transparent dark:from-slate-900/50 dark:to-transparent py-8 sm:py-12 lg:py-16">
+      <section className="relative overflow-hidden bg-white py-6 sm:py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Carousel */}
-          <div className="relative mb-6 sm:mb-8 rounded-2xl lg:rounded-3xl overflow-hidden shadow-lg bg-gradient-to-br from-slate-200 dark:from-slate-800">
-            <div className="relative aspect-video lg:aspect-auto lg:h-72 overflow-hidden">
-              {heroImages.map((image, index) => (
-                <img
-                  key={index}
-                  src={image.url}
-                  alt={image.alt}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                    index === currentSlide ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-              ))}
-
-              {/* Carousel Controls */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 p-2 sm:p-3 rounded-full transition-all backdrop-blur-sm shadow-lg hover:shadow-xl"
-                aria-label="Previous slide"
-              >
-                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-slate-900 dark:text-cyan-400" />
-              </button>
-
-              <button
-                onClick={nextSlide}
-                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 p-2 sm:p-3 rounded-full transition-all backdrop-blur-sm shadow-lg hover:shadow-xl"
-                aria-label="Next slide"
-              >
-                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-slate-900 dark:text-cyan-400" />
-              </button>
-
-              {/* Slide Indicators */}
-              <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                {heroImages.map((_, index) => (
-                  <button
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            
+            {/* Main Carousel - spans 3 columns on large screens */}
+            <div className="lg:col-span-3 relative rounded-md overflow-hidden shadow-sm border border-slate-200 bg-white">
+              <div className="relative aspect-[21/9] sm:aspect-[21/9] lg:h-[400px] overflow-hidden">
+                {heroImages.map((image, index) => (
+                  <img
                     key={index}
-                    onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 backdrop-blur-md ${
-                      index === currentSlide
-                        ? 'bg-orange-500 dark:bg-orange-400 w-6 sm:w-8 shadow-lg'
-                        : 'bg-white/60 dark:bg-slate-400/60 hover:bg-white/80 dark:hover:bg-slate-300/80'
+                    src={image.url}
+                    alt={image.alt}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                      index === currentSlide ? 'opacity-100' : 'opacity-0'
                     }`}
-                    aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
-              </div>
-            </div>
-          </div>
 
-          {/* Promo Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {/* Featured Product Spotlight */}
-            <div className="bg-gradient-to-br from-blue-600 to-blue-500 dark:from-blue-900/80 dark:to-blue-800/80 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-blue-400/20">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p className="text-xs sm:text-sm font-semibold opacity-90">Featured</p>
-                  <h3 className="text-sm sm:text-base font-bold">New Arrivals</h3>
+                {/* Carousel Controls */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-slate-800 p-2 rounded-full transition-all backdrop-blur-sm shadow-sm"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-slate-800 p-2 rounded-full transition-all backdrop-blur-sm shadow-sm"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+
+                {/* Slide Indicators */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                  {heroImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                        index === currentSlide
+                          ? 'bg-blue-600 w-8 shadow-sm'
+                          : 'bg-white/70 hover:bg-white'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
                 </div>
-                <Star className="w-5 h-5 sm:w-6 sm:h-6 fill-orange-400 text-orange-400" />
               </div>
-              <p className="text-xs sm:text-sm opacity-90">Premium collection available now</p>
             </div>
 
-            {/* Sale Promotion Card */}
-            <div className="bg-gradient-to-br from-orange-500 to-red-600 dark:from-orange-900/80 dark:to-red-900/80 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-orange-400/20">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p className="text-xs sm:text-sm font-semibold opacity-90">Limited</p>
-                  <h3 className="text-sm sm:text-base font-bold">Up to 50% Off</h3>
-                </div>
-                <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-orange-200" />
+            {/* Side Promo Banners - 1 column on large screens */}
+            <div className="hidden lg:flex flex-col gap-4">
+              <div className="flex-1 bg-slate-50 rounded-md p-6 flex flex-col justify-center border border-slate-200 hover:border-blue-500 transition-colors">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">Featured</span>
+                <h3 className="text-lg font-bold text-slate-900 mb-1">New Arrivals</h3>
+                <p className="text-sm text-slate-500 font-medium">Discover the latest premium tech.</p>
               </div>
-              <p className="text-xs sm:text-sm opacity-90">Best deals this season</p>
+              
+              <div className="flex-1 bg-blue-50 rounded-md p-6 flex flex-col justify-center border border-blue-200 hover:border-blue-500 transition-colors">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">Special Offer</span>
+                <h3 className="text-lg font-bold text-slate-900 mb-1">Up to 50% Off</h3>
+                <p className="text-sm text-slate-600 font-medium">On selected smart devices.</p>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section className="py-4 sm:py-6 lg:py-8 border-b border-slate-200 dark:border-slate-800">
+      <section className="py-4 sm:py-6 lg:py-8 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Explore Popular Categories" subtitle="Shop by Category" linkTo="/shop" />
 
@@ -225,10 +217,10 @@ const HomePage = () => {
                   to={`/shop?category=${encodeURIComponent(category.name)}`}
                   className={`flex flex-col items-center gap-2 flex-shrink-0 transition-all duration-300 group`}
                 >
-                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-110`}>
-                    <IconComponent className="w-7 h-7 sm:w-8 sm:h-8 text-slate-700 dark:text-slate-200" />
+                  <div className={`w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-md flex items-center justify-center border border-slate-200 transition-colors ${category.color} group-hover:border-blue-500`}>
+                    <IconComponent className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
-                  <p className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 text-center whitespace-nowrap">
+                  <p className="text-xs sm:text-sm font-bold text-slate-700 text-center whitespace-nowrap group-hover:text-blue-600 transition-colors">
                     {category.name}
                   </p>
                 </Link>
@@ -251,22 +243,22 @@ const HomePage = () => {
               [...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse"
+                  className="bg-slate-100 border border-slate-200 rounded-md animate-pulse"
                   style={{ aspectRatio: '3/4' }}
                 />
               ))
             ) : isError ? (
-              <div className="col-span-full text-center py-8">
+              <div className="col-span-full text-center py-8 border border-slate-200 rounded-md bg-slate-50">
                 <Shield className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                <p className="text-slate-600 dark:text-slate-300 text-sm font-semibold">Unable to load deals</p>
+                <p className="text-slate-600 text-sm font-bold">Unable to load deals</p>
               </div>
             ) : featuredProducts?.products && featuredProducts.products.length > 0 ? (
               featuredProducts.products.slice(0, 5).map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))
             ) : (
-              <div className="col-span-full text-center py-8">
-                <p className="text-slate-600 dark:text-slate-300 text-sm font-semibold">No deals available</p>
+              <div className="col-span-full text-center py-8 border border-slate-200 rounded-md bg-slate-50">
+                <p className="text-slate-600 text-sm font-bold">No deals available</p>
               </div>
             )}
           </div>
@@ -276,7 +268,7 @@ const HomePage = () => {
       {/* Promotional Banners Section */}
       <section className="py-6 sm:py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-3">Special Collections</h3>
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-3 uppercase tracking-wider">Special Collections</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             {promotionalBanners.map((banner, idx) => {
@@ -285,15 +277,15 @@ const HomePage = () => {
                 <Link
                   key={idx}
                   to={`/shop`}
-                  className={`bg-gradient-to-br ${banner.bgGradient} rounded-xl sm:rounded-2xl h-40 sm:h-48 flex items-end p-4 sm:p-6 group overflow-hidden relative shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-white/10`}
+                  className={`${banner.bgGradient} rounded-md h-40 sm:h-48 flex items-end p-4 sm:p-6 group overflow-hidden relative shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200`}
                 >
-                  <div className="absolute top-0 right-0 opacity-20 group-hover:opacity-30 transition-opacity">
+                  <div className={`absolute top-0 right-0 opacity-10 group-hover:opacity-20 transition-opacity ${banner.textColor}`}>
                     <IconComponent className="w-20 h-20 sm:w-24 sm:h-24" />
                   </div>
                   <div className="relative z-10">
                     <h4 className={`text-sm sm:text-base font-bold mb-1 ${banner.textColor}`}>{banner.title}</h4>
-                    <p className={`text-xs sm:text-sm opacity-90 mb-3 ${banner.textColor}`}>{banner.description}</p>
-                    <button className={`text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${banner.textColor} bg-white/20 hover:bg-white/30 transition-colors`}>
+                    <p className={`text-xs sm:text-sm font-medium mb-3 ${banner.textColor === 'text-white' ? 'text-slate-200' : 'text-slate-600'}`}>{banner.description}</p>
+                    <button className={`text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-md ${banner.textColor === 'text-white' ? 'bg-white text-slate-900 hover:bg-slate-100' : 'bg-blue-600 text-white hover:bg-blue-700'} transition-colors`}>
                       Shop now
                     </button>
                   </div>
@@ -311,24 +303,24 @@ const HomePage = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {[
-              { name: 'Apple', icon: Laptop, color: 'from-blue-100 to-blue-50' },
-              { name: 'Nike', icon: Shirt, color: 'from-pink-100 to-pink-50' },
-              { name: 'Samsung', icon: Home, color: 'from-green-100 to-green-50' },
-              { name: 'Rolex', icon: Watch, color: 'from-purple-100 to-purple-50' },
-              { name: 'Dior', icon: Sparkles, color: 'from-yellow-100 to-yellow-50' },
-              { name: 'Adidas', icon: Flame, color: 'from-red-100 to-red-50' },
+              { name: 'Apple', icon: Laptop, color: 'bg-slate-50' },
+              { name: 'Nike', icon: Shirt, color: 'bg-slate-50' },
+              { name: 'Samsung', icon: Home, color: 'bg-slate-50' },
+              { name: 'Rolex', icon: Watch, color: 'bg-slate-50' },
+              { name: 'Dior', icon: Sparkles, color: 'bg-slate-50' },
+              { name: 'Adidas', icon: Flame, color: 'bg-slate-50' },
             ].map((brand, idx) => {
               const IconComponent = brand.icon;
               return (
                 <Link
                   key={idx}
                   to={`/shop?search=${encodeURIComponent(brand.name)}`}
-                  className={`bg-gradient-to-br ${brand.color} dark:from-slate-800 dark:to-slate-700/80 rounded-xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-slate-200/50 dark:border-slate-600/30 group`}
+                  className={`bg-white rounded-md p-4 flex flex-col items-center gap-2 shadow-sm border border-slate-200 hover:border-blue-500 transition-colors duration-200 group`}
                 >
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-white/50 dark:bg-slate-600/50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-slate-700 dark:text-slate-200" />
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-md ${brand.color} flex items-center justify-center border border-slate-200`}>
+                    <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-slate-700 group-hover:text-blue-600 transition-colors" />
                   </div>
-                  <p className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 text-center">{brand.name}</p>
+                  <p className="text-xs sm:text-sm font-bold text-slate-700 text-center group-hover:text-blue-600 transition-colors uppercase tracking-wider mt-1">{brand.name}</p>
                 </Link>
               );
             })}
@@ -346,22 +338,22 @@ const HomePage = () => {
               [...Array(8)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"
+                  className="bg-slate-100 border border-slate-200 rounded-md animate-pulse"
                   style={{ aspectRatio: '3/4' }}
                 />
               ))
             ) : isError ? (
-              <div className="col-span-full text-center py-12">
+              <div className="col-span-full text-center py-12 border border-slate-200 rounded-md bg-slate-50">
                 <Shield className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-                <p className="text-slate-600 dark:text-slate-300 font-semibold">Unable to load products</p>
+                <p className="text-slate-600 font-bold">Unable to load products</p>
               </div>
             ) : featuredProducts?.products && featuredProducts.products.length > 0 ? (
               featuredProducts.products.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))
             ) : (
-              <div className="col-span-full text-center py-12">
-                <p className="text-slate-600 dark:text-slate-300 font-semibold">No products available yet</p>
+              <div className="col-span-full text-center py-12 border border-slate-200 rounded-md bg-slate-50">
+                <p className="text-slate-600 font-bold">No products available yet</p>
               </div>
             )}
           </div>
@@ -381,22 +373,22 @@ const HomePage = () => {
               [...Array(4)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse"
+                  className="bg-slate-100 border border-slate-200 rounded-md animate-pulse"
                   style={{ aspectRatio: '3/4' }}
                 />
               ))
             ) : isError ? (
-              <div className="col-span-full text-center py-12">
+              <div className="col-span-full text-center py-12 border border-slate-200 rounded-md bg-slate-50">
                 <Award className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-                <p className="text-slate-600 dark:text-slate-300 font-semibold">Unable to load offers</p>
+                <p className="text-slate-600 font-bold">Unable to load offers</p>
               </div>
             ) : featuredProducts?.products && featuredProducts.products.length > 0 ? (
               featuredProducts.products.slice(0, 4).map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))
             ) : (
-              <div className="col-span-full text-center py-12">
-                <p className="text-slate-600 dark:text-slate-300 font-semibold">No offers available</p>
+              <div className="col-span-full text-center py-12 border border-slate-200 rounded-md bg-slate-50">
+                <p className="text-slate-600 font-bold">No offers available</p>
               </div>
             )}
           </div>
@@ -404,11 +396,11 @@ const HomePage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-6 sm:py-8 lg:py-10 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-600 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <section className="py-12 sm:py-16 bg-white border-y border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">Why Shop with VIBEIT?</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10 text-center uppercase tracking-wider">Why Shop with VIBEIT?</h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
               {
                 icon: Truck,
@@ -430,11 +422,13 @@ const HomePage = () => {
               return (
                 <div
                   key={index}
-                  className="bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/20 dark:border-cyan-400/20 p-4 sm:p-6 text-white hover:bg-white/20 dark:hover:bg-white/10 transition-all group"
+                  className="bg-slate-50 rounded-md border border-slate-200 p-8 text-slate-900 hover:border-blue-500 transition-colors flex flex-col items-center text-center"
                 >
-                  <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 mb-3 group-hover:scale-125 transition-transform" />
-                  <h3 className="text-base sm:text-lg font-bold mb-2">{item.title}</h3>
-                  <p className="text-sm opacity-90">{item.desc}</p>
+                  <div className="w-16 h-16 bg-blue-100 rounded-md flex items-center justify-center mb-6">
+                    <IconComponent className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2 uppercase tracking-wider">{item.title}</h3>
+                  <p className="text-sm text-slate-500 font-medium">{item.desc}</p>
                 </div>
               );
             })}

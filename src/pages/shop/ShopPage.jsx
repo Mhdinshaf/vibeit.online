@@ -28,24 +28,24 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
   const maxPrice = searchParams.get('maxPrice') || '';
 
   return (
-    <div className="premium-card p-5 sm:p-6 border-0 dark:border dark:border-slate-700">
+    <div className="bg-white rounded-lg p-5 sm:p-6 border border-slate-200">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 dark:from-blue-600 dark:to-blue-500 text-white flex items-center justify-center shadow-sm">
-            <SlidersHorizontal className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center">
+            <SlidersHorizontal className="w-4 h-4 text-slate-700" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Filters</h3>
+          <h3 className="text-lg font-bold text-slate-900">Filters</h3>
         </div>
         <button
           onClick={clearFilters}
-          className="text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium transition-colors"
+          className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors"
         >
           Clear All
         </button>
       </div>
 
-      <div className="mb-6 pb-6 border-b border-slate-100 dark:border-slate-700">
-        <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Price Range</h4>
+      <div className="mb-6 pb-6 border-b border-slate-100">
+        <h4 className="font-semibold text-slate-900 mb-4 text-sm uppercase tracking-wider">Price Range</h4>
         <div className="flex gap-3">
           <div className="flex-1">
             <input
@@ -53,24 +53,24 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
               placeholder="Min"
               value={minPrice}
               onChange={(e) => setParam('minPrice', e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors"
+              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
             />
           </div>
-          <div className="flex items-center text-slate-400 dark:text-slate-600">—</div>
+          <div className="flex items-center text-slate-400">—</div>
           <div className="flex-1">
             <input
               type="number"
               placeholder="Max"
               value={maxPrice}
               onChange={(e) => setParam('maxPrice', e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors"
+              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
             />
           </div>
         </div>
       </div>
 
       <div>
-        <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Categories</h4>
+        <h4 className="font-semibold text-slate-900 mb-4 text-sm uppercase tracking-wider">Categories</h4>
         <div className="space-y-1">
           {CATEGORIES.map((cat) => {
             const isExpanded = expandedCategory === cat.name;
@@ -90,15 +90,15 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
                       setExpandedCategory(cat.name);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-colors ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
                     isSelected
-                      ? 'bg-slate-900 text-white dark:bg-blue-600 dark:text-white shadow-md'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+                      ? 'bg-blue-50 text-blue-700 font-semibold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600'
                   }`}
                   >
                     <span className="flex items-center gap-2">
-                      <cat.icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
-                      <span className="font-medium">{cat.name}</span>
+                      <cat.icon className={`w-4 h-4 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                      <span>{cat.name}</span>
                     </span>
                   <ChevronDown
                     className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
@@ -106,15 +106,15 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
                 </button>
 
                 {isExpanded && (
-                  <div className="ml-4 mt-2 space-y-1">
+                  <div className="ml-4 mt-1 mb-2 space-y-1 border-l-2 border-slate-100 pl-2">
                     {cat.subcategories.map((sub) => (
                         <button
                           key={sub}
                           onClick={() => onSubcategorySelect(cat.name, sub)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                          className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
                             subcategory === sub
-                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
-                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/30 hover:text-slate-900 dark:hover:text-white'
+                              ? 'text-blue-600 font-semibold'
+                              : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50'
                         }`}
                       >
                         {sub}
@@ -215,14 +215,14 @@ const ShopPage = () => {
         <meta property="og:description" content="Browse our complete collection of fashion, tech gadgets, and home essentials." />
         <meta property="og:url" content="https://vibeitlk.vercel.app/shop" />
       </Helmet>
-      <div className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#050b18]">
+      <div className="border-b border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-          <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 dark:text-slate-400 mb-2">Shop collection</p>
-          <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white">
+          <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 mb-2">Shop collection</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
             {category || 'Shop All Products'}
           </h1>
           {subcategory && (
-            <p className="text-slate-600 dark:text-slate-300 text-lg mt-2">{subcategory}</p>
+            <p className="text-slate-600 text-lg mt-2">{subcategory}</p>
           )}
         </div>
       </div>
@@ -241,15 +241,15 @@ const ShopPage = () => {
           </aside>
 
           <div className="flex-1">
-            <nav className="flex flex-wrap items-center gap-2 text-sm mb-5 sm:mb-6 border-b border-slate-100 dark:border-slate-800 py-3">
+            <nav className="flex flex-wrap items-center gap-2 text-sm mb-5 sm:mb-6 border-b border-slate-100 py-3">
               {breadcrumbs.map((crumb, index) => (
                 <span key={crumb} className="flex items-center gap-2">
-                  {index > 0 && <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />}
+                  {index > 0 && <ChevronRight className="w-4 h-4 text-slate-300" />}
                   <span
                     className={
                       index === breadcrumbs.length - 1
-                        ? 'text-slate-900 dark:text-white font-semibold'
-                        : 'text-slate-500 dark:text-slate-400'
+                        ? 'text-slate-900 font-semibold'
+                        : 'text-slate-500'
                     }
                   >
                     {crumb}
@@ -262,15 +262,15 @@ const ShopPage = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setMobileFilterOpen(true)}
-                  className="md:hidden flex items-center gap-2 px-4 py-2.5 bg-transparent border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+                  className="md:hidden flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
                 >
-                <Filter className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Filters</span>
+                <Filter className="w-4 h-4 text-slate-600" />
+                  <span className="text-sm font-medium text-slate-700">Filters</span>
                 </button>
 
-                <div className="flex items-center gap-2 px-4 py-2 bg-transparent border border-slate-200 dark:border-slate-700 rounded-xl">
+                <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-md">
                   <Package className="w-4 h-4 text-slate-600" />
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{isLoading ? 'Loading...' : `${data?.total || 0} products`}
+                  <p className="text-sm font-medium text-slate-700">{isLoading ? 'Loading...' : `${data?.total || 0} products`}
                   </p>
                 </div>
               </div>
@@ -278,7 +278,7 @@ const ShopPage = () => {
               <select
                 value={sort}
                 onChange={(e) => setParam('sort', e.target.value)}
-                className="px-4 py-2.5 bg-transparent border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 focus:border-slate-900 dark:focus:border-blue-500 transition-colors cursor-pointer"
+                className="px-4 py-2 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors cursor-pointer"
               >
                 {sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -293,12 +293,12 @@ const ShopPage = () => {
                 {[...Array(8)].map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-pulse"
+                    className="bg-white rounded-lg border border-slate-200 overflow-hidden animate-pulse"
                   >
-                    <div className="aspect-square bg-slate-200 dark:bg-slate-700" />
+                    <div className="aspect-square bg-slate-100" />
                     <div className="p-4 space-y-3">
-                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
-                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+                      <div className="h-4 bg-slate-100 rounded w-3/4" />
+                      <div className="h-4 bg-slate-100 rounded w-1/2" />
                     </div>
                   </div>
                 ))}
@@ -316,7 +316,7 @@ const ShopPage = () => {
                     <button
                       onClick={() => setParam('page', String(Math.max(1, Number(page) - 1)))}
                       disabled={Number(page) <= 1}
-                      className="px-5 py-2.5 border border-slate-200 rounded-xl font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+                      className="px-4 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
                     >
                       Previous
                     </button>
@@ -326,7 +326,7 @@ const ShopPage = () => {
                     <button
                       onClick={() => setParam('page', String(Number(page) + 1))}
                       disabled={Number(page) >= data.totalPages}
-                      className="px-5 py-2.5 border border-slate-200 rounded-xl font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+                      className="px-4 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
                     >
                       Next
                     </button>
@@ -334,15 +334,15 @@ const ShopPage = () => {
                 )}
               </>
             ) : (
-              <div className="text-center py-20 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Package className="w-10 h-10 text-slate-400 dark:text-slate-500" />
+              <div className="text-center py-20 border-b border-slate-100">
+                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Package className="w-8 h-8 text-slate-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No products found</h3>
-                <p className="text-slate-500 dark:text-slate-400 mb-6">Try adjusting your filters or search terms</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">No products found</h3>
+                <p className="text-slate-500 mb-6 text-sm">Try adjusting your filters or search terms</p>
                 <button
                   onClick={clearFilters}
-                  className="inline-flex items-center gap-2 bg-slate-900 dark:bg-blue-600 text-white font-medium px-6 py-3 rounded-xl hover:bg-slate-800 dark:hover:bg-blue-500 transition-colors shadow-md"
+                  className="inline-flex items-center gap-2 bg-blue-600 text-white text-sm font-medium px-6 py-2.5 rounded-md hover:bg-blue-700 transition-colors"
                 >
                 Clear All Filters
                 </button>

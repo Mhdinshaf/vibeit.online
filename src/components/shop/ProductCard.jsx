@@ -41,13 +41,13 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <article className="group rounded-3xl border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:scale-105">
-      <Link to={`/product/${product._id}`}>
-        <div className="relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-700">
+    <article className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500/50 dark:hover:border-blue-400/50 transition-colors duration-200 overflow-hidden flex flex-col h-full rounded-lg">
+      <Link to={`/product/${product._id}`} className="flex-1 flex flex-col">
+        <div className="relative aspect-square overflow-hidden bg-white dark:bg-slate-700 p-4">
           <img
             src={getImageUrl(product.images?.[0])}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105"
           />
 
           {isOnSale && (
@@ -67,22 +67,18 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
-        <div className="p-4 sm:p-5 md:p-6">
-          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.14em] text-blue-600 dark:text-blue-400 font-bold mb-2">
-            {product.category}
-          </p>
-
-          <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white line-clamp-2 mb-3 leading-snug">
+        <div className="p-4 flex flex-col flex-1">
+          <h3 className="text-sm font-medium text-slate-900 dark:text-white line-clamp-2 mb-2 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {product.name}
           </h3>
 
-          <div className="flex items-center gap-2 mb-1">
+          <div className="mt-auto pt-2 flex items-center gap-2">
             {isOnSale ? (
               <>
-                <span className="text-lg font-bold text-slate-900 dark:text-white">
+                <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
                   රු{product.discountPrice?.toLocaleString()}
                 </span>
-                <span className="text-sm text-slate-400 dark:text-slate-500 line-through">
+                <span className="text-xs text-slate-400 line-through">
                   රු{product.originalPrice?.toLocaleString()}
                 </span>
               </>
@@ -95,27 +91,27 @@ const ProductCard = ({ product }) => {
         </div>
       </Link>
 
-      <div className="px-4 sm:px-5 md:px-6 pb-4 sm:pb-5 md:pb-6">
+      <div className="px-4 pb-4">
         {isOutOfStock ? (
           <button
             disabled
-            className="w-full rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 text-sm font-bold px-4 py-3 cursor-not-allowed"
+            className="w-full rounded-md bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 text-sm font-semibold px-4 py-2 cursor-not-allowed"
           >
-            Not available
+            Out of Stock
           </button>
         ) : requiresSizeSelection ? (
           <Link
             to={`/product/${product._id}`}
-            className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-500 dark:to-blue-400 dark:hover:from-blue-600 dark:hover:to-blue-500 px-4 py-3 text-white text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg"
+            className="flex items-center justify-center w-full rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 transition-colors duration-200"
           >
-            Select size
+            Select Options
           </Link>
         ) : (
           <button
             onClick={handleAddToCart}
-            className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-500 dark:to-blue-400 dark:hover:from-blue-600 dark:hover:to-blue-500 px-4 py-3 text-white text-sm font-bold transition-all duration-300 shadow-md hover:shadow-lg group/btn"
+            className="flex items-center justify-center gap-2 w-full rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 transition-colors duration-200"
           >
-            <ShoppingCart className="w-4 h-4 group-hover/btn:scale-125 transition-transform" />
+            <ShoppingCart className="w-4 h-4" />
             Add to cart
           </button>
         )}

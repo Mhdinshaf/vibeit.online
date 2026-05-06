@@ -23,21 +23,20 @@ const devError = (...args) => {
   }
 };
 
-// Premium Input Component
 const CheckoutInput = ({ icon: Icon, label, required, ...props }) => (
   <div>
-    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
+    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <div className="relative">
       {Icon && (
         <div className="absolute left-3 top-1/2 -translate-y-1/2">
-          <Icon className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+          <Icon className="w-4 h-4 text-slate-400" />
         </div>
       )}
       <input
         {...props}
-        className={`w-full ${Icon ? 'pl-11' : 'px-4'} pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500`}
+        className={`w-full ${Icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400`}
       />
     </div>
   </div>
@@ -191,15 +190,15 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#050b18] py-6 sm:py-8 overflow-x-clip transition-colors">
+    <div className="min-h-screen bg-slate-50 py-6 sm:py-8 overflow-x-clip transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex items-center gap-2 text-sm mb-8 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
-          <Link to="/cart" className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Cart</Link>
-          <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
-          <span className="text-slate-900 font-semibold">Checkout</span>
+        <nav className="flex items-center gap-2 text-sm mb-6 pb-4 border-b border-slate-200">
+          <Link to="/cart" className="text-slate-500 hover:text-slate-900 transition-colors">Cart</Link>
+          <ChevronRight className="w-4 h-4 text-slate-300" />
+          <span className="text-slate-900 font-bold">Checkout</span>
         </nav>
 
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white mb-8">Secure Checkout</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-8 uppercase tracking-wider">Secure Checkout</h1>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8">
@@ -236,12 +235,9 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-white" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Contact Information</h2>
+              <div className="bg-white rounded-md border border-slate-200 p-6 shadow-sm mb-6">
+                <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
+                  <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider">Contact Information</h2>
                 </div>
                 <CheckoutInput
                   icon={Mail}
@@ -252,28 +248,25 @@ const CheckoutPage = () => {
                   onChange={(e) => setField('email', e.target.value)}
                   placeholder="your@email.com"
                 />
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 ml-1">
+                <p className="text-xs text-slate-500 mt-2 ml-1">
                   We'll send order confirmation to this email
                 </p>
               </div>
 
-              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
-                    <MapPin className="w-5 h-5 text-white" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Shipping Address</h2>
+              <div className="bg-white rounded-md border border-slate-200 p-6 shadow-sm mb-6">
+                <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
+                  <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider">Shipping Address</h2>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                       District <span className="text-red-500">*</span>
                     </label>
                     <select
                       required
                       value={form.district}
                       onChange={(e) => setField('district', e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors text-slate-900 dark:text-white"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900"
                     >
                       <option value="">Select District</option>
                       {SRI_LANKA_DISTRICTS.map((district) => (
@@ -343,62 +336,50 @@ const CheckoutPage = () => {
                   </div>
                 </div>
                 {paymentMethod === 'Bank Transfer' && (
-                  <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                    <p className="text-sm font-semibold text-amber-800">Bank details for transfer</p>
-                    <p className="text-sm text-amber-700 mt-2">
+                  <div className="mt-4 rounded-md border border-blue-200 bg-blue-50 p-4">
+                    <p className="text-sm font-bold text-blue-900 mb-2">Bank details for transfer</p>
+                    <p className="text-sm text-blue-800">
                       {BANK_TRANSFER_DETAILS.accountHolder}
                     </p>
-                    <p className="text-sm text-amber-700">
+                    <p className="text-sm text-blue-800">
                       Account: {BANK_TRANSFER_DETAILS.accountNumber}
                     </p>
-                    <p className="text-sm text-amber-700">
+                    <p className="text-sm text-blue-800">
                       Bank: {BANK_TRANSFER_DETAILS.bankName}
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
-                    <Truck className="w-5 h-5 text-white" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-slate-900">Shipping Method</h2>
+              <div className="bg-white rounded-md border border-slate-200 p-6 shadow-sm mb-6">
+                <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
+                  <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider">Shipping Method</h2>
                 </div>
-                <div className="border border-slate-300 rounded-xl p-4 bg-slate-50">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Truck className="w-5 h-5 text-slate-700" />
-                    </div>
+                <div className="border border-slate-300 rounded-md p-4 bg-slate-50">
+                  <div className="flex items-center gap-4">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-slate-900">Standard Delivery</h3>
-                      <p className="text-sm text-slate-600">3-5 business days • Island wide</p>
+                      <h3 className="font-bold text-slate-900 text-sm">Standard Delivery</h3>
+                      <p className="text-xs text-slate-600 mt-1">3-5 business days • Island wide</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-slate-900 text-lg">
-                        {shippingFee === 0 ? 'FREE' : `රු${shippingFee}`}
+                      <p className="font-bold text-slate-900">
+                        {shippingFee === 0 ? 'FREE' : `Rs ${shippingFee}`}
                       </p>
-                      {shippingFee > 0 && (
-                        <p className="text-xs text-slate-500">Free above රු5000</p>
-                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
-                    <CreditCard className="w-5 h-5 text-white" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-slate-900">Payment Method</h2>
+              <div className="bg-white rounded-md border border-slate-200 p-6 shadow-sm mb-6">
+                <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
+                  <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider">Payment Method</h2>
                 </div>
                 <div className="space-y-3">
                   <label
-                    className={`block border rounded-xl p-4 cursor-pointer transition-colors ${
+                    className={`block border rounded-md p-4 cursor-pointer transition-colors ${
                       paymentMethod === 'Bank Transfer'
-                        ? 'border-slate-900 bg-slate-100'
-                        : 'border-slate-200 hover:border-slate-400'
+                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                        : 'border-slate-300 hover:border-slate-400'
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -408,23 +389,20 @@ const CheckoutPage = () => {
                         value="Bank Transfer"
                         checked={paymentMethod === 'Bank Transfer'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-5 h-5 text-slate-900"
+                        className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
                       />
-                      <div className="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center">
-                        <CreditCard className="w-5 h-5 text-slate-700" />
-                      </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900">Bank Transfer</h3>
-                        <p className="text-sm text-slate-500">Send slip to WhatsApp 0753979659</p>
+                        <h3 className="font-bold text-slate-900 text-sm">Bank Transfer</h3>
+                        <p className="text-xs text-slate-500 mt-1">Send slip to WhatsApp 0753979659</p>
                       </div>
                     </div>
                   </label>
 
                   <label
-                    className={`block border rounded-xl p-4 cursor-pointer transition-colors ${
+                    className={`block border rounded-md p-4 cursor-pointer transition-colors ${
                       paymentMethod === 'Cash on Delivery'
-                        ? 'border-slate-900 bg-slate-100'
-                        : 'border-slate-200 hover:border-slate-400'
+                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                        : 'border-slate-300 hover:border-slate-400'
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -434,36 +412,33 @@ const CheckoutPage = () => {
                         value="Cash on Delivery"
                         checked={paymentMethod === 'Cash on Delivery'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-5 h-5 text-slate-900"
+                        className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
                       />
-                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                        <DollarSign className="w-5 h-5 text-emerald-600" />
-                      </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900">Cash on Delivery</h3>
-                        <p className="text-sm text-slate-500">Pay when you receive</p>
+                        <h3 className="font-bold text-slate-900 text-sm">Cash on Delivery</h3>
+                        <p className="text-xs text-slate-500 mt-1">Pay when you receive</p>
                       </div>
                     </div>
                   </label>
                 </div>
               </div>
 
-              <div className="border-b border-slate-200 dark:border-slate-700 py-6 sm:py-8">
-                <label className="flex items-center gap-3 cursor-pointer">
+              <div className="bg-white rounded-md border border-slate-200 p-6 shadow-sm mb-6">
+                <label className="flex items-center gap-2 cursor-pointer mb-2">
                   <input
                     type="checkbox"
                     checked={showNotes}
                     onChange={(e) => setShowNotes(e.target.checked)}
-                    className="w-5 h-5 rounded-lg text-slate-900 border-slate-300 focus:ring-slate-500"
+                    className="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500"
                   />
-                  <span className="font-medium text-slate-700">Add order notes (optional)</span>
+                  <span className="font-bold text-sm text-slate-700">Add order notes (optional)</span>
                 </label>
 
                 {showNotes && (
                   <textarea
                     value={form.notes}
                     onChange={(e) => setField('notes', e.target.value)}
-                    className="w-full mt-4 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-slate-900 placeholder-slate-400 resize-none"
+                    className="w-full mt-2 px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400 resize-none"
                     rows="3"
                     placeholder="Any special instructions for your order..."
                   />
@@ -483,17 +458,17 @@ const CheckoutPage = () => {
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-semibold py-4 rounded-xl hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-3.5 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm uppercase tracking-wider"
               >
                 {isPending ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     Placing order...
                   </>
                 ) : (
                   <>
-                    <Shield className="w-5 h-5" />
-                    Place order • රු{total.toLocaleString()}
+                    <Shield className="w-4 h-4" />
+                    Place order • Rs {total.toLocaleString()}
                   </>
                 )}
               </button>
@@ -501,78 +476,74 @@ const CheckoutPage = () => {
 
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-5">
-              <div className="lg:sticky lg:top-24 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="bg-slate-900 px-6 py-4">
-                  <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                    <Package className="w-5 h-5" />
-                    Order Summary
-                  </h2>
-                </div>
+              <div className="lg:sticky lg:top-8 bg-slate-50 rounded-md border border-slate-200 shadow-sm overflow-hidden p-6">
+                <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider mb-6 border-b border-slate-200 pb-4">
+                  Order Summary
+                </h2>
 
-                <div className="p-6">
-                  <div className="space-y-4 mb-6">
-                    {items.map((item) => (
-                      <div key={item.key} className="flex gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div className="relative flex-shrink-0">
-                          <img
-                            src={getImageUrl(item.product.images?.[0])}
-                            alt={item.product.name}
-                            className="w-16 h-16 rounded-xl object-cover border border-slate-200"
-                          />
-                          <span className="absolute -top-2 -right-2 bg-slate-900 text-white text-xs font-semibold w-5 h-5 rounded-full flex items-center justify-center">
-                            {item.quantity}
-                          </span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-medium text-slate-900 line-clamp-1">
-                            {item.product.name}
-                          </h3>
-                          {item.size && (
-                            <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-lg font-medium">
-                              Size: {item.size}
-                            </span>
-                          )}
-                          <p className="text-sm font-semibold text-slate-900 mt-1">
-                            රු{(item.price * item.quantity).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="border-t border-slate-200 pt-4 space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-slate-600">Subtotal</span>
-                      <span className="font-semibold text-slate-900">රු{subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-600">Shipping</span>
-                      <span className="font-semibold">
-                        {shippingFee === 0 ? (
-                          <span className="text-emerald-600 flex items-center gap-1">
-                            <Truck className="w-4 h-4" />
-                            FREE
-                          </span>
-                        ) : (
-                          <span className="text-slate-900">රු{shippingFee}</span>
-                        )}
-                      </span>
-                    </div>
-                    <div className="border-t border-slate-200 pt-4">
-                      <div className="flex justify-between">
-                        <span className="text-lg font-semibold text-slate-900">Total</span>
-                        <span className="text-2xl font-semibold text-slate-900">
-                          රු{total.toLocaleString()}
+                <div className="space-y-4 mb-6">
+                  {items.map((item) => (
+                    <div key={item.key} className="flex gap-4">
+                      <div className="relative flex-shrink-0">
+                        <img
+                          src={getImageUrl(item.product.images?.[0])}
+                          alt={item.product.name}
+                          className="w-16 h-16 rounded-md object-contain bg-white border border-slate-200"
+                        />
+                        <span className="absolute -top-2 -right-2 bg-slate-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center ring-2 ring-slate-50">
+                          {item.quantity}
                         </span>
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold text-slate-900 line-clamp-2">
+                          {item.product.name}
+                        </h3>
+                        {item.size && (
+                          <span className="text-xs text-slate-500 font-medium">
+                            Size: {item.size}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-slate-900">
+                          Rs {(item.price * item.quantity).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-slate-200 pt-4 space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Subtotal</span>
+                    <span className="font-bold text-slate-900">Rs {subtotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Shipping</span>
+                    <span className="font-bold">
+                      {shippingFee === 0 ? (
+                        <span className="text-blue-600 flex items-center gap-1">
+                          FREE
+                        </span>
+                      ) : (
+                        <span className="text-slate-900">Rs {shippingFee}</span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="border-t border-slate-200 pt-4 mt-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-base font-bold text-slate-900 uppercase">Total</span>
+                      <span className="text-2xl font-bold text-slate-900">
+                        Rs {total.toLocaleString()}
+                      </span>
                     </div>
                   </div>
+                </div>
 
-                  <div className="mt-6 bg-slate-100 rounded-xl p-4 border border-slate-200">
-                    <div className="flex items-center gap-2 text-sm text-slate-700">
-                      <Truck className="w-4 h-4 text-slate-700" />
-                      <span><strong>Estimated:</strong> 3-5 business days</span>
-                    </div>
+                <div className="mt-6 border-t border-slate-200 pt-6">
+                  <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+                    <Shield className="w-4 h-4 text-slate-400" />
+                    <span>Secure Checkout • SSL Encrypted</span>
                   </div>
                 </div>
               </div>

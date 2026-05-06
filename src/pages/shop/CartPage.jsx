@@ -65,22 +65,22 @@ const CartPage = () => {
   // Empty State
   if (!items || items.length === 0) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#050b18] flex items-center justify-center py-16">
+      <div className="min-h-screen bg-white flex items-center justify-center py-16">
         <div className="text-center max-w-md mx-auto px-4">
-          <div className="w-28 h-28 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-            <ShoppingBag className="w-14 h-14 text-slate-500 dark:text-slate-400" />
+          <div className="w-24 h-24 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShoppingBag className="w-10 h-10 text-slate-400" />
           </div>
-          <h1 className="text-3xl font-semibold text-slate-900 dark:text-white mb-3">
+          <h1 className="text-2xl font-bold text-slate-900 mb-3">
             Your cart is empty
           </h1>
-          <p className="text-slate-600 dark:text-slate-300 mb-8">
+          <p className="text-slate-500 text-sm mb-8">
             Looks like you haven't added anything to your cart yet
           </p>
           <Link 
             to="/shop" 
-            className="inline-flex items-center gap-2 bg-slate-900 text-white font-medium px-7 py-3.5 rounded-xl hover:bg-slate-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-blue-600 text-white text-sm font-bold px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className="w-4 h-4" />
             Start shopping
           </Link>
         </div>
@@ -89,21 +89,21 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#050b18] py-6 sm:py-8 overflow-x-clip transition-colors">
+    <div className="min-h-screen bg-slate-50 py-6 sm:py-8 overflow-x-clip transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {freeShippingRemaining > 0 && (
-          <div className="bg-slate-900 dark:bg-blue-600 rounded-2xl p-4 mb-6 sm:mb-8 text-white">
+          <div className="bg-blue-50 border border-blue-100 rounded-md p-4 mb-6 sm:mb-8 text-blue-900">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center">
-                <Truck className="w-5 h-5" />
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                <Truck className="w-5 h-5 text-blue-600" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold">
-                  Add රු{freeShippingRemaining.toLocaleString()} more for FREE shipping!
+                <p className="font-semibold text-sm">
+                  Add Rs {freeShippingRemaining.toLocaleString()} more for FREE shipping!
                 </p>
-                <div className="w-full bg-white/20 rounded-full h-2 mt-2">
+                <div className="w-full bg-blue-200 rounded-full h-1.5 mt-2">
                   <div 
-                    className="bg-white h-2 rounded-full transition-all duration-500"
+                    className="bg-blue-600 h-1.5 rounded-full transition-all duration-500"
                     style={{ width: `${Math.min((subtotal / 5000) * 100, 100)}%` }}
                   />
                 </div>
@@ -113,27 +113,27 @@ const CartPage = () => {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-8">
             <div className="flex items-center justify-between mb-5 sm:mb-6">
-              <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-slate-900">
                 Shopping Cart
-                <span className="text-slate-500 dark:text-slate-400 ml-2">({itemCount})</span>
+                <span className="text-slate-500 font-normal ml-2 text-lg">({itemCount})</span>
               </h1>
               <button
                 onClick={handleClearCart}
-                className="text-sm text-slate-500 hover:text-red-600 font-medium transition-colors"
+                className="text-sm text-slate-500 hover:text-red-600 font-semibold transition-colors"
               >
                 Clear All
               </button>
             </div>
 
-            <div className="space-y-4">
-              {items.map((item) => (
+            <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden">
+              {items.map((item, index) => (
                 <div 
                   key={item.key}
-                  className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 md:p-5 shadow-sm"
+                  className={`p-4 md:p-5 ${index !== items.length - 1 ? 'border-b border-slate-100' : ''}`}
                 >
-                  <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
+                  <div className="flex flex-col xs:flex-row gap-4 sm:gap-6">
                     <Link
                       to={`/product/${item.product._id}`}
                       className="flex-shrink-0 self-start"
@@ -141,7 +141,7 @@ const CartPage = () => {
                       <img
                         src={getImageUrl(item.product.images?.[0])}
                         alt={item.product.name}
-                        className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
+                        className="w-20 h-20 sm:w-24 sm:h-24 object-contain"
                       />
                     </Link>
 
@@ -150,64 +150,65 @@ const CartPage = () => {
                         <div className="flex-1 min-w-0">
                           <Link
                             to={`/product/${item.product._id}`}
-                            className="font-semibold text-slate-900 hover:text-slate-700 line-clamp-2 transition-colors"
+                            className="font-bold text-slate-900 hover:text-blue-600 line-clamp-2 transition-colors"
                           >
                             {item.product.name}
                           </Link>
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-2 mt-2">
                             {item.product.category && (
-                              <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-lg">
+                              <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-sm uppercase tracking-wider font-semibold">
                                 {item.product.category}
                               </span>
                             )}
                             {item.size && (
-                              <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-2 py-1 rounded-lg font-medium">
+                              <span className="text-xs text-slate-500 font-medium">
                                 Size: {item.size}
                               </span>
                             )}
                           </div>
-                          <p className="text-lg font-semibold text-slate-900 mt-2">
-                            රු{item.price.toLocaleString()}
+                          <p className="text-sm text-slate-500 mt-2">
+                            Rs {item.price.toLocaleString()} each
                           </p>
                         </div>
 
                         <div className="flex flex-col sm:items-end gap-3">
-                          <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-                            <button
-                              onClick={() =>
-                                handleQuantityChange(item.key, item.quantity - 1, item.product.stockQuantity)
-                              }
-                              className="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center bg-white rounded-lg hover:bg-slate-50 transition-colors"
-                            >
-                              <Minus className="w-4 h-4 text-slate-600" />
-                            </button>
-                            <span className="font-semibold text-slate-900 dark:text-white w-12 sm:w-10 text-center">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() =>
-                                handleQuantityChange(item.key, item.quantity + 1, item.product.stockQuantity)
-                              }
-                              disabled={item.quantity >= item.product.stockQuantity}
-                              className="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center bg-white rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Plus className="w-4 h-4 text-slate-600" />
-                            </button>
-                          </div>
-
-                          <p className="font-semibold text-slate-900 dark:text-white text-lg">
-                            රු{(item.price * item.quantity).toLocaleString()}
+                          <p className="font-bold text-slate-900 text-lg hidden md:block">
+                            Rs {(item.price * item.quantity).toLocaleString()}
                           </p>
 
-                          <button
-                            onClick={() =>
-                              handleRemoveItem(item.key, item.product.name)
-                            }
-                            className="flex items-center gap-1 text-sm text-slate-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            Remove
-                          </button>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center border border-slate-300 rounded-md bg-white">
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(item.key, item.quantity - 1, item.product.stockQuantity)
+                                }
+                                className="w-8 h-8 flex items-center justify-center hover:bg-slate-50 transition-colors"
+                              >
+                                <Minus className="w-3 h-3 text-slate-600" />
+                              </button>
+                              <span className="font-semibold text-sm text-slate-900 w-8 text-center">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(item.key, item.quantity + 1, item.product.stockQuantity)
+                                }
+                                disabled={item.quantity >= item.product.stockQuantity}
+                                className="w-8 h-8 flex items-center justify-center hover:bg-slate-50 transition-colors disabled:opacity-50"
+                              >
+                                <Plus className="w-3 h-3 text-slate-600" />
+                              </button>
+                            </div>
+
+                            <button
+                              onClick={() =>
+                                handleRemoveItem(item.key, item.product.name)
+                              }
+                              className="text-sm font-semibold text-slate-400 hover:text-red-600 transition-colors underline"
+                            >
+                              Remove
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -219,7 +220,7 @@ const CartPage = () => {
             <div className="mt-6">
               <Link
                 to="/shop"
-                className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 font-medium transition-colors"
+                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-bold transition-colors"
               >
                 <ArrowRight className="w-4 h-4 rotate-180" />
                 Continue Shopping
@@ -227,63 +228,63 @@ const CartPage = () => {
             </div>
           </div>
 
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-4">
             <div className="lg:sticky lg:top-8">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                <div className="bg-slate-900 dark:bg-blue-600 px-6 py-4">
-                  <h2 className="text-xl font-semibold text-white">Order Summary</h2>
+              <div className="bg-white rounded-md border border-slate-200 shadow-sm overflow-hidden">
+                <div className="border-b border-slate-100 px-6 py-4">
+                  <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider">Order Summary</h2>
                 </div>
 
                 <div className="p-6">
-                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300 mb-4">
+                  <div className="flex items-center justify-between text-slate-500 text-sm mb-4">
                     <span>{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>
                   </div>
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
+                      <span className="text-slate-600 text-sm">Subtotal</span>
                       <span className="font-semibold text-slate-900">
-                        රු{subtotal.toLocaleString()}
+                        Rs {subtotal.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Shipping</span>
-                      <span className="font-semibold">
+                      <span className="text-slate-600 text-sm">Shipping</span>
+                      <span className="font-semibold text-sm">
                         {shippingCost === 0 ? (
-                          <span className="text-emerald-600 flex items-center gap-1">
+                          <span className="text-blue-600 flex items-center gap-1">
                             <Truck className="w-4 h-4" />
                             FREE
                           </span>
                         ) : (
-                          <span className="text-slate-900">රු{shippingCost.toLocaleString()}</span>
+                          <span className="text-slate-900">Rs {shippingCost.toLocaleString()}</span>
                         )}
                       </span>
                     </div>
-                    <div className="border-t border-slate-100 pt-4">
+                    <div className="border-t border-slate-100 pt-4 mt-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-lg font-semibold text-slate-900">Total</span>
-                        <span className="text-2xl font-semibold text-slate-900">
-                          රු{total.toLocaleString()}
+                        <span className="text-base font-bold text-slate-900">Total</span>
+                        <span className="text-2xl font-bold text-slate-900">
+                          Rs {total.toLocaleString()}
                         </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                       Promo Code
                     </label>
                     <div className="flex gap-2">
                       <input
                         type="text"
                         placeholder="Enter code"
-                        className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-900 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-700 transition-colors text-sm text-slate-900 dark:text-white"
+                        className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900"
                       />
                       <button
                         onClick={() => toast('Promo codes coming soon!', { icon: '🎁' })}
-                        className="px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        className="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-sm rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider"
                       >
-                        <Gift className="w-5 h-5" />
+                        Apply
                       </button>
                     </div>
                   </div>
@@ -291,14 +292,14 @@ const CartPage = () => {
                   <button
                     type="button"
                     onClick={handleProceedToCheckout}
-                    className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-medium py-4 rounded-xl hover:bg-slate-700 transition-colors mb-4"
+                    className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-3.5 rounded-md hover:bg-blue-700 transition-colors mb-4"
                   >
                     Proceed to checkout
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
 
-                  <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
-                    <Lock className="w-4 h-4 text-emerald-600" />
+                  <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+                    <Lock className="w-3 h-3 text-slate-400" />
                     <span>Secure Checkout • SSL Encrypted</span>
                   </div>
                 </div>

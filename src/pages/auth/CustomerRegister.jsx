@@ -122,23 +122,23 @@ const CustomerRegister = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-block mb-4">
-            <div className="w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 mx-auto">
+            <div className="w-16 h-16 overflow-hidden mx-auto flex items-center justify-center">
               <img
                 src={logo}
                 alt="VIBEIT logo"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
-          <h1 className="text-3xl font-semibold text-slate-900 mb-2 tracking-tight">VIBEIT</h1>
-          <p className="text-slate-600">Create Your Account</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Create Account</h1>
+          <p className="text-slate-500 text-sm">Join VIBEIT today</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div className="bg-white rounded-lg border border-slate-200 p-6 sm:p-8">
           {error && (
             <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -167,7 +167,7 @@ const CustomerRegister = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     placeholder="John"
-                    className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:border-slate-900 focus:bg-white transition-colors text-sm text-slate-900 placeholder-slate-400"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
                     disabled={isLoading}
                   />
                 </div>
@@ -184,7 +184,7 @@ const CustomerRegister = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                     placeholder="Doe"
-                    className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:border-slate-900 focus:bg-white transition-colors text-sm text-slate-900 placeholder-slate-400"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
                     disabled={isLoading}
                   />
                 </div>
@@ -202,8 +202,8 @@ const CustomerRegister = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="you@example.com"
-                  className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:border-slate-900 focus:bg-white transition-colors text-sm text-slate-900 placeholder-slate-400"
+                  placeholder="Email Address"
+                  className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
                   disabled={isLoading}
                 />
               </div>
@@ -220,8 +220,8 @@ const CustomerRegister = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="+94 71 234 5678"
-                  className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:border-slate-900 focus:bg-white transition-colors text-sm text-slate-900 placeholder-slate-400"
+                  placeholder="Phone Number"
+                  className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
                   disabled={isLoading}
                 />
               </div>
@@ -238,8 +238,8 @@ const CustomerRegister = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:border-slate-900 focus:bg-white transition-colors text-sm text-slate-900 placeholder-slate-400"
+                  placeholder="Password"
+                  className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
                   disabled={isLoading}
                 />
                 <button
@@ -271,8 +271,8 @@ const CustomerRegister = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:border-slate-900 focus:bg-white transition-colors text-sm text-slate-900 placeholder-slate-400"
+                  placeholder="Confirm Password"
+                  className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
                   disabled={isLoading}
                 />
                 <button
@@ -296,7 +296,7 @@ const CustomerRegister = () => {
                 name="agreeTerms"
                 checked={formData.agreeTerms}
                 onChange={handleChange}
-                className="w-4 h-4 rounded border-2 border-slate-300 accent-slate-900 cursor-pointer mt-0.5"
+                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer mt-0.5"
                 disabled={isLoading}
               />
               <span className="text-xs text-slate-600">
@@ -314,7 +314,7 @@ const CustomerRegister = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-slate-900 text-white font-medium rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
+              className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-sm"
             >
               {isLoading ? (
                 <>
@@ -323,7 +323,6 @@ const CustomerRegister = () => {
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-4 h-4" />
                   Create Account
                 </>
               )}
@@ -341,7 +340,7 @@ const CustomerRegister = () => {
 
           <Link
             to="/auth/customer/login"
-            className="w-full py-3 px-4 border border-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors text-center text-sm"
+            className="w-full py-2.5 px-4 bg-slate-100 text-slate-700 font-medium rounded-md hover:bg-slate-200 transition-colors text-center text-sm block"
           >
             Login Here
           </Link>

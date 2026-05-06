@@ -84,23 +84,23 @@ const CustomerLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-block mb-4">
-            <div className="w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 mx-auto">
+            <div className="w-16 h-16 overflow-hidden mx-auto flex items-center justify-center">
               <img
                 src={logo}
                 alt="VIBEIT logo"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
-          <h1 className="text-3xl font-semibold text-slate-900 mb-2 tracking-tight">VIBEIT</h1>
-          <p className="text-slate-600">Customer Login</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Login to VIBEIT</h1>
+          <p className="text-slate-500 text-sm">Please enter your details below</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div className="bg-white rounded-lg border border-slate-200 p-6 sm:p-8">
           {error && (
             <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -127,8 +127,8 @@ const CustomerLogin = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="you@example.com"
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-slate-900 placeholder-slate-400"
+                  placeholder="Email Address"
+                  className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
                   disabled={isLoading}
                 />
               </div>
@@ -145,8 +145,8 @@ const CustomerLogin = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors text-slate-900 placeholder-slate-400"
+                  placeholder="Password"
+                  className="w-full pl-12 pr-12 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
                   disabled={isLoading}
                 />
                 <button
@@ -171,14 +171,14 @@ const CustomerLogin = () => {
                   name="rememberMe"
                   checked={formData.rememberMe}
                   onChange={handleChange}
-                  className="w-4 h-4 rounded border-2 border-slate-300 accent-slate-900 cursor-pointer"
+                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   disabled={isLoading}
                 />
                 <span className="text-sm text-slate-600">Remember me</span>
               </label>
               <Link
                 to="/auth/customer/forgot-password"
-                className="text-sm text-slate-700 hover:text-slate-900 font-medium transition-colors"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
               >
                 Forgot password?
               </Link>
@@ -187,16 +187,15 @@ const CustomerLogin = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Logging in...
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-5 h-5" />
                   Login
                 </>
               )}
@@ -205,12 +204,12 @@ const CustomerLogin = () => {
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full py-3 px-4 border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2.5 px-4 border border-slate-300 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#4285F4" d="M21.35 11.1H12v2.98h5.35c-.23 1.5-1.73 4.4-5.35 4.4-3.22 0-5.84-2.67-5.84-5.97s2.62-5.97 5.84-5.97c1.84 0 3.07.79 3.78 1.46l2.58-2.5C16.7 3.94 14.56 3 12 3 7.03 3 3 7.03 3 12s4.03 9 9 9c5.19 0 8.62-3.64 8.62-8.77 0-.59-.06-1.04-.27-1.13z" />
               </svg>
-              Continue with Google
+              Sign in with Google
             </button>
           </form>
 
@@ -225,9 +224,9 @@ const CustomerLogin = () => {
 
           <Link
             to="/auth/customer/register"
-            className="w-full py-3 px-4 border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors text-center"
+            className="w-full py-2.5 px-4 bg-slate-100 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-200 transition-colors text-center block"
           >
-            Create New Account
+            Create an Account
           </Link>
         </div>
 

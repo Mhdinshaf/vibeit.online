@@ -122,7 +122,7 @@ const ProductPage = () => {
   const images = rawImages.length > 0 ? rawImages.map(getImageUrl) : ['/placeholder.jpg'];
 
   return (
-    <div className="min-h-screen bg-slate-50 py-6 sm:py-8 overflow-x-clip">
+    <div className="min-h-screen bg-white py-6 sm:py-8 overflow-x-clip">
       <Helmet>
         <title>{product?.name} - Buy at VIBEIT Sri Lanka</title>
         <meta name="description" content={`Buy ${product?.name} at VIBEIT. ${product?.description ? product.description.substring(0, 120) : 'Premium quality product'} - Cash on delivery available across Sri Lanka.`} />
@@ -147,7 +147,7 @@ const ProductPage = () => {
       </Helmet>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm mb-8 bg-white rounded-xl px-4 py-3 border border-slate-200 shadow-sm">
+        <nav className="flex items-center gap-2 text-xs sm:text-sm mb-6 pb-4 border-b border-gray-100">
           <Link to="/" className="text-slate-500 hover:text-slate-900 transition-colors">
             Home
           </Link>
@@ -170,11 +170,31 @@ const ProductPage = () => {
           <span className="text-slate-900 font-semibold line-clamp-1">{product.name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Column - Image Gallery */}
-          <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Left Column - Image Gallery (7 columns) */}
+          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 md:gap-6">
+            
+            {/* Thumbnail Gallery (Vertical on Desktop, Horizontal on Mobile) */}
+            {images.length > 1 && (
+              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto scrollbar-hide py-1 md:w-20 md:flex-shrink-0">
+                {images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border transition-all duration-200 ${
+                      selectedImage === index
+                        ? 'border-blue-600 border-2'
+                        : 'border-gray-200 hover:border-gray-400'
+                    }`}
+                  >
+                    <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-contain bg-white" />
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Main Image */}
-             <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+            <div className="flex-1 relative rounded-xl overflow-hidden bg-white border border-gray-100 flex items-center justify-center">
               {isOnSale && (
                 <div className="absolute top-4 left-4 z-10">
                   <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
@@ -193,32 +213,13 @@ const ProductPage = () => {
               <img
                 src={images[selectedImage]}
                 alt={product.name}
-                className="w-full aspect-square object-cover"
+                className="w-full h-full object-contain max-h-[500px]"
               />
             </div>
-
-            {/* Thumbnail Gallery */}
-            {images.length > 1 && (
-              <div className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide pb-2">
-                {images.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                      selectedImage === index
-                        ? 'border-slate-900 ring-2 ring-slate-200 shadow-sm'
-                        : 'border-slate-200 hover:border-slate-400'
-                    }`}
-                  >
-                    <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* Right Column - Product Details */}
-          <div className="lg:sticky lg:top-8 lg:self-start">
+          {/* Right Column - Product Details (5 columns) */}
+          <div className="lg:col-span-5 lg:sticky lg:top-8 lg:self-start">
             {/* Brand */}
             {product.brand && (
                <p className="text-slate-600 font-medium text-sm mb-2">{product.brand}</p>
@@ -230,32 +231,34 @@ const ProductPage = () => {
              </h1>
 
             {/* Pricing */}
-            <div className="mb-6">
+            <div className="mb-6 flex flex-wrap items-baseline gap-3">
               {isOnSale ? (
-                <div className="flex items-center gap-4 mb-2">
-                   <span className="text-4xl font-semibold text-slate-900">
-                     රු{(product.discountPrice || 0).toLocaleString()}
-                   </span>
-                   <span className="text-xl text-slate-400 line-through">
-                    රු{(product.originalPrice || 0).toLocaleString()}
+                <>
+                  <span className="text-xl text-gray-400 line-through">
+                    Rs {product.originalPrice?.toLocaleString()}
                   </span>
-                </div>
+                  <span className="text-3xl font-bold text-red-600">
+                    Rs {product.discountPrice?.toLocaleString()}
+                  </span>
+                  <span className="bg-[#cc0000] text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                    Save {discountPercent}%
+                  </span>
+                </>
               ) : (
-                 <span className="text-4xl font-semibold text-slate-900">
-                  රු{(product.originalPrice || 0).toLocaleString()}
+                 <span className="text-3xl font-bold text-gray-900">
+                  Rs {product.originalPrice?.toLocaleString()}
                 </span>
-              )}
-              {isOnSale && savings > 0 && (
-               <div className="mt-2">
-                  <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 text-sm font-semibold px-4 py-1.5 rounded-full">
-                    <Sparkles className="w-4 h-4" />
-                    You save රු{savings.toLocaleString()}
-                  </span>
-                </div>
               )}
             </div>
 
-             <div className="border-t border-slate-200 my-6" />
+            <div className="flex items-center gap-1 mb-6">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className={`w-4 h-4 ${i < 5 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+              ))}
+              <span className="text-sm text-gray-500 ml-2">4.89 (360 reviews)</span>
+            </div>
+
+             <div className="border-t border-gray-100 my-6" />
 
             {/* Size Selector */}
              {requiresSizeSelection && (
@@ -268,10 +271,10 @@ const ProductPage = () => {
                      <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
-                      className={`px-6 py-3 rounded-xl border-2 font-semibold transition-all duration-300 ${
+                      className={`px-4 py-2 rounded-md border font-semibold transition-all duration-200 ${
                         selectedSize === size
-                           ? 'bg-slate-900 text-white border-slate-900'
-                           : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400 hover:text-slate-900'
+                           ? 'bg-blue-600 text-white border-blue-600'
+                           : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
                       }`}
                     >
                       {size}
@@ -282,97 +285,85 @@ const ProductPage = () => {
             )}
 
             {/* Quantity Selector or Out of Stock */}
-            <div className="mb-6">
-               <label className="block text-sm font-semibold text-slate-900 mb-3">
-                Quantity
-              </label>
+            <div className="mb-6 flex gap-4">
               {isOutOfStock ? (
-                 <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 font-semibold px-6 py-3 rounded-xl">
-                  <Package className="w-5 h-5" />
+                 <div className="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-500 font-bold px-6 py-3.5 rounded-md">
                   OUT OF STOCK
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
+                <>
+                  <div className="flex items-center border border-gray-300 rounded-md bg-white">
+                    <button
+                      onClick={decreaseQty}
+                     className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                    >
+                       <Minus className="w-4 h-4 text-gray-600" />
+                    </button>
+                     <span className="text-base font-semibold text-gray-900 w-10 text-center">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={increaseQty}
+                      disabled={quantity >= product.stockQuantity}
+                       className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    >
+                       <Plus className="w-4 h-4 text-gray-600" />
+                    </button>
+                  </div>
                   <button
-                    onClick={decreaseQty}
-                   className="w-12 h-12 flex items-center justify-center border border-slate-200 rounded-xl hover:border-slate-900 hover:bg-slate-100 transition-colors"
+                    onClick={handleAddToCart}
+                    className="flex-1 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition-colors py-3 px-6 flex items-center justify-center gap-2"
                   >
-                     <Minus className="w-5 h-5 text-slate-700" />
+                    Add to cart
                   </button>
-                   <span className="text-xl font-semibold text-slate-900 w-12 text-center">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={increaseQty}
-                    disabled={quantity >= product.stockQuantity}
-                     className="w-12 h-12 flex items-center justify-center border border-slate-200 rounded-xl hover:border-slate-900 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                     <Plus className="w-5 h-5 text-slate-700" />
-                  </button>
-                  {product.stockQuantity < 10 && product.stockQuantity > 0 && (
-                     <span className="text-sm text-amber-600 font-medium ml-2">
-                       Only {product.stockQuantity} left!
-                     </span>
-                  )}
-                </div>
+                </>
               )}
             </div>
 
-             <div className="rounded-2xl border border-slate-200 bg-white p-4 mb-3 shadow-sm">
-               <p className="text-xs uppercase tracking-[0.14em] font-semibold text-slate-500 mb-3">Ready to buy</p>
-               <div className="flex items-center justify-between mb-4">
-                 <span className="text-sm text-slate-600">Items total</span>
-                 <span className="text-lg font-semibold text-slate-900">
-                   රු{(Number(product.discountPrice || product.originalPrice || 0) * quantity).toLocaleString()}
-                 </span>
-               </div>
-               <button
-                 onClick={handleAddToCart}
-                 disabled={isOutOfStock}
-                 className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-semibold py-4 rounded-xl hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-               >
-                 <ShoppingCart className="w-5 h-5" />
-                 Add to cart
-               </button>
-             </div>
+            {product.stockQuantity < 10 && product.stockQuantity > 0 && (
+               <p className="text-sm text-red-600 font-semibold mb-6">
+                 Hurry! Only {product.stockQuantity} items left in stock.
+               </p>
+            )}
 
-             {addedToCart && (
-               <Link
-                 to="/cart"
-                 className="w-full flex items-center justify-center gap-2 border border-slate-900 text-slate-900 font-semibold py-4 rounded-xl hover:bg-slate-100 transition-colors"
-               >
-                 <Check className="w-5 h-5" />
-                 View cart
-               </Link>
-             )}
+            {addedToCart && (
+              <Link
+                to="/cart"
+                className="w-full flex items-center justify-center gap-2 border-2 border-gray-900 text-gray-900 font-bold py-3 rounded-md hover:bg-gray-50 transition-colors mb-6"
+              >
+                <Check className="w-5 h-5" />
+                View cart
+              </Link>
+            )}
 
-             <div className="border-t border-slate-200 my-6" />
+             <div className="border-t border-gray-100 my-6" />
 
             {/* Product Details */}
             <div className="space-y-4 mb-6">
               {product.description && (
-                 <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                   <h3 className="text-sm font-semibold text-slate-900 mb-2">
+                 <div className="bg-white">
+                   <h3 className="text-base font-bold text-gray-900 mb-2">
                      Description
                    </h3>
-                   <p className="text-slate-600 text-sm leading-relaxed">
+                   <div className="border-b border-gray-100 mb-4 w-12"></div>
+                   <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">
                      {product.description}
                    </p>
                  </div>
               )}
 
               {product.tags && product.tags.length > 0 && (
-                <div>
-                   <h3 className="text-sm font-semibold text-slate-900 mb-2">
+                <div className="mt-6">
+                   <h3 className="text-sm font-semibold text-gray-900 mb-2">
                      Tags
                    </h3>
                   <div className="flex flex-wrap gap-2">
                     {product.tags.map((tag) => (
                       <span
                         key={tag}
-                         className="inline-block bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full"
+                         className="inline-block bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-sm"
                       >
-                        #{tag}
+                        {tag}
                       </span>
                     ))}
                   </div>
@@ -381,34 +372,20 @@ const ProductPage = () => {
             </div>
 
             {/* Shipping Info Cards */}
-            <div className="grid grid-cols-2 gap-3">
-               <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-                 <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                   <Truck className="w-5 h-5 text-slate-700" />
+            <div className="mt-8 pt-6 border-t border-gray-100 grid grid-cols-2 gap-4">
+               <div className="flex items-center gap-3">
+                 <Truck className="w-5 h-5 text-gray-400" />
+                 <div>
+                   <p className="text-sm font-semibold text-gray-900">Shipping</p>
+                   <p className="text-xs text-gray-500">Calculated at checkout</p>
                  </div>
-                 <p className="text-xs font-semibold text-slate-900">Free Shipping</p>
-                 <p className="text-xs text-slate-500">Above රු5000</p>
                </div>
-               <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-                 <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                   <Shield className="w-5 h-5 text-emerald-600" />
+               <div className="flex items-center gap-3">
+                 <Shield className="w-5 h-5 text-gray-400" />
+                 <div>
+                   <p className="text-sm font-semibold text-gray-900">Warranty</p>
+                   <p className="text-xs text-gray-500">Authentic products</p>
                  </div>
-                 <p className="text-xs font-semibold text-slate-900">100% Authentic</p>
-                 <p className="text-xs text-slate-500">Quality Guaranteed</p>
-               </div>
-               <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-                 <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                   <RefreshCw className="w-5 h-5 text-amber-600" />
-                 </div>
-                 <p className="text-xs font-semibold text-slate-900">Easy Returns</p>
-                 <p className="text-xs text-slate-500">7 Day Policy</p>
-               </div>
-               <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-                 <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                   <Package className="w-5 h-5 text-purple-600" />
-                 </div>
-                 <p className="text-xs font-semibold text-slate-900">Fast Delivery</p>
-                 <p className="text-xs text-slate-500">Island Wide</p>
                </div>
             </div>
           </div>

@@ -48,7 +48,7 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-[#050b18] overflow-x-clip transition-colors">
+    <div className="bg-slate-50 overflow-x-clip transition-colors">
       <Helmet>
         <title>Contact VIBEIT - Get Help & Support</title>
         <meta name="description" content="Contact VIBEIT for help with orders, products, or inquiries. We're available 9 AM - 9 PM daily on WhatsApp and email. Fast customer support in Sri Lanka." />
@@ -57,11 +57,11 @@ const ContactPage = () => {
         <meta property="og:url" content="https://vibeitlk.vercel.app/contact" />
       </Helmet>
 
-      <section className="border-b border-slate-200 dark:border-slate-700">
+      <section className="border-b border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 text-center">
-          <p className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-500 dark:text-slate-400 mb-3">Contact</p>
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 dark:text-white">Talk to the VIBEIT team</h1>
-          <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+          <p className="text-xs uppercase tracking-[0.16em] font-bold text-slate-500 mb-3">Contact</p>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900">Talk to the VIBEIT team</h1>
+          <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
             Questions about products, orders, or delivery? We reply quickly.
           </p>
         </div>
@@ -75,17 +75,17 @@ const ContactPage = () => {
             { icon: MapPin, title: 'Location', value: 'Colombo, Sri Lanka', href: null },
             { icon: Clock, title: 'Hours', value: '9 AM - 9 PM Daily', href: null },
           ].map((item) => (
-            <article key={item.title} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
-              <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center">
+            <article key={item.title} className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center">
                 <item.icon className="w-5 h-5" />
               </div>
-              <h3 className="mt-4 font-semibold text-slate-900 dark:text-white">{item.title}</h3>
+              <h3 className="mt-4 font-bold text-slate-900">{item.title}</h3>
               {item.href ? (
-                <a href={item.href} className="mt-1 inline-block text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
+                <a href={item.href} className="mt-1 inline-block text-slate-600 hover:text-blue-600 font-medium transition-colors">
                   {item.value}
                 </a>
               ) : (
-                <p className="mt-1 text-slate-600 dark:text-slate-300">{item.value}</p>
+                <p className="mt-1 text-slate-600 font-medium">{item.value}</p>
               )}
             </article>
           ))}
@@ -94,65 +94,65 @@ const ContactPage = () => {
 
       <section className="pb-12 sm:pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-          <div className="border-b border-slate-100 dark:border-slate-800 py-6 sm:py-8">
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Send us a message</h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-300">Fill this form and we will respond as soon as possible.</p>
+          <div className="bg-white rounded-md border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-wider">Send us a message</h2>
+            <p className="mt-2 text-slate-600">Fill this form and we will respond as soon as possible.</p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Your Name</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Your Name</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-slate-900 dark:focus:border-blue-500 transition-colors text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 rounded-md border border-slate-300 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 text-sm"
                     placeholder="John Doe"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Email Address</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-slate-900 dark:focus:border-blue-500 transition-colors text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 rounded-md border border-slate-300 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 text-sm"
                     placeholder="john@example.com"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Subject</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Subject</label>
                 <input
                   type="text"
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-slate-900 dark:focus:border-blue-500 transition-colors text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2.5 rounded-md border border-slate-300 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 text-sm"
                   placeholder="How can we help?"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Message</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Message</label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   required
                   rows="5"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:border-slate-900 dark:focus:border-blue-500 transition-colors resize-none text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2.5 rounded-md border border-slate-300 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors resize-none text-slate-900 text-sm"
                   placeholder="Your message..."
                 />
               </div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3.5 text-white font-medium hover:bg-slate-700 transition-colors disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 px-6 py-3.5 text-white font-bold hover:bg-blue-700 transition-colors disabled:opacity-50 uppercase tracking-wider text-sm"
               >
                 {isSubmitting ? 'Sending...' : (
                   <>
@@ -164,20 +164,20 @@ const ContactPage = () => {
             </form>
           </div>
 
-          <div className="flex flex-col gap-5">
-            <div className="border-b border-slate-100 dark:border-slate-800 py-6 sm:py-8">
-              <div className="w-11 h-11 rounded-xl bg-slate-900 dark:bg-blue-600 text-white flex items-center justify-center">
-                <MessageCircle className="w-5 h-5" />
+          <div className="flex flex-col gap-6 sm:gap-8">
+            <div className="bg-white rounded-md border border-slate-200 p-6 sm:p-8 shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <MessageCircle className="w-6 h-6" />
               </div>
-              <h3 className="mt-5 text-2xl font-semibold text-slate-900 dark:text-white">Prefer WhatsApp?</h3>
-              <p className="mt-3 text-slate-600 dark:text-slate-300">
+              <h3 className="mt-5 text-2xl font-bold text-slate-900">Prefer WhatsApp?</h3>
+              <p className="mt-3 text-slate-600">
                 Get a faster reply for order updates, product questions, and delivery support.
               </p>
               <a
                 href="https://wa.me/94753979659"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-900 dark:bg-blue-600 px-6 py-3.5 text-white font-medium hover:bg-slate-700 dark:hover:bg-blue-700 transition-colors"
+                className="mt-6 inline-flex items-center gap-2 rounded-md bg-emerald-500 px-6 py-3.5 text-white font-bold hover:bg-emerald-600 transition-colors uppercase tracking-wider text-sm"
               >
                 <MessageCircle className="w-4 h-4" />
                 Chat on WhatsApp
@@ -185,8 +185,8 @@ const ContactPage = () => {
               </a>
             </div>
 
-            <div className="border-b border-slate-100 dark:border-slate-800 py-6 sm:py-8">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Quick help</h3>
+            <div className="bg-white rounded-md border border-slate-200 p-6 sm:p-8 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-900 uppercase tracking-wider">Quick help</h3>
               <ul className="mt-4 space-y-3">
                 {[
                   'How long does delivery take?',
@@ -194,12 +194,12 @@ const ContactPage = () => {
                   'Can I return a product?',
                   'How can I track my order?',
                 ].map((question) => (
-                  <li key={question}>
+                  <li key={question} className="border-b border-slate-100 pb-3 last:border-0 last:pb-0">
                     <a
                       href="https://wa.me/94753979659"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                      className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800 transition-colors text-sm"
                     >
                       <ArrowRight className="w-4 h-4" />
                       {question}
