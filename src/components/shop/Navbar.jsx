@@ -60,35 +60,37 @@ const Navbar = () => {
         Skip to main content
       </a>
 
-      <header className="sticky top-0 z-50 glass-effect transition-colors duration-300">
+      <header className="sticky top-0 z-50 bg-white dark:bg-[#050b18] border-b border-gray-100 dark:border-slate-800 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-16 sm:h-[4.5rem] flex items-center justify-between gap-3">
             <NavLink to="/" className="flex items-center gap-3 min-w-0 shrink-0 group">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm flex items-center justify-center bg-slate-900 dark:bg-slate-800">
+              <div className="w-10 h-10 overflow-hidden flex items-center justify-center">
                 <img
                   src={logo}
                   alt="VIBEIT logo"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
-              <div className="leading-none">
-                <span className="block text-lg sm:text-xl font-semibold tracking-tight text-slate-900 dark:text-white" 
-                >VIBEIT</span>
-                <span className="block text-[10px] sm:text-[11px] mt-1 tracking-[0.2em] text-blue-600 dark:text-blue-400"
-                >PREMIUM STORE</span>
+              <div className="leading-none hidden sm:block">
+                <span className="block text-xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
+                  VIBEIT
+                </span>
+                <span className="block text-[10px] mt-0.5 tracking-[0.1em] text-slate-500 dark:text-slate-400">
+                  STORE
+                </span>
               </div>
             </NavLink>
 
-            <nav className="hidden md:flex items-center gap-1 rounded-full border px-2 py-1 shadow-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 transition-colors duration-300">
+            <nav className="hidden md:flex items-center gap-6">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) =>
-                    `px-4 lg:px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
+                    `text-sm font-semibold transition-colors duration-200 ${
                       isActive
-                        ? 'bg-slate-900 text-white dark:bg-blue-600 shadow-md'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700/50'
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400'
                     }`
                   }
                 >
@@ -100,30 +102,26 @@ const Navbar = () => {
             <div className="flex items-center gap-1 sm:gap-2">
               <form
                 onSubmit={handleSearch}
-                className={`flex items-center overflow-hidden rounded-xl border transition-all duration-300 bg-slate-50 dark:bg-slate-800/50 ${
+                className={`flex items-center overflow-hidden rounded-md border transition-all duration-300 bg-gray-50 dark:bg-slate-800/50 ${
                   searchOpen
-                    ? 'w-40 xs:w-48 sm:w-56 px-2 sm:px-3 py-1.5 opacity-100 border-blue-500/50 dark:border-blue-400/50 ring-2 ring-blue-500/20 dark:ring-blue-400/20'
+                    ? 'w-48 sm:w-64 px-3 py-2 opacity-100 border-blue-500/30'
                     : 'w-0 border-transparent px-0 py-0 opacity-0 pointer-events-none'
                 }`}
               >
-                <Search className="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                <Search className="w-4 h-4 shrink-0 text-slate-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="w-full min-w-0 bg-transparent border-none outline-none px-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
+                  placeholder="Search products..."
+                  className="w-full min-w-0 bg-transparent border-none outline-none px-2 text-sm text-slate-900 dark:text-white placeholder-slate-400"
                   autoFocus={searchOpen}
                 />
               </form>
 
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
-                className={`p-2.5 rounded-xl transition-all duration-300 ${
-                  searchOpen 
-                    ? 'bg-slate-900 text-white dark:bg-blue-600 shadow-md' 
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                className="p-2 transition-colors text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
@@ -131,12 +129,12 @@ const Navbar = () => {
 
               <NavLink
                 to="/cart"
-                className="relative p-2.5 rounded-xl transition-all duration-300 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="relative p-2 transition-colors text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
                 aria-label="Shopping Cart"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1 text-xs font-semibold rounded-full text-white bg-blue-600 flex items-center justify-center shadow-sm">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] text-[10px] font-bold rounded-full text-white bg-red-600 flex items-center justify-center">
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
                 )}
@@ -144,7 +142,7 @@ const Navbar = () => {
 
               <button
                 onClick={toggleTheme}
-                className="inline-flex p-2.5 rounded-xl transition-colors text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="inline-flex p-2 transition-colors text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
                 aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
                 title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
               >
@@ -155,13 +153,11 @@ const Navbar = () => {
                 <div className="hidden md:block relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-white bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500 transition-all shadow-sm hover:shadow-md"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors"
                     aria-label="Customer Profile"
                   >
-                    <div className="w-6 h-6 rounded-full text-white bg-blue-500/50 text-xs font-semibold flex items-center justify-center">
-                      {customer.firstName?.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="text-sm font-medium">{customer.firstName}</span>
+                    <User className="w-5 h-5" />
+                    <span className="text-sm font-semibold">{customer.firstName}</span>
                   </button>
 
                   {profileDropdownOpen && (
@@ -194,11 +190,11 @@ const Navbar = () => {
               ) : (
                 <button
                   onClick={() => navigate('/auth/customer/login')}
-                  className="hidden md:flex items-center gap-2 px-4 py-2.5 text-white bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl transition-all shadow-sm hover:shadow-md text-sm font-medium"
+                  className="hidden md:flex items-center gap-2 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors text-sm font-semibold"
                   aria-label="Customer Login"
                 >
                   <User className="w-4 h-4" />
-                  Login
+                  Sign In
                 </button>
               )}
 
