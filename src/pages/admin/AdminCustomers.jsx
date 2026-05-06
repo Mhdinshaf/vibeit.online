@@ -170,9 +170,12 @@ const CustomerOrdersPanel = ({ customerId, isApiConnected }) => {
 // ─── Main AdminCustomers Page ─────────────────────────────────────────────────
 const AdminCustomers = () => {
   const [customers, setCustomers] = useState([]);
+  const [totalCustomers, setTotalCustomers] = useState(0);   // total from API
+  const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isApiConnected, setIsApiConnected] = useState(false);
   const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');         // raw typed value
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedId, setExpandedId] = useState(null);
   const [editingId, setEditingId] = useState(null);
@@ -186,37 +189,52 @@ const AdminCustomers = () => {
     return () => window.removeEventListener(PROMO_CONFIG_EVENT, handler);
   }, []);
 
-  const loadCustomers = useCallback(async () => {
+  // Debounce search input → triggers API call after 400 ms
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const loadCustomers = useCallback(async (page = 1, q = '') => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/admin/customers`, {
+      const params = new URLSearchParams({ page, limit: CUSTOMERS_PER_PAGE });
+      if (q) params.set('search', q);
+      const res = await fetch(`${API_BASE}/admin/customers?${params}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('vibeit_token')}` },
       });
       if (!res.ok) throw new Error('not ok');
       const data = await res.json();
-      const list = data.customers || data.data || data;
+      const list = data.customers || data.data || [];
       setCustomers(Array.isArray(list) ? list : []);
+      setTotalCustomers(data.total ?? list.length);
+      setTotalPages(data.pages ?? Math.ceil((data.total ?? list.length) / CUSTOMERS_PER_PAGE));
       setIsApiConnected(true);
     } catch {
-      setCustomers(deriveCustomersFromOrders());
+      // Demo fallback — derive from localStorage, client-side filter + paginate
+      const all = deriveCustomersFromOrders();
+      const filtered = q
+        ? all.filter(c => `${c.firstName} ${c.lastName} ${c.email}`.toLowerCase().includes(q.toLowerCase()))
+        : all;
+      const start = (page - 1) * CUSTOMERS_PER_PAGE;
+      setCustomers(filtered.slice(start, start + CUSTOMERS_PER_PAGE));
+      setTotalCustomers(filtered.length);
+      setTotalPages(Math.ceil(filtered.length / CUSTOMERS_PER_PAGE));
       setIsApiConnected(false);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  useEffect(() => { loadCustomers(); }, [loadCustomers]);
-  useEffect(() => { setCurrentPage(1); }, [search]);
+  // Re-fetch whenever page or debounced search changes
+  useEffect(() => { loadCustomers(currentPage, search); }, [loadCustomers, currentPage, search]);
 
-  const filtered = customers.filter(c => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return `${c.firstName} ${c.lastName}`.toLowerCase().includes(q) ||
-      c.email.toLowerCase().includes(q) || (c.phone || '').includes(q);
-  });
 
-  const totalPages = Math.ceil(filtered.length / CUSTOMERS_PER_PAGE);
-  const paged = filtered.slice((currentPage - 1) * CUSTOMERS_PER_PAGE, currentPage * CUSTOMERS_PER_PAGE);
+  // NOTE: customers[] is already the current page from the server
+  const paged = customers;
 
   const startEdit = (c) => {
     setEditingId(c._id);
@@ -257,14 +275,23 @@ const AdminCustomers = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Customers</h1>
-          <p className="text-slate-500 mt-1">{customers.length} total customers</p>
+          <p className="text-slate-500 mt-1">{totalCustomers} total customers</p>
         </div>
-        {!isApiConnected && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            Demo mode — derived from local orders
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => loadCustomers(currentPage, search)}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-colors"
+            title="Refresh list">
+            <Loader2 className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-500' : 'text-slate-400'}`} />
+            Refresh
+          </button>
+          {!isApiConnected && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              Demo mode — derived from local orders
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Search */}
@@ -272,7 +299,9 @@ const AdminCustomers = () => {
         <div className="relative">
           <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
-            type="text" value={search} onChange={e => setSearch(e.target.value)}
+            type="text"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
             placeholder="Search by name, email or phone..."
             className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-slate-500 bg-slate-50 text-sm"
           />
@@ -406,8 +435,8 @@ const AdminCustomers = () => {
                 <p className="text-sm text-slate-600">
                   Showing{' '}
                   <span className="font-medium">{(currentPage - 1) * CUSTOMERS_PER_PAGE + 1}</span>–
-                  <span className="font-medium">{Math.min(currentPage * CUSTOMERS_PER_PAGE, filtered.length)}</span>
-                  {' '}of <span className="font-medium">{filtered.length}</span>
+                  <span className="font-medium">{Math.min(currentPage * CUSTOMERS_PER_PAGE, totalCustomers)}</span>
+                  {' '}of <span className="font-medium">{totalCustomers}</span>
                 </p>
                 <div className="flex items-center gap-2">
                   <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}
