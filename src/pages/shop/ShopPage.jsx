@@ -311,7 +311,7 @@ const ShopPage = () => {
                   ))}
                 </div>
 
-                {data?.pages > 1 && (
+                {data?.pages > 0 && (
                   <div className="flex flex-wrap items-center justify-center gap-2 mt-10">
                     <button
                       onClick={() => {
@@ -326,8 +326,8 @@ const ShopPage = () => {
                     </button>
                     
                     <div className="flex items-center gap-1 sm:gap-2">
-                      {Array.from({ length: data.pages }, (_, i) => i + 1)
-                        .filter(p => p === 1 || p === data.pages || (p >= Number(page) - 1 && p <= Number(page) + 1))
+                      {Array.from({ length: data.pages || 1 }, (_, i) => i + 1)
+                        .filter(p => p === 1 || p === (data.pages || 1) || (p >= Number(page) - 1 && p <= Number(page) + 1))
                         .reduce((acc, p, i, arr) => {
                           if (i > 0 && p - arr[i - 1] > 1) acc.push('...');
                           acc.push(p);
