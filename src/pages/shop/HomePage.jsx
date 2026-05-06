@@ -185,16 +185,16 @@ const HomePage = () => {
 
             {/* Side Promo Banners - 1 column on large screens */}
             <div className="hidden lg:flex flex-col gap-4">
-              <Link to="/shop" className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-md p-6 flex flex-col justify-center border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
+              <Link to="/shop?category=Trending%20Items&subcategory=New%20Arrivals" className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-md p-6 flex flex-col justify-center border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">Featured</span>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">New Arrivals</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Discover the latest premium tech.</p>
               </Link>
               
-              <Link to="/shop" className="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-md p-6 flex flex-col justify-center border border-blue-200 dark:border-blue-800/50 hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">Special Offer</span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Up to 50% Off</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">On selected smart devices.</p>
+              <Link to="/shop?category=Trending%20Items" className="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-md p-6 flex flex-col justify-center border border-blue-200 dark:border-blue-800/50 hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">Hot Right Now</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Trending Collection</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Explore the most popular items.</p>
               </Link>
             </div>
 
