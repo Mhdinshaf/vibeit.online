@@ -817,13 +817,39 @@ export const getDashboardStats = async () => {
 
     return {
       ...remote,
-      monthlyRevenue: Math.max(Number(remote.monthlyRevenue || 0), localMetrics.monthlyRevenue),
-      monthlyOrders: Math.max(Number(remote.monthlyOrders || 0), localMetrics.monthlyOrders),
+      monthlyRevenue: Math.max(Number(remote.monthlyRevenue || remote.monthRevenue || 0), localMetrics.monthlyRevenue),
+      monthlyOrders: Math.max(Number(remote.monthlyOrders || remote.monthOrders || 0), localMetrics.monthlyOrders),
       pendingOrders: Math.max(Number(remote.pendingOrders || 0), localMetrics.pendingOrders),
-      revenueByDay: remote.revenueByDay || [],
-      ordersByCategory: remote.ordersByCategory || [],
-      topSellingProducts: remote.topSellingProducts || [],
-      lowStockProducts: remote.lowStockProducts || [],
+      
+      revenueGrowth: remote.lastMonthRevenue 
+        ? Math.round(((Number(remote.monthlyRevenue) - Number(remote.lastMonthRevenue)) / Number(remote.lastMonthRevenue)) * 100) 
+        : (Number(remote.monthlyRevenue) > 0 ? 100 : 0),
+        
+      lowStockCount: remote.lowStock?.length || 0,
+
+      // Map backend fields to match AdminDashboard expectations
+      revenueByDay: (remote.revenueByDay || []).map(item => ({
+        date: item._id,
+        revenue: item.revenue,
+      })),
+      
+      ordersByCategory: (remote.ordersByCategory || []).map(item => ({
+        name: item._id,
+        value: item.count || 0,
+      })),
+      
+      topSellingProducts: (remote.topProducts || []).map(item => ({
+        _id: item._id,
+        name: item.title,
+        unitsSold: item.totalQuantity,
+        revenue: item.totalRevenue,
+      })),
+      
+      lowStockProducts: (remote.lowStock || []).map(item => ({
+        _id: item._id,
+        name: item.title,
+        stockQuantity: item.stockQuantity,
+      })),
     };
   } catch (error) {
     if (!isOfflineOrServerUnavailable(error)) {
