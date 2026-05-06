@@ -40,14 +40,14 @@ const HomePage = () => {
   ];
 
   const categories = [
-    { name: 'Tech Gadgets', icon: Laptop, color: 'bg-blue-50 text-blue-600' },
-    { name: 'Ladies Dresses', icon: Shirt, color: 'bg-pink-50 text-pink-600' },
-    { name: 'Gents Clothing', icon: Briefcase, color: 'bg-slate-100 text-slate-700' },
-    { name: 'Home Accessories', icon: Home, color: 'bg-green-50 text-green-600' },
-    { name: 'Watches', icon: Watch, color: 'bg-amber-50 text-amber-600' },
-    { name: 'Trending Items', icon: Flame, color: 'bg-red-50 text-red-600' },
-    { name: 'Creams and Skincare', icon: Droplets, color: 'bg-cyan-50 text-cyan-600' },
-    { name: 'Toys', icon: Gift, color: 'bg-purple-50 text-purple-600' },
+    { name: 'Tech Gadgets', icon: Laptop, color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
+    { name: 'Ladies Dresses', icon: Shirt, color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
+    { name: 'Gents Clothing', icon: Briefcase, color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
+    { name: 'Home Accessories', icon: Home, color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
+    { name: 'Watches', icon: Watch, color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
+    { name: 'Trending Items', icon: Flame, color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
+    { name: 'Creams and Skincare', icon: Droplets, color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
+    { name: 'Toys', icon: Gift, color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
   ];
 
   const promotionalBanners = [
@@ -185,17 +185,17 @@ const HomePage = () => {
 
             {/* Side Promo Banners - 1 column on large screens */}
             <div className="hidden lg:flex flex-col gap-4">
-              <div className="flex-1 bg-slate-50 rounded-md p-6 flex flex-col justify-center border border-slate-200 hover:border-blue-500 transition-colors">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">Featured</span>
-                <h3 className="text-lg font-bold text-slate-900 mb-1">New Arrivals</h3>
-                <p className="text-sm text-slate-500 font-medium">Discover the latest premium tech.</p>
-              </div>
+              <Link to="/shop" className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-md p-6 flex flex-col justify-center border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">Featured</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">New Arrivals</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Discover the latest premium tech.</p>
+              </Link>
               
-              <div className="flex-1 bg-blue-50 rounded-md p-6 flex flex-col justify-center border border-blue-200 hover:border-blue-500 transition-colors">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">Special Offer</span>
-                <h3 className="text-lg font-bold text-slate-900 mb-1">Up to 50% Off</h3>
-                <p className="text-sm text-slate-600 font-medium">On selected smart devices.</p>
-              </div>
+              <Link to="/shop" className="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-md p-6 flex flex-col justify-center border border-blue-200 dark:border-blue-800/50 hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">Special Offer</span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Up to 50% Off</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">On selected smart devices.</p>
+              </Link>
             </div>
 
           </div>
@@ -217,10 +217,10 @@ const HomePage = () => {
                   to={`/shop?category=${encodeURIComponent(category.name)}`}
                   className={`flex flex-col items-center gap-2 flex-shrink-0 transition-all duration-300 group`}
                 >
-                  <div className={`w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-md flex items-center justify-center border border-slate-200 transition-colors ${category.color} group-hover:border-blue-500`}>
-                    <IconComponent className="w-6 h-6 sm:w-7 sm:h-7" />
+                  <div className={`w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700/50 transition-all duration-300 ${category.color} group-hover:border-blue-500 dark:group-hover:border-blue-400 group-hover:shadow-md`}>
+                    <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 group-hover:scale-110 transition-transform duration-300" />
                   </div>
-                  <p className="text-xs sm:text-sm font-bold text-slate-700 text-center whitespace-nowrap group-hover:text-blue-600 transition-colors">
+                  <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 text-center whitespace-nowrap group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {category.name}
                   </p>
                 </Link>
@@ -297,33 +297,47 @@ const HomePage = () => {
       </section>
 
       {/* Official Brand Stores Section */}
-      <section className="py-6 sm:py-8 lg:py-10">
+      <section className="py-6 sm:py-8 lg:py-10 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Official Brand Stores" subtitle="Verified Sellers" linkTo="/shop" />
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {[
-              { name: 'Apple', icon: Laptop, color: 'bg-slate-50' },
-              { name: 'Nike', icon: Shirt, color: 'bg-slate-50' },
-              { name: 'Samsung', icon: Home, color: 'bg-slate-50' },
-              { name: 'Rolex', icon: Watch, color: 'bg-slate-50' },
-              { name: 'Dior', icon: Sparkles, color: 'bg-slate-50' },
-              { name: 'Adidas', icon: Flame, color: 'bg-slate-50' },
-            ].map((brand, idx) => {
-              const IconComponent = brand.icon;
-              return (
-                <Link
-                  key={idx}
-                  to={`/shop?search=${encodeURIComponent(brand.name)}`}
-                  className={`bg-white rounded-md p-4 flex flex-col items-center gap-2 shadow-sm border border-slate-200 hover:border-blue-500 transition-colors duration-200 group`}
-                >
-                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-md ${brand.color} flex items-center justify-center border border-slate-200`}>
-                    <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-slate-700 group-hover:text-blue-600 transition-colors" />
-                  </div>
-                  <p className="text-xs sm:text-sm font-bold text-slate-700 text-center group-hover:text-blue-600 transition-colors uppercase tracking-wider mt-1">{brand.name}</p>
-                </Link>
-              );
-            })}
+          {/* Marquee Wrapper */}
+          <div className="relative flex w-full overflow-hidden group py-2">
+            <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
+              {[...Array(2)].map((_, groupIdx) => (
+                <div key={groupIdx} className="flex gap-3 sm:gap-4 pr-3 sm:pr-4 items-center">
+                  {[
+                    { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple', invertDark: true },
+                    { name: 'Nike', iconUrl: 'https://cdn.simpleicons.org/nike', invertDark: true },
+                    { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true },
+                    { name: 'Rolex', iconUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b3/Rolex_logo.svg', invertDark: false },
+                    { name: 'Dior', iconUrl: 'https://cdn.simpleicons.org/dior', invertDark: true },
+                    { name: 'Adidas', iconUrl: 'https://cdn.simpleicons.org/adidas', invertDark: true },
+                    { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple', invertDark: true },
+                    { name: 'Nike', iconUrl: 'https://cdn.simpleicons.org/nike', invertDark: true },
+                    { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true },
+                    { name: 'Rolex', iconUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b3/Rolex_logo.svg', invertDark: false },
+                    { name: 'Dior', iconUrl: 'https://cdn.simpleicons.org/dior', invertDark: true },
+                    { name: 'Adidas', iconUrl: 'https://cdn.simpleicons.org/adidas', invertDark: true },
+                  ].map((brand, idx) => (
+                    <Link
+                      key={`${groupIdx}-${idx}`}
+                      to={`/shop?search=${encodeURIComponent(brand.name)}`}
+                      className="bg-white dark:bg-slate-800 rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center gap-3 sm:gap-4 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 transition-colors duration-200 group w-32 sm:w-40 flex-shrink-0"
+                    >
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
+                        <img 
+                          src={brand.iconUrl} 
+                          alt={brand.name} 
+                          className={`max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110 ${brand.invertDark ? 'dark:invert' : ''}`} 
+                        />
+                      </div>
+                      <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 text-center group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors uppercase tracking-wider">{brand.name}</p>
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

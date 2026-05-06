@@ -120,12 +120,20 @@ body {
   50% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
 }
 
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 @layer utilities {
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
   .animate-pulse-blue {
     animation: pulse-blue 2s ease-in-out infinite;
+  }
+  .animate-marquee {
+    animation: marquee 25s linear infinite;
   }
 }
 
