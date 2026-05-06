@@ -730,11 +730,6 @@ export const getOrderStats = async () => {
   }
 };
 
-export const getDashboardStats = async () => {
-  const response = await api.get('/analytics/dashboard');
-  return response.data;
-};
-
 // Auth APIs
 export const loginAdmin = async (data) => {
   const response = await api.post('/auth/login', data);
