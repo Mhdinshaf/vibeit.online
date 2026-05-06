@@ -311,8 +311,8 @@ const ShopPage = () => {
                   ))}
                 </div>
 
-                {data?.pages > 0 && (
-                  <div className="flex flex-wrap items-center justify-center gap-2 mt-10">
+                {true && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-10 pb-8">
                     <button
                       onClick={() => {
                         const newPage = Math.max(1, Number(page) - 1);
