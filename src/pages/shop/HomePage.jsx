@@ -216,7 +216,7 @@ const HomePage = () => {
           <SectionHeader title="Explore Popular Categories" subtitle="Shop by Category" linkTo="/shop" />
 
           {/* Horizontal Scroll Categories */}
-          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-3 scrollbar-hide">
+          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-3 scrollbar-hide sm:justify-center">
             {categories.map((category) => {
               const IconComponent = category.icon;
               return (
@@ -311,18 +311,18 @@ const HomePage = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {[
-              { name: 'Tech Gadgets', icon: Laptop, color: 'from-blue-100 to-blue-50' },
-              { name: 'Ladies Dresses', icon: Shirt, color: 'from-pink-100 to-pink-50' },
-              { name: 'Home Accessories', icon: Home, color: 'from-green-100 to-green-50' },
-              { name: 'Watches', icon: Watch, color: 'from-purple-100 to-purple-50' },
-              { name: 'Perfumes', icon: Sparkles, color: 'from-yellow-100 to-yellow-50' },
-              { name: 'Trending Items', icon: Flame, color: 'from-red-100 to-red-50' },
+              { name: 'Apple', icon: Laptop, color: 'from-blue-100 to-blue-50' },
+              { name: 'Nike', icon: Shirt, color: 'from-pink-100 to-pink-50' },
+              { name: 'Samsung', icon: Home, color: 'from-green-100 to-green-50' },
+              { name: 'Rolex', icon: Watch, color: 'from-purple-100 to-purple-50' },
+              { name: 'Dior', icon: Sparkles, color: 'from-yellow-100 to-yellow-50' },
+              { name: 'Adidas', icon: Flame, color: 'from-red-100 to-red-50' },
             ].map((brand, idx) => {
               const IconComponent = brand.icon;
               return (
                 <Link
                   key={idx}
-                  to={`/shop?category=${encodeURIComponent(brand.name)}`}
+                  to={`/shop?search=${encodeURIComponent(brand.name)}`}
                   className={`bg-gradient-to-br ${brand.color} dark:from-slate-800 dark:to-slate-700/80 rounded-xl p-4 flex flex-col items-center gap-2 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 border border-slate-200/50 dark:border-slate-600/30 group`}
                 >
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-white/50 dark:bg-slate-600/50 flex items-center justify-center group-hover:scale-110 transition-transform">
