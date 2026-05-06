@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useCustomerStore } from '../../context/store';
-import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search } from 'lucide-react';
+import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getCustomerOrders, getProductById } from '../../services/api';
@@ -16,6 +16,9 @@ const CustomerDashboard = () => {
   const [orderError, setOrderError] = useState(null);
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [resolvedItemNames, setResolvedItemNames] = useState({});
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
   
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -131,13 +134,24 @@ const CustomerDashboard = () => {
       )
     : null;
 
-  const displayedOrders = normalizedQuery
+  const filteredOrders = normalizedQuery
     ? orders.filter((order) =>
         [order.orderNumber, order._id]
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(normalizedQuery))
       )
     : orders;
+
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [normalizedQuery]);
+
+  const displayedOrders = filteredOrders.slice(
+    (currentPage - 1) * ordersPerPage,
+    currentPage * ordersPerPage
+  );
 
   useEffect(() => {
     const resolveMissingProductNames = async () => {
@@ -408,8 +422,9 @@ const CustomerDashboard = () => {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               {orders.length > 0 ? (
                 displayedOrders.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm">
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
                       <thead>
                         <tr className="border-b border-slate-200 text-left">
                           <th className="py-3 pr-4 font-semibold text-slate-700">Order ID</th>
@@ -448,8 +463,63 @@ const CustomerDashboard = () => {
                       </tbody>
                     </table>
                   </div>
-                ) : (
-                  <p className="text-slate-600 text-center py-12">No orders found for this Order ID.</p>
+                  {totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-200 pt-4 mt-4 gap-4">
+                      <p className="text-sm text-slate-700 text-center sm:text-left">
+                        Showing <span className="font-medium">{(currentPage - 1) * ordersPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * ordersPerPage, filteredOrders.length)}</span> of{' '}
+                        <span className="font-medium">{filteredOrders.length}</span> results
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                          disabled={currentPage === 1}
+                          className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        
+                        <div className="flex items-center gap-1">
+                          {[...Array(totalPages)].map((_, i) => {
+                            if (
+                              totalPages <= 5 || 
+                              i === 0 || 
+                              i === totalPages - 1 || 
+                              (i + 1 >= currentPage - 1 && i + 1 <= currentPage + 1)
+                            ) {
+                              return (
+                                <button
+                                  key={i + 1}
+                                  onClick={() => setCurrentPage(i + 1)}
+                                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                                    currentPage === i + 1
+                                      ? 'bg-slate-900 text-white'
+                                      : 'text-slate-700 hover:bg-slate-100'
+                                  }`}
+                                >
+                                  {i + 1}
+                                </button>
+                              );
+                            }
+                            if (i + 1 === currentPage - 2 || i + 1 === currentPage + 2) {
+                              return <span key={i} className="px-1 text-slate-400">...</span>;
+                            }
+                            return null;
+                          })}
+                        </div>
+
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                          disabled={currentPage === totalPages}
+                          className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-slate-600 text-center py-12">No orders found for this Order ID.</p>
                 )
               ) : (
                 <p className="text-slate-600 text-center py-12">No orders yet. Ready to shop? Browse our store now.</p>
