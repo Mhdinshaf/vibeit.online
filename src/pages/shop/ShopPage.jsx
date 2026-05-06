@@ -311,7 +311,7 @@ const ShopPage = () => {
                   ))}
                 </div>
 
-                {data.totalPages > 1 && (
+                {data?.pages > 1 && (
                   <div className="flex flex-wrap items-center justify-center gap-2 mt-10">
                     <button
                       onClick={() => {
@@ -326,8 +326,8 @@ const ShopPage = () => {
                     </button>
                     
                     <div className="flex items-center gap-1 sm:gap-2">
-                      {Array.from({ length: data.totalPages }, (_, i) => i + 1)
-                        .filter(p => p === 1 || p === data.totalPages || (p >= Number(page) - 1 && p <= Number(page) + 1))
+                      {Array.from({ length: data.pages }, (_, i) => i + 1)
+                        .filter(p => p === 1 || p === data.pages || (p >= Number(page) - 1 && p <= Number(page) + 1))
                         .reduce((acc, p, i, arr) => {
                           if (i > 0 && p - arr[i - 1] > 1) acc.push('...');
                           acc.push(p);
@@ -356,11 +356,11 @@ const ShopPage = () => {
 
                     <button
                       onClick={() => {
-                        const newPage = Math.min(data.totalPages, Number(page) + 1);
+                        const newPage = Math.min(data.pages, Number(page) + 1);
                         setParam('page', String(newPage));
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      disabled={Number(page) >= data.totalPages}
+                      disabled={Number(page) >= data.pages}
                       className="px-3 py-1.5 border border-slate-200 rounded-md text-sm font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors flex items-center gap-1"
                     >
                       Next <ChevronRight className="w-4 h-4" />
