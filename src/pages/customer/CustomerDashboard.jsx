@@ -8,7 +8,7 @@ import { getCustomerOrders, getProductById } from '../../services/api';
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
-  const { customer, logout } = useCustomerAuth();
+  const { customer, logout, updateProfile } = useCustomerAuth();
   const { orders, setOrders } = useCustomerStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
@@ -16,6 +16,39 @@ const CustomerDashboard = () => {
   const [orderError, setOrderError] = useState(null);
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [resolvedItemNames, setResolvedItemNames] = useState({});
+  
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+  });
+
+  useEffect(() => {
+    if (customer) {
+      setProfileForm({
+        firstName: customer.firstName || '',
+        lastName: customer.lastName || '',
+        phone: customer.phone || '',
+      });
+    }
+  }, [customer]);
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      setIsSavingProfile(true);
+      await updateProfile(profileForm);
+      toast.success('Profile updated successfully');
+      setIsEditingProfile(false);
+    } catch (error) {
+      console.error('Profile update failed:', error);
+      toast.error(error.response?.data?.message || error.message || 'Failed to update profile');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -384,6 +417,7 @@ const CustomerDashboard = () => {
                           <th className="py-3 pr-4 font-semibold text-slate-700">Items</th>
                           <th className="py-3 pr-4 font-semibold text-slate-700">Amount</th>
                           <th className="py-3 pr-4 font-semibold text-slate-700">Status</th>
+                          <th className="py-3 pl-4 font-semibold text-slate-700"></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -397,6 +431,17 @@ const CustomerDashboard = () => {
                               <span className={`text-xs font-semibold px-3 py-1 rounded-full inline-block ${getStatusBadgeClass(order.status)}`}>
                                 {order.status}
                               </span>
+                            </td>
+                            <td className="py-3 pl-4 text-right">
+                              <button
+                                onClick={() => {
+                                  setOrderSearchQuery(order.orderNumber || order._id);
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg whitespace-nowrap"
+                              >
+                                View Details
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -421,30 +466,108 @@ const CustomerDashboard = () => {
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm max-w-3xl">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-2">First Name</label>
-                  <p className="text-lg font-semibold text-slate-900">{customer?.firstName}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-2">Last Name</label>
-                  <p className="text-lg font-semibold text-slate-900">{customer?.lastName}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-2">Email</label>
-                  <p className="text-lg font-semibold text-slate-900 break-all">{customer?.email}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-2">Phone</label>
-                  <p className="text-lg font-semibold text-slate-900">{customer?.phone}</p>
-                </div>
-              </div>
+              {isEditingProfile ? (
+                <form onSubmit={handleProfileUpdate}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">First Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={profileForm.firstName}
+                        onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
+                        className="w-full border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Last Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={profileForm.lastName}
+                        onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
+                        className="w-full border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Email</label>
+                      <input
+                        type="email"
+                        disabled
+                        value={customer?.email || ''}
+                        className="w-full border border-slate-200 bg-slate-50 text-slate-500 rounded-xl py-2 px-3 cursor-not-allowed"
+                      />
+                      <p className="text-xs text-slate-500 mt-1">Email cannot be changed</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Phone</label>
+                      <input
+                        type="tel"
+                        required
+                        value={profileForm.phone}
+                        onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                        className="w-full border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
 
-              <div className="mt-8 pt-6 border-t border-slate-200">
-                <button className="px-6 py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors">
-                  Edit Profile
-                </button>
-              </div>
+                  <div className="mt-8 pt-6 border-t border-slate-200 flex items-center gap-3">
+                    <button
+                      type="submit"
+                      disabled={isSavingProfile}
+                      className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {isSavingProfile && <Loader2 className="w-4 h-4 animate-spin" />}
+                      Save Changes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditingProfile(false);
+                        setProfileForm({
+                          firstName: customer?.firstName || '',
+                          lastName: customer?.lastName || '',
+                          phone: customer?.phone || '',
+                        });
+                      }}
+                      disabled={isSavingProfile}
+                      className="px-6 py-2.5 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-colors disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">First Name</label>
+                      <p className="text-lg font-semibold text-slate-900">{customer?.firstName}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Last Name</label>
+                      <p className="text-lg font-semibold text-slate-900">{customer?.lastName}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Email</label>
+                      <p className="text-lg font-semibold text-slate-900 break-all">{customer?.email}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-2">Phone</label>
+                      <p className="text-lg font-semibold text-slate-900">{customer?.phone}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-6 border-t border-slate-200">
+                    <button 
+                      onClick={() => setIsEditingProfile(true)}
+                      className="px-6 py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
+                    >
+                      Edit Profile
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
