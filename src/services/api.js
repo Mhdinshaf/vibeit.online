@@ -273,8 +273,9 @@ api.interceptors.request.use(
     const customerToken = localStorage.getItem('vibeit_customer_token');
     const adminToken = localStorage.getItem('vibeit_token');
     
-    // Use whichever token is available (customer > admin priority if both exist)
-    const token = customerToken || adminToken;
+    // Use the admin token explicitly for admin endpoints
+    const isAdminEndpoint = config.url?.includes('/admin') || config.url?.includes('/analytics');
+    const token = isAdminEndpoint ? adminToken : (customerToken || adminToken);
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
