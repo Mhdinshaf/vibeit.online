@@ -189,7 +189,11 @@ const ShopPage = () => {
 
   const sortedProducts = useMemo(() => {
     const products = Array.isArray(data?.products) ? [...data.products] : [];
-    const getPriceValue = (product) => Number(product?.price ?? 0);
+    const getPriceValue = (product) => {
+      if (product?.discountPrice) return Number(product.discountPrice);
+      if (product?.originalPrice) return Number(product.originalPrice);
+      return Number(product?.price ?? 0);
+    };
 
     if (sort === 'price-asc') {
       return products.sort((a, b) => getPriceValue(a) - getPriceValue(b));

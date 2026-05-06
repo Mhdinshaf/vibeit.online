@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Truck, Shield, Headphones, ArrowRight, ChevronLeft, ChevronRight, Gift, Zap, Award,
   ShoppingBag, Shirt, Watch, Home, Sparkles, ShoppingCart, Footprints, Package,
-  Heart, Star, Laptop, TrendingUp, Flame, Clock
+  Heart, Star, Laptop, TrendingUp, Flame, Clock, Briefcase, Droplets
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getProducts } from '../../services/api';
