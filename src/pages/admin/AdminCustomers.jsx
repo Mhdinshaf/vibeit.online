@@ -16,14 +16,32 @@ const TierBadge = ({ deliveredOrders, config }) => {
   );
 };
 
+const ORDERS_PER_PAGE = 5;
+
 const CustomerOrdersPanel = ({ customer }) => {
   const orders = customer.orders || [];
+  const [page, setPage] = useState(1);
+
   if (orders.length === 0) return <p className="text-sm text-slate-500">No orders found.</p>;
+
+  const totalPages = Math.ceil(orders.length / ORDERS_PER_PAGE);
+  const paged = orders.slice((page - 1) * ORDERS_PER_PAGE, page * ORDERS_PER_PAGE);
+
   return (
     <div className="space-y-2">
-      <p className="text-sm font-semibold text-slate-700 mb-3">Recent Orders ({orders.length})</p>
-      {orders.slice(0, 5).map(o => (
-        <div key={o._id} className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-semibold text-slate-700">
+          All Orders ({orders.length})
+        </p>
+        {totalPages > 1 && (
+          <p className="text-xs text-slate-400">
+            Page {page} of {totalPages}
+          </p>
+        )}
+      </div>
+
+      {paged.map(o => (
+        <div key={o._id || o.orderNumber} className="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm">
           <div>
             <p className="font-semibold text-slate-900">{o.orderNumber || o._id}</p>
             <p className="text-slate-500 text-xs">{new Date(o.createdAt).toLocaleDateString()}</p>
@@ -32,15 +50,51 @@ const CustomerOrdersPanel = ({ customer }) => {
             <p className="font-medium text-slate-900">රු{o.total?.toLocaleString()}</p>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               o.status === 'Delivered' ? 'bg-emerald-100 text-emerald-700' :
-              o.status === 'Pending' ? 'bg-slate-100 text-slate-700' :
+              o.status === 'Pending'   ? 'bg-slate-100 text-slate-700' :
               'bg-blue-100 text-blue-700'
             }`}>{o.status}</span>
           </div>
         </div>
       ))}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-2">
+          <p className="text-xs text-slate-500">
+            Showing {(page - 1) * ORDERS_PER_PAGE + 1}–{Math.min(page * ORDERS_PER_PAGE, orders.length)} of {orders.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage(p => Math.max(p - 1, 1))}
+              disabled={page === 1}
+              className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-white disabled:opacity-40 transition-colors"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => setPage(i + 1)}
+                className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
+                  page === i + 1 ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+              disabled={page === totalPages}
+              className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-white disabled:opacity-40 transition-colors"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
 
 const AdminCustomers = () => {
   const [customers, setCustomers] = useState([]);

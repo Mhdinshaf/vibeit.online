@@ -83,32 +83,13 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
   const [showNotes, setShowNotes] = useState(false);
   const [isOrderFinalizing, setIsOrderFinalizing] = useState(false);
-  const [promoInput, setPromoInput] = useState('');
-  const [appliedPromo, setAppliedPromo] = useState(null);
-  const [showPromoInput, setShowPromoInput] = useState(false);
 
-  // Load promo config + get delivered order count for validation
+  // Read promo applied in cart (from localStorage)
+  const appliedPromo = (() => {
+    try { return JSON.parse(localStorage.getItem('vibeit_cart_promo') || 'null'); } catch { return null; }
+  })();
   const promoConfig = getPromoConfig();
-  const customerOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
-  const customerEmail = customer?.email?.toLowerCase();
-  const deliveredOrderCount = customerOrders.filter(o =>
-    o.shippingAddress?.email?.toLowerCase() === customerEmail &&
-    ['Delivered', 'delivered'].includes(o.status)
-  ).length;
-
   const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
-
-  const setField = (key, value) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
-
-  // Helper to get image URL
-  const getImageUrl = (img) => {
-    if (!img) return '/placeholder.jpg';
-    if (typeof img === 'string') return img;
-    if (img.url) return img.url;
-    return '/placeholder.jpg';
-  };
 
   const baseShippingFee = subtotal >= 5000 ? 0 : 400;
   const shippingFee = freeDeliveryEnabled || appliedPromo?.discountType === 'freeDelivery' ? 0 : baseShippingFee;
@@ -117,15 +98,15 @@ const CheckoutPage = () => {
     : 0;
   const total = subtotal + shippingFee - discountAmount;
 
-  const applyPromoCode = () => {
-    if (!promoInput.trim()) return;
-    const promo = validatePromoCode(promoInput, deliveredOrderCount, promoConfig);
-    if (promo) {
-      setAppliedPromo(promo);
-      toast.success(`✅ ${promo.description} applied!`);
-    } else {
-      toast.error('Invalid or unearned promo code. Check your rewards in the dashboard.');
-    }
+  const setField = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const getImageUrl = (img) => {
+    if (!img) return '/placeholder.jpg';
+    if (typeof img === 'string') return img;
+    if (img.url) return img.url;
+    return '/placeholder.jpg';
   };
 
   const { mutate: placeOrder, isPending } = useMutation({
@@ -138,12 +119,10 @@ const CheckoutPage = () => {
       if (data.whatsappUrl) {
         window.open(data.whatsappUrl, '_blank');
       }
-      // Navigate to success page with order data
+      // Clear cart promo from localStorage after successful order
+      localStorage.removeItem('vibeit_cart_promo');
       navigate(`/order-success/${data._id}`, { state: { order: data } });
-      // Clear cart after navigation to avoid checkout empty-cart redirect race
-      setTimeout(() => {
-        clearCart();
-      }, 0);
+      setTimeout(() => { clearCart(); }, 0);
     },
     onError: (error) => {
       setIsOrderFinalizing(false);
@@ -476,44 +455,6 @@ const CheckoutPage = () => {
                 )}
               </div>
 
-              {/* Promo Code */}
-              <div className="bg-white rounded-md border border-slate-200 p-5 shadow-sm mb-6">
-                <button type="button" onClick={() => setShowPromoInput(p => !p)}
-                  className="flex items-center justify-between w-full text-sm font-semibold text-slate-700">
-                  <span>🎟️ Have a promo code?</span>
-                  <span className="text-slate-400 text-xs">{showPromoInput ? '▲' : '▼'}</span>
-                </button>
-                {showPromoInput && (
-                  <div className="mt-4">
-                    {appliedPromo ? (
-                      <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
-                        <div>
-                          <p className="text-sm font-semibold text-emerald-800">✅ {appliedPromo.promoCode} applied</p>
-                          <p className="text-xs text-emerald-600">{appliedPromo.description}</p>
-                        </div>
-                        <button type="button" onClick={() => { setAppliedPromo(null); setPromoInput(''); }}
-                          className="text-xs text-red-500 hover:text-red-700 font-medium">Remove</button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <input type="text" value={promoInput} onChange={e => setPromoInput(e.target.value.toUpperCase())}
-                          placeholder="Enter promo code (e.g. VIBE10)"
-                          className="flex-1 px-3 py-2.5 border border-slate-300 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                          onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), applyPromoCode())}
-                        />
-                        <button type="button" onClick={applyPromoCode}
-                          className="px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-md hover:bg-slate-700 transition-colors">
-                          Apply
-                        </button>
-                      </div>
-                    )}
-                    {freeDeliveryEnabled && !appliedPromo && (
-                      <p className="text-xs text-emerald-600 mt-2">🎉 Free delivery is currently active for all orders!</p>
-                    )}
-                  </div>
-                )}
-              </div>
-
               <div className="bg-slate-100 rounded-xl p-4 border border-slate-200">
                 <div className="flex items-start gap-3">
                   <Shield className="w-5 h-5 text-slate-700 flex-shrink-0 mt-0.5" />
@@ -546,9 +487,19 @@ const CheckoutPage = () => {
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-5">
               <div className="lg:sticky lg:top-8 bg-slate-50 rounded-md border border-slate-200 shadow-sm overflow-hidden p-6">
-                <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider mb-6 border-b border-slate-200 pb-4">
+                <h2 className="text-lg font-bold text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-200 pb-4">
                   Order Summary
                 </h2>
+
+                {appliedPromo && (
+                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5 mb-4">
+                    <span className="text-emerald-600 text-lg">🎟️</span>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-emerald-800">{appliedPromo.promoCode} applied</p>
+                      <p className="text-xs text-emerald-600">{appliedPromo.description}</p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-4 mb-6">
                   {items.map((item) => (

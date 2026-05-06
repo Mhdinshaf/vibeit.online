@@ -1,13 +1,21 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Trash2, Lock, Minus, Plus, ArrowRight, Gift, ShoppingBag, Truck } from 'lucide-react';
+import { ShoppingCart, Trash2, Lock, Minus, Plus, ArrowRight, Gift, ShoppingBag, Truck, CheckCircle, X } from 'lucide-react';
 import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
+import { useState } from 'react';
+import { getPromoConfig, validatePromoCode } from '../../utils/promotions';
 import toast from 'react-hot-toast';
+
+const PROMO_STORAGE_KEY = 'vibeit_cart_promo';
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useCustomerAuth();
+  const { isAuthenticated, customer } = useCustomerAuth();
   const { items, removeItem, updateQuantity, clearCart } = useCartStore();
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY) || 'null'); } catch { return null; }
+  });
   
   // Calculate values locally
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
@@ -42,8 +50,44 @@ const CartPage = () => {
     return '/placeholder.jpg';
   };
 
-  const shippingCost = subtotal >= 5000 ? 0 : 400;
-  const total = subtotal + shippingCost;
+  const promoConfig = getPromoConfig();
+  const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
+
+  // Count delivered orders for this customer (for promo validation)
+  const customerEmail = customer?.email?.toLowerCase();
+  const localOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
+  const deliveredOrderCount = localOrders.filter(o =>
+    o.shippingAddress?.email?.toLowerCase() === customerEmail &&
+    ['Delivered', 'delivered'].includes(o.status)
+  ).length;
+
+  const applyPromoCode = () => {
+    const code = promoInput.trim();
+    if (!code) return;
+    const promo = validatePromoCode(code, deliveredOrderCount, promoConfig);
+    if (promo) {
+      setAppliedPromo(promo);
+      localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(promo));
+      setPromoInput('');
+      toast.success(`✅ ${promo.description} applied!`);
+    } else {
+      toast.error('Invalid or unearned promo code. Check your Rewards in the dashboard.');
+    }
+  };
+
+  const removePromo = () => {
+    setAppliedPromo(null);
+    setPromoInput('');
+    localStorage.removeItem(PROMO_STORAGE_KEY);
+    toast.success('Promo code removed');
+  };
+
+  const baseShippingCost = subtotal >= 5000 ? 0 : 400;
+  const shippingCost = freeDeliveryEnabled || appliedPromo?.discountType === 'freeDelivery' ? 0 : baseShippingCost;
+  const discountAmount = appliedPromo?.discountType === 'percent'
+    ? Math.round((subtotal * appliedPromo.discountValue) / 100)
+    : 0;
+  const total = subtotal + shippingCost - discountAmount;
   const freeShippingRemaining = subtotal >= 5000 ? 0 : 5000 - subtotal;
 
   const handleProceedToCheckout = () => {
@@ -51,12 +95,7 @@ const CartPage = () => {
       navigate('/checkout');
       return;
     }
-
-    const cartSnapshot = {
-      items,
-      savedAt: new Date().toISOString(),
-      redirectTo: '/checkout',
-    };
+    const cartSnapshot = { items, savedAt: new Date().toISOString(), redirectTo: '/checkout' };
     localStorage.setItem('vibeit-cart-checkout-snapshot', JSON.stringify(cartSnapshot));
     toast.error('Please login to complete your purchase.');
     navigate('/login', { state: { from: { pathname: '/checkout' } } });
@@ -240,12 +279,10 @@ const CartPage = () => {
                     <span>{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>
                   </div>
 
-                  <div className="space-y-3 mb-6">
+                  <div className="space-y-3 mb-5">
                     <div className="flex items-center justify-between">
                       <span className="text-slate-600 text-sm">Subtotal</span>
-                      <span className="font-semibold text-slate-900">
-                        Rs {subtotal.toLocaleString()}
-                      </span>
+                      <span className="font-semibold text-slate-900">Rs {subtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-600 text-sm">Shipping</span>
@@ -260,33 +297,59 @@ const CartPage = () => {
                         )}
                       </span>
                     </div>
+                    {discountAmount > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-emerald-600 text-sm">Discount ({appliedPromo?.promoCode})</span>
+                        <span className="font-semibold text-emerald-600">-Rs {discountAmount.toLocaleString()}</span>
+                      </div>
+                    )}
                     <div className="border-t border-slate-100 pt-4 mt-2">
                       <div className="flex items-center justify-between">
                         <span className="text-base font-bold text-slate-900">Total</span>
-                        <span className="text-2xl font-bold text-slate-900">
-                          Rs {total.toLocaleString()}
-                        </span>
+                        <span className="text-2xl font-bold text-slate-900">Rs {total.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mb-6">
+                  {/* Promo Code */}
+                  <div className="mb-5">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Promo Code
+                      🎟️ Promo Code
                     </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Enter code"
-                        className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900"
-                      />
-                      <button
-                        onClick={() => toast('Promo codes coming soon!', { icon: '🎁' })}
-                        className="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-sm rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider"
-                      >
-                        Apply
-                      </button>
-                    </div>
+                    {appliedPromo ? (
+                      <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-semibold text-emerald-800">{appliedPromo.promoCode}</p>
+                            <p className="text-xs text-emerald-600">{appliedPromo.description}</p>
+                          </div>
+                        </div>
+                        <button onClick={removePromo} className="p-1 text-slate-400 hover:text-red-500 transition-colors">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={promoInput}
+                          onChange={e => setPromoInput(e.target.value.toUpperCase())}
+                          placeholder="Enter code (e.g. VIBE10)"
+                          onKeyDown={e => e.key === 'Enter' && applyPromoCode()}
+                          className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900"
+                        />
+                        <button
+                          onClick={applyPromoCode}
+                          className="px-4 py-2 bg-slate-900 text-white font-bold text-sm rounded-md hover:bg-slate-700 transition-colors uppercase tracking-wider"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    )}
+                    {freeDeliveryEnabled && (
+                      <p className="text-xs text-emerald-600 mt-1.5">🎉 Free delivery is active on all orders!</p>
+                    )}
                   </div>
 
                   <button
