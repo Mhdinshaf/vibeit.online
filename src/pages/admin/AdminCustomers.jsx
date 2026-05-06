@@ -45,7 +45,7 @@ const CustomerOrdersPanel = ({ customerId, isApiConnected }) => {
       setError(null);
       try {
         if (isApiConnected) {
-          const res = await fetch(`${API_BASE}/admin/customers/${customerId}/orders`, {
+          const res = await fetch(`${API_BASE}/admin/customers/${encodeURIComponent(customerId)}/orders`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('vibeit_token')}` },
           });
           if (!res.ok) throw new Error(`Server returned ${res.status}`);
@@ -352,7 +352,12 @@ const AdminCustomers = () => {
                             </div>
                           ) : (
                             <div>
-                              <p className="font-semibold text-slate-900">{c.firstName} {c.lastName}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-semibold text-slate-900">{c.firstName} {c.lastName}</p>
+                                {c.isRegistered === false && (
+                                  <span className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-medium">Guest</span>
+                                )}
+                              </div>
                               <p className="text-slate-500 text-xs">{c.email}</p>
                             </div>
                           )}
