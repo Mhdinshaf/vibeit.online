@@ -3,7 +3,7 @@ import { Search, ChevronLeft, ChevronRight, Eye, Edit2, X, Check, Loader2, Alert
 import toast from 'react-hot-toast';
 import { getPromoConfig, getHighestEarnedTier, getTierBadgeColor, deriveCustomersFromOrders, PROMO_CONFIG_EVENT } from '../../utils/promotions';
 
-const CUSTOMERS_PER_PAGE = 10;
+const CUSTOMERS_PER_PAGE = 15;
 const ORDERS_PER_PAGE = 5;
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -429,42 +429,57 @@ const AdminCustomers = () => {
               </table>
             </div>
 
-            {/* Customer-level pagination */}
-            {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-slate-200 gap-4">
-                <p className="text-sm text-slate-600">
-                  Showing{' '}
-                  <span className="font-medium">{(currentPage - 1) * CUSTOMERS_PER_PAGE + 1}</span>–
-                  <span className="font-medium">{Math.min(currentPage * CUSTOMERS_PER_PAGE, totalCustomers)}</span>
-                  {' '}of <span className="font-medium">{totalCustomers}</span>
-                </p>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}
-                    className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50">
+            {/* Customer-level pagination — always visible */}
+            <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-slate-200 gap-4">
+              <p className="text-sm text-slate-500">
+                Showing{' '}
+                <span className="font-semibold text-slate-700">
+                  {totalCustomers === 0 ? 0 : (currentPage - 1) * CUSTOMERS_PER_PAGE + 1}
+                </span>
+                {' '}–{' '}
+                <span className="font-semibold text-slate-700">
+                  {Math.min(currentPage * CUSTOMERS_PER_PAGE, totalCustomers)}
+                </span>
+                {' '}of{' '}
+                <span className="font-semibold text-slate-700">{totalCustomers}</span>
+                {' '}customers
+              </p>
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-slate-200 disabled:opacity-30 hover:bg-slate-50 transition-colors">
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   {[...Array(totalPages)].map((_, i) => {
                     const pg = i + 1;
-                    if (totalPages <= 5 || pg === 1 || pg === totalPages || Math.abs(pg - currentPage) <= 1) {
+                    if (totalPages <= 7 || pg === 1 || pg === totalPages || Math.abs(pg - currentPage) <= 1) {
                       return (
                         <button key={pg} onClick={() => setCurrentPage(pg)}
-                          className={`w-9 h-9 rounded-lg text-sm font-medium ${
-                            pg === currentPage ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'
+                          className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                            pg === currentPage
+                              ? 'bg-slate-900 text-white shadow-sm'
+                              : 'text-slate-600 hover:bg-slate-100 border border-slate-200'
                           }`}>
                           {pg}
                         </button>
                       );
                     }
-                    if (Math.abs(pg - currentPage) === 2) return <span key={pg} className="text-slate-400">…</span>;
+                    if (Math.abs(pg - currentPage) === 2) {
+                      return <span key={pg} className="text-slate-400 px-1">…</span>;
+                    }
                     return null;
                   })}
-                  <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-slate-200 disabled:opacity-30 hover:bg-slate-50 transition-colors">
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </>
         )}
       </div>
