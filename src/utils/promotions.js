@@ -38,13 +38,20 @@ export const getNextMilestone = (deliveredOrderCount, config) => {
   return sorted.find(t => deliveredOrderCount < t.minOrders) || null;
 };
 
-export const validatePromoCode = (code, deliveredOrderCount, config) => {
+export const validatePromoCode = (code, deliveredOrderCount, config, usedPromoCodes = []) => {
   if (!code) return null;
   const cfg = config || getPromoConfig();
   const normalizedCode = code.trim().toUpperCase();
   const tier = (cfg.promoTiers || []).find(t => t.promoCode.toUpperCase() === normalizedCode);
   if (!tier) return null;
   if (deliveredOrderCount < tier.minOrders) return null;
+
+  // Check if already used
+  const isUsed = usedPromoCodes.some(c => String(c || '').toUpperCase() === normalizedCode);
+  if (isUsed) {
+    return { ...tier, alreadyUsed: true };
+  }
+
   return tier;
 };
 

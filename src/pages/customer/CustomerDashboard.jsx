@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { getCustomerOrders, getProductById } from '../../services/api';
 import { getPromoConfig, getEarnedPromos, getNextMilestone, PROMO_CONFIG_EVENT } from '../../utils/promotions';
 
-const RewardsCard = ({ deliveredOrderCount, promoConfig }) => {
+const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [] }) => {
   const [copied, setCopied] = useState(null);
   const promos = getEarnedPromos(deliveredOrderCount, promoConfig);
   const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig);
@@ -17,6 +17,13 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig }) => {
   const progressPct = nextMilestone
     ? Math.min(100, ((deliveredOrderCount - progressFrom) / (progressTo - progressFrom)) * 100)
     : 100;
+
+  // Build a set of promo codes this customer has already used in non-cancelled orders
+  const usedPromoCodes = new Set(
+    orders
+      .filter(o => o.promoCode && !['Cancelled', 'cancelled'].includes(o.status || ''))
+      .map(o => (o.promoCode || '').toUpperCase())
+  );
 
   const copyCode = (code) => {
     navigator.clipboard.writeText(code);
@@ -64,33 +71,54 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig }) => {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {promos.map(promo => (
-          <div key={promo.id}
-            className={`rounded-xl border p-4 transition-all ${promo.earned
-              ? 'border-blue-200 bg-blue-50'
-              : 'border-slate-200 bg-slate-50 opacity-60'}`}>
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className={`text-sm font-semibold ${promo.earned ? 'text-slate-900' : 'text-slate-500'}`}>
-                  {promo.label}
-                </p>
-                <p className="text-xs text-slate-500 mt-0.5">{promo.description}</p>
-                <p className="text-xs text-slate-400 mt-1">{promo.minOrders}+ delivered orders</p>
-              </div>
-              {promo.earned ? (
-                <button onClick={() => copyCode(promo.promoCode)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
-                  {copied === promo.promoCode ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copied === promo.promoCode ? 'Copied!' : promo.promoCode}
-                </button>
-              ) : (
-                <div className="flex items-center gap-1 text-slate-400">
-                  <Lock className="w-4 h-4" />
+        {promos.map(promo => {
+          const isUsed = usedPromoCodes.has(promo.promoCode.toUpperCase());
+          return (
+            <div key={promo.id}
+              className={`rounded-xl border p-4 transition-all ${
+                !promo.earned
+                  ? 'border-slate-200 bg-slate-50 opacity-60'
+                  : isUsed
+                    ? 'border-slate-200 bg-slate-50'
+                    : 'border-blue-200 bg-blue-50'
+              }`}>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className={`text-sm font-semibold ${promo.earned ? 'text-slate-900' : 'text-slate-500'}`}>
+                      {promo.label}
+                    </p>
+                    {promo.earned && isUsed && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-500 uppercase tracking-wide">
+                        Used
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">{promo.description}</p>
+                  <p className="text-xs text-slate-400 mt-1">{promo.minOrders}+ delivered orders</p>
                 </div>
-              )}
+                {promo.earned ? (
+                  isUsed ? (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 text-slate-500 text-xs font-semibold rounded-lg cursor-not-allowed whitespace-nowrap">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      Used ✓
+                    </div>
+                  ) : (
+                    <button onClick={() => copyCode(promo.promoCode)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+                      {copied === promo.promoCode ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copied === promo.promoCode ? 'Copied!' : promo.promoCode}
+                    </button>
+                  )
+                ) : (
+                  <div className="flex items-center gap-1 text-slate-400">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -436,7 +464,7 @@ const CustomerDashboard = () => {
                 </div>
 
                 {/* Rewards Card */}
-                <RewardsCard deliveredOrderCount={deliveredOrderCount} promoConfig={promoConfig} />
+                <RewardsCard deliveredOrderCount={deliveredOrderCount} promoConfig={promoConfig} orders={orders} />
               </>
             )}
           </div>

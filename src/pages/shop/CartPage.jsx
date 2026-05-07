@@ -64,8 +64,23 @@ const CartPage = () => {
   const applyPromoCode = () => {
     const code = promoInput.trim();
     if (!code) return;
-    const promo = validatePromoCode(code, deliveredOrderCount, promoConfig);
+
+    // Get codes already used in previous orders
+    const usedPromoCodes = localOrders
+      .filter(o => 
+        o.shippingAddress?.email?.toLowerCase() === customerEmail && 
+        o.promoCode && 
+        !['Cancelled', 'cancelled'].includes(o.status)
+      )
+      .map(o => o.promoCode);
+
+    const promo = validatePromoCode(code, deliveredOrderCount, promoConfig, usedPromoCodes);
+    
     if (promo) {
+      if (promo.alreadyUsed) {
+        toast.error(`The code ${promo.promoCode} has already been used by you. Each reward is single-use only.`);
+        return;
+      }
       setAppliedPromo(promo);
       localStorage.setItem(PROMO_STORAGE_KEY, JSON.stringify(promo));
       setPromoInput('');

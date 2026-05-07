@@ -837,4 +837,20 @@ export const getDashboardStats = async () => {
   }
 };
 
+// Admin Customers APIs
+export const getAdminCustomers = async (params = {}) => {
+  const response = await api.get('/admin/customers', { params });
+  return response.data;
+};
+
+export const getAdminCustomerOrders = async (id) => {
+  const response = await api.get(`/admin/customers/${encodeURIComponent(id)}/orders`);
+  return response.data;
+};
+
+export const updateAdminCustomer = async (id, data) => {
+  const response = await api.put(`/admin/customers/${id}`, data);
+  return response.data;
+};
+
 export default api;

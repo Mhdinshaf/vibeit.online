@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Trash2, Edit2, Check, X, Truck, Gift, Trophy, ChevronDown, Loader2, ToggleLeft, ToggleRight, Users } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Truck, Gift, Trophy, Loader2, ToggleLeft, ToggleRight, Users, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   getPromoConfig, savePromoConfig, getEarnedPromos,
   getTierBadgeColor, getHighestEarnedTier, deriveCustomersFromOrders, PROMO_CONFIG_EVENT,
 } from '../../utils/promotions';
+import { getAdminCustomers, getAdminCustomerOrders } from '../../services/api';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -74,6 +75,142 @@ const MilestoneView = ({ tiers, selectedMonth, selectedYear }) => {
           })}
         </tbody>
       </table>
+    </div>
+  );
+};
+
+// ── Promo Code Tracker (live from backend) ─────────────────────────────────
+const PromoTracker = ({ config }) => {
+  const [rows, setRows] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Fetch all customers (max 200)
+      const res = await getAdminCustomers({ limit: 200, page: 1 });
+      const customers = res.customers || [];
+
+      // For each customer that has earned at least the lowest tier, fetch their orders
+      const lowestMin = Math.min(...(config.promoTiers || []).map(t => t.minOrders), Infinity);
+
+      const results = await Promise.all(
+        customers.map(async (c) => {
+          const highestTier = getHighestEarnedTier(c.totalOrders, config);
+          if (!highestTier) return null;
+
+          // Fetch their order list to check promo usage
+          let usedPromos = new Set();
+          try {
+            const orderRes = await getAdminCustomerOrders(c._id);
+            (orderRes.orders || []).forEach(o => {
+              if (o.promoCode && !['Cancelled'].includes(o.status || '')) {
+                usedPromos.add(o.promoCode.toUpperCase());
+              }
+            });
+          } catch { /* ignore per-customer fetch errors */ }
+
+          return {
+            ...c,
+            highestTier,
+            isUsed: usedPromos.has(highestTier.promoCode.toUpperCase()),
+          };
+        })
+      );
+
+      setRows(results.filter(Boolean));
+    } catch (e) {
+      setError('Failed to load promo tracker data.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [config]);
+
+  useEffect(() => { load(); }, [load]);
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+        <div className="flex items-center gap-3">
+          <CheckCircle className="w-5 h-5 text-emerald-600" />
+          <h2 className="text-lg font-semibold text-slate-900">Promo Code Tracker</h2>
+          <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Live from orders</span>
+        </div>
+        <button onClick={load} disabled={isLoading}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50">
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
+
+      {error && (
+        <div className="flex items-center gap-2 m-6 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />{error}
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+        </div>
+      )}
+
+      {!isLoading && !error && rows.length === 0 && (
+        <div className="text-center py-12 text-slate-500">
+          <Users className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+          <p className="font-medium">No customers have earned promo codes yet.</p>
+        </div>
+      )}
+
+      {!isLoading && rows.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th className="text-left py-3 px-6 font-semibold text-slate-700">Customer</th>
+                <th className="text-left py-3 px-6 font-semibold text-slate-700">Total Orders</th>
+                <th className="text-left py-3 px-6 font-semibold text-slate-700">Tier Earned</th>
+                <th className="text-left py-3 px-6 font-semibold text-slate-700">Promo Code</th>
+                <th className="text-left py-3 px-6 font-semibold text-slate-700">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r._id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50">
+                  <td className="py-3 px-6">
+                    <p className="font-semibold text-slate-900">{r.firstName} {r.lastName}</p>
+                    <p className="text-xs text-slate-500">{r.email}</p>
+                  </td>
+                  <td className="py-3 px-6 font-medium text-slate-900">{r.totalOrders}</td>
+                  <td className="py-3 px-6">
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getTierBadgeColor(r.highestTier.id)}`}>
+                      {r.highestTier.label}
+                    </span>
+                  </td>
+                  <td className="py-3 px-6">
+                    <code className="bg-slate-900 text-white px-2.5 py-1 rounded font-mono text-xs font-bold">
+                      {r.highestTier.promoCode}
+                    </code>
+                  </td>
+                  <td className="py-3 px-6">
+                    {r.isUsed ? (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500">
+                        <CheckCircle className="w-3.5 h-3.5" /> Used
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Available
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
@@ -267,6 +404,9 @@ const AdminPromotions = () => {
           <MilestoneView tiers={config.promoTiers} selectedMonth={selectedMonth} selectedYear={selectedYear} />
         </div>
       </div>
+
+      {/* Promo Code Tracker */}
+      <PromoTracker config={config} />
     </div>
   );
 };

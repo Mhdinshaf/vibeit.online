@@ -84,11 +84,43 @@ const CheckoutPage = () => {
   const [isOrderFinalizing, setIsOrderFinalizing] = useState(false);
 
   // Read promo applied in cart (from localStorage)
-  const appliedPromo = (() => {
+  const [appliedPromo, setAppliedPromo] = useState(() => {
     try { return JSON.parse(localStorage.getItem('vibeit_cart_promo') || 'null'); } catch { return null; }
-  })();
+  });
+
   const promoConfig = getPromoConfig();
   const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
+
+  // Re-validate promo on load to ensure it hasn't been used since applied to cart
+  useEffect(() => {
+    if (appliedPromo && customer) {
+      const email = customer.email?.toLowerCase();
+      const localOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
+      const usedPromoCodes = localOrders
+        .filter(o => 
+          o.shippingAddress?.email?.toLowerCase() === email && 
+          o.promoCode && 
+          !['Cancelled', 'cancelled'].includes(o.status)
+        )
+        .map(o => o.promoCode);
+
+      // deliveredOrderCount for this customer
+      const deliveredCount = localOrders.filter(o =>
+        o.shippingAddress?.email?.toLowerCase() === email &&
+        ['Delivered', 'delivered'].includes(o.status)
+      ).length;
+
+      const promo = validatePromoCode(appliedPromo.promoCode, deliveredCount, promoConfig, usedPromoCodes);
+      if (!promo || promo.alreadyUsed) {
+        localStorage.removeItem('vibeit_cart_promo');
+        setAppliedPromo(null);
+        toast.error(promo?.alreadyUsed 
+          ? `The promo code ${appliedPromo.promoCode} has already been used and has been removed.`
+          : 'Your promo code is no longer valid and has been removed.'
+        );
+      }
+    }
+  }, [appliedPromo, customer, promoConfig]);
 
   const baseShippingFee = subtotal >= 5000 ? 0 : 400;
   const shippingFee = freeDeliveryEnabled || appliedPromo?.discountType === 'freeDelivery' ? 0 : baseShippingFee;
@@ -169,6 +201,7 @@ const CheckoutPage = () => {
 
     // Prepare order data
     const orderData = {
+      customerId: customer?._id || null,
       items: normalizedOrderItems,
       orderItems: normalizedOrderItems,
       shippingAddress: {
