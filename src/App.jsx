@@ -23,6 +23,8 @@ import ContactPage from './pages/shop/ContactPage';
 import AdminLogin from './pages/admin/AdminLogin';
 import CustomerLogin from './pages/auth/CustomerLogin';
 import CustomerRegister from './pages/auth/CustomerRegister';
+import CustomerForgotPassword from './pages/auth/CustomerForgotPassword';
+import CustomerResetPassword from './pages/auth/CustomerResetPassword';
 import GoogleAuthCallback from './pages/auth/GoogleAuthCallback';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
 
@@ -64,6 +66,8 @@ export default function App() {
         <Route path="/login" element={<CustomerLogin />} />
         <Route path="/auth/customer/login" element={<CustomerLogin />} />
         <Route path="/auth/customer/register" element={<CustomerRegister />} />
+        <Route path="/auth/customer/forgot-password" element={<CustomerForgotPassword />} />
+        <Route path="/auth/customer/reset-password/:token" element={<CustomerResetPassword />} />
         <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
 
         {/* Protected Customer Routes */}
