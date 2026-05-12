@@ -2,9 +2,26 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Truck, Shield, Headphones, ArrowRight, ChevronLeft, ChevronRight, Gift, Zap, Award,
-  ShoppingBag, Shirt, Watch, Home, Sparkles, ShoppingCart, Footprints, Package,
-  Heart, Star, Laptop, TrendingUp, Flame, Clock, Briefcase, Droplets
+  Truck,
+  Shield,
+  Headphones,
+  ArrowRight,
+  Gift,
+  Zap,
+  Award,
+  ShoppingBag,
+  Shirt,
+  Watch,
+  Home,
+  Sparkles,
+  ShoppingCart,
+  Package,
+  Star,
+  Laptop,
+  Flame,
+  Clock,
+  Briefcase,
+  Droplets
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getProducts } from '../../services/api';
@@ -85,16 +102,8 @@ const HomePage = () => {
     setCurrentSlide(index);
   };
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
-  };
-
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden bg-white">
       <Helmet>
         <title>VIBEIT - Shop Fashion, Tech & Home Online in Sri Lanka | Free Delivery</title>
         <meta name="description" content="Shop online at VIBEIT Sri Lanka. Premium fashion, tech gadgets, home essentials & more. Cash on delivery available across Sri Lanka. Free gifts on orders above රු5000!" />
@@ -129,52 +138,102 @@ const HomePage = () => {
         </script>
       </Helmet>
 
-      {/* Hero Section with Carousel */}
-      <section className="relative overflow-hidden bg-white py-6 sm:py-8 lg:py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            
-            {/* Main Carousel - spans 3 columns on large screens */}
-            <div className="lg:col-span-3 relative rounded-md overflow-hidden shadow-sm border border-slate-200 bg-white">
-              <div className="relative aspect-[21/9] sm:aspect-[21/9] lg:h-[400px] overflow-hidden">
-                {heroImages.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image.url}
-                    alt={image.alt}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                      index === currentSlide ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  />
-                ))}
-
-                {/* Carousel Controls */}
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-slate-800 p-2 rounded-full transition-all backdrop-blur-sm shadow-sm"
-                  aria-label="Previous slide"
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white">
+        <div className="absolute -top-24 right-[-10%] h-64 w-64 rounded-full bg-blue-200/40 blur-3xl" aria-hidden="true" />
+        <div className="absolute bottom-0 left-[-10%] h-72 w-72 rounded-full bg-slate-200/60 blur-3xl" aria-hidden="true" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div className="space-y-6">
+              <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 text-blue-700 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em]">
+                <Sparkles className="w-4 h-4" />
+                Premium Marketplace
+              </span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900">
+                Discover modern shopping made effortless in Sri Lanka.
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed">
+                Curated fashion, tech, and home essentials with reliable delivery, secure payments, and real-time support. Shop with confidence and style.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  to="/shop"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-sm font-bold uppercase tracking-wider shadow-sm transition-all"
                 >
-                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-slate-800 p-2 rounded-full transition-all backdrop-blur-sm shadow-sm"
-                  aria-label="Next slide"
+                  Start Shopping
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/shop?category=Trending%20Items"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white hover:border-blue-500 text-slate-700 px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all"
                 >
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
+                  View Hot Deals
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { icon: Truck, label: '48h delivery', sub: 'Island-wide' },
+                  { icon: Shield, label: 'Secure checkout', sub: 'COD + cards' },
+                  { icon: Headphones, label: '24/7 support', sub: 'Live help' },
+                ].map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <div key={item.label} className="rounded-xl border border-slate-200 bg-white/80 px-4 py-3 flex items-center gap-3 shadow-sm">
+                      <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                        <IconComponent className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">{item.label}</p>
+                        <p className="text-xs text-slate-500 font-semibold">{item.sub}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex flex-wrap items-center gap-4 text-sm font-semibold text-slate-600">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-amber-500" />
+                  4.9/5 customer ratings
+                </div>
+                <div className="flex items-center gap-2">
+                  <Package className="w-4 h-4 text-blue-600" />
+                  10K+ verified deliveries
+                </div>
+              </div>
+            </div>
 
-                {/* Slide Indicators */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            <div className="relative">
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-lg bg-white">
+                <div className="relative aspect-[16/10] sm:aspect-[21/9] lg:h-[420px] overflow-hidden">
+                  {heroImages.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image.url}
+                      alt={image.alt}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                        index === currentSlide ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  ))}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent" />
+                  <div className="absolute top-4 left-4 hidden sm:flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-slate-700 shadow-md backdrop-blur">
+                    <ShoppingCart className="w-4 h-4 text-blue-600" />
+                    24-hour dispatch
+                  </div>
+                  <div className="absolute bottom-4 right-4 hidden sm:flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-slate-700 shadow-md backdrop-blur">
+                    <ShoppingBag className="w-4 h-4 text-blue-600" />
+                    Premium quality picks
+                  </div>
+                </div>
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                   {heroImages.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => goToSlide(index)}
-                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                      className={`h-2.5 rounded-full transition-all duration-300 ${
                         index === currentSlide
-                          ? 'bg-blue-600 w-8 shadow-sm'
-                          : 'bg-white/70 hover:bg-white'
+                          ? 'bg-white w-10 shadow-sm'
+                          : 'bg-white/60 hover:bg-white w-2.5'
                       }`}
                       aria-label={`Go to slide ${index + 1}`}
                     />
@@ -182,45 +241,28 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-
-            {/* Side Promo Banners - 1 column on large screens */}
-            <div className="hidden lg:flex flex-col gap-4">
-              <Link to="/shop?category=Trending%20Items&subcategory=New%20Arrivals" className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-md p-6 flex flex-col justify-center border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">Featured</span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">New Arrivals</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Discover the latest premium tech.</p>
-              </Link>
-              
-              <Link to="/shop?category=Trending%20Items" className="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-md p-6 flex flex-col justify-center border border-blue-200 dark:border-blue-800/50 hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">Hot Right Now</span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Trending Collection</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Explore the most popular items.</p>
-              </Link>
-            </div>
-
           </div>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section className="py-4 sm:py-6 lg:py-8 border-b border-slate-200">
+      <section className="py-6 sm:py-8 lg:py-10 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Explore Popular Categories" subtitle="Shop by Category" linkTo="/shop" />
 
-          {/* Horizontal Scroll Categories */}
-          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-3 scrollbar-hide sm:justify-center">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
             {categories.map((category) => {
               const IconComponent = category.icon;
               return (
                 <Link
                   key={category.name}
                   to={`/shop?category=${encodeURIComponent(category.name)}`}
-                  className={`flex flex-col items-center gap-2 flex-shrink-0 transition-all duration-300 group`}
+                  className="group flex flex-col items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-4 hover:border-blue-500 hover:shadow-md transition-all"
                 >
-                  <div className={`w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700/50 transition-all duration-300 ${category.color} group-hover:border-blue-500 dark:group-hover:border-blue-400 group-hover:shadow-md`}>
+                  <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center border border-slate-200 transition-all duration-300 ${category.color} group-hover:border-blue-500 group-hover:shadow-sm`}>
                     <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 group-hover:scale-110 transition-transform duration-300" />
                   </div>
-                  <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 text-center whitespace-nowrap group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <p className="text-xs sm:text-sm font-bold text-slate-700 text-center group-hover:text-blue-600 transition-colors">
                     {category.name}
                   </p>
                 </Link>
@@ -231,24 +273,24 @@ const HomePage = () => {
       </section>
 
       {/* Today's Best Deals Section */}
-      <section className="py-6 sm:py-8 lg:py-10">
+      <section className="py-8 sm:py-10 lg:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-4 h-4 text-orange-500" />
             <SectionHeader title="Today's Best Deals For You!" subtitle="Limited Time" linkTo="/shop" />
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {isLoading ? (
               [...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-100 border border-slate-200 rounded-md animate-pulse"
+                  className="bg-slate-100 border border-slate-200 rounded-xl animate-pulse"
                   style={{ aspectRatio: '3/4' }}
                 />
               ))
             ) : isError ? (
-              <div className="col-span-full text-center py-8 border border-slate-200 rounded-md bg-slate-50">
+              <div className="col-span-full text-center py-8 border border-slate-200 rounded-xl bg-slate-50">
                 <Shield className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                 <p className="text-slate-600 text-sm font-bold">Unable to load deals</p>
               </div>
@@ -266,28 +308,29 @@ const HomePage = () => {
       </section>
 
       {/* Promotional Banners Section */}
-      <section className="py-6 sm:py-8 lg:py-10">
+      <section className="py-8 sm:py-10 lg:py-12 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-3 uppercase tracking-wider">Special Collections</h3>
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4 uppercase tracking-wider">Special Collections</h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {promotionalBanners.map((banner, idx) => {
               const IconComponent = banner.icon;
               return (
                 <Link
                   key={idx}
                   to={`/shop`}
-                  className={`${banner.bgGradient} rounded-md h-40 sm:h-48 flex items-end p-4 sm:p-6 group overflow-hidden relative shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200`}
+                  className={`${banner.bgGradient} rounded-2xl h-44 sm:h-52 flex items-end p-5 sm:p-6 group overflow-hidden relative shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200`}
                 >
-                  <div className={`absolute top-0 right-0 opacity-10 group-hover:opacity-20 transition-opacity ${banner.textColor}`}>
-                    <IconComponent className="w-20 h-20 sm:w-24 sm:h-24" />
+                  <div className={`absolute -top-6 -right-6 opacity-15 group-hover:opacity-25 transition-opacity ${banner.textColor}`}>
+                    <IconComponent className="w-24 h-24 sm:w-28 sm:h-28" />
                   </div>
                   <div className="relative z-10">
                     <h4 className={`text-sm sm:text-base font-bold mb-1 ${banner.textColor}`}>{banner.title}</h4>
-                    <p className={`text-xs sm:text-sm font-medium mb-3 ${banner.textColor === 'text-white' ? 'text-slate-200' : 'text-slate-600'}`}>{banner.description}</p>
-                    <button className={`text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-md ${banner.textColor === 'text-white' ? 'bg-white text-slate-900 hover:bg-slate-100' : 'bg-blue-600 text-white hover:bg-blue-700'} transition-colors`}>
+                    <p className={`text-xs sm:text-sm font-medium mb-4 ${banner.textColor === 'text-white' ? 'text-slate-200' : 'text-slate-600'}`}>{banner.description}</p>
+                    <span className={`inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full ${banner.textColor === 'text-white' ? 'bg-white text-slate-900' : 'bg-blue-600 text-white'} transition-colors`}>
                       Shop now
-                    </button>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
                   </div>
                 </Link>
               );
@@ -297,7 +340,7 @@ const HomePage = () => {
       </section>
 
       {/* Official Brand Stores Section */}
-      <section className="py-6 sm:py-8 lg:py-10 overflow-hidden">
+      <section className="py-8 sm:py-10 lg:py-12 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Official Brand Stores" subtitle="Verified Sellers" linkTo="/shop" />
 
@@ -343,21 +386,21 @@ const HomePage = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-6 sm:py-8 lg:py-10">
+      <section className="py-8 sm:py-10 lg:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title="Fresh Arrivals with Premium Finish" subtitle="Featured Collection" linkTo="/shop" />
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {isLoading ? (
               [...Array(8)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-100 border border-slate-200 rounded-md animate-pulse"
+                  className="bg-slate-100 border border-slate-200 rounded-xl animate-pulse"
                   style={{ aspectRatio: '3/4' }}
                 />
               ))
             ) : isError ? (
-              <div className="col-span-full text-center py-12 border border-slate-200 rounded-md bg-slate-50">
+              <div className="col-span-full text-center py-12 border border-slate-200 rounded-xl bg-slate-50">
                 <Shield className="w-10 h-10 text-slate-400 mx-auto mb-3" />
                 <p className="text-slate-600 font-bold">Unable to load products</p>
               </div>
@@ -375,24 +418,24 @@ const HomePage = () => {
       </section>
 
       {/* Limited Time Deals Section */}
-      <section className="py-6 sm:py-8 lg:py-10">
+      <section className="py-8 sm:py-10 lg:py-12 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 mb-2">
             <Zap className="w-4 h-4 text-orange-500" />
             <SectionHeader title="Limited Time Deals" subtitle="Special Offers" linkTo="/shop" />
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {isLoading ? (
               [...Array(4)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-100 border border-slate-200 rounded-md animate-pulse"
+                  className="bg-slate-100 border border-slate-200 rounded-xl animate-pulse"
                   style={{ aspectRatio: '3/4' }}
                 />
               ))
             ) : isError ? (
-              <div className="col-span-full text-center py-12 border border-slate-200 rounded-md bg-slate-50">
+              <div className="col-span-full text-center py-12 border border-slate-200 rounded-xl bg-slate-50">
                 <Award className="w-10 h-10 text-slate-400 mx-auto mb-3" />
                 <p className="text-slate-600 font-bold">Unable to load offers</p>
               </div>
@@ -412,7 +455,13 @@ const HomePage = () => {
       {/* Features Section */}
       <section className="py-12 sm:py-16 bg-white border-y border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10 text-center uppercase tracking-wider">Why Shop with VIBEIT?</h2>
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <p className="text-xs font-bold tracking-[0.2em] uppercase text-blue-600 mb-3">Why customers return</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Why Shop with VIBEIT?</h2>
+            <p className="text-sm sm:text-base text-slate-600 font-medium">
+              Built for speed, safety, and a premium buying experience from the first click to the final delivery.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
@@ -436,9 +485,9 @@ const HomePage = () => {
               return (
                 <div
                   key={index}
-                  className="bg-slate-50 rounded-md border border-slate-200 p-8 text-slate-900 hover:border-blue-500 transition-colors flex flex-col items-center text-center"
+                  className="bg-slate-50 rounded-2xl border border-slate-200 p-8 text-slate-900 hover:border-blue-500 hover:shadow-md transition-all flex flex-col items-center text-center"
                 >
-                  <div className="w-16 h-16 bg-blue-100 rounded-md flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
                     <IconComponent className="w-8 h-8 text-blue-600" />
                   </div>
                   <h3 className="text-lg font-bold mb-2 uppercase tracking-wider">{item.title}</h3>

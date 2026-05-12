@@ -3,16 +3,19 @@ import { ChevronRight } from 'lucide-react';
 
 const SectionHeader = ({ title, subtitle, linkText = 'View all', linkTo = '/shop' }) => {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-4">
       <div>
         {subtitle && (
-          <p className="text-xs tracking-[0.12em] font-bold text-orange-500 dark:text-orange-400 uppercase mb-2">
+          <p className="text-[11px] tracking-[0.2em] font-bold text-blue-600 dark:text-blue-400 uppercase mb-2">
             {subtitle}
           </p>
         )}
-        <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-          {title}
-        </h3>
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-7 w-1.5 rounded-full bg-blue-600 dark:bg-blue-400" aria-hidden="true" />
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+            {title}
+          </h3>
+        </div>
       </div>
       <Link
         to={linkTo}
