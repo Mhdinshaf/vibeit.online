@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { getCustomerOrders, getProductById } from '../../services/api';
 import { getPromoConfig, getEarnedPromos, getNextMilestone, PROMO_CONFIG_EVENT } from '../../utils/promotions';
 
-const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [] }) => {
+const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEmail }) => {
   const [copied, setCopied] = useState(null);
   const promos = getEarnedPromos(deliveredOrderCount, promoConfig);
   const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig);
@@ -18,12 +18,31 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [] }) => {
     ? Math.min(100, ((deliveredOrderCount - progressFrom) / (progressTo - progressFrom)) * 100)
     : 100;
 
+  const normalizedCustomerEmail = customerEmail?.toLowerCase();
+  const normalizeStatus = (status) => String(status || '').toLowerCase();
+  const isCancelled = (status) => ['cancelled', 'canceled'].includes(normalizeStatus(status));
+  const safeUpper = (value) => String(value || '').toUpperCase();
+  const localOrders = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
+    } catch {
+      return [];
+    }
+  })();
+
   // Build a set of promo codes this customer has already used in non-cancelled orders
-  const usedPromoCodes = new Set(
-    orders
-      .filter(o => o.promoCode && !['Cancelled', 'cancelled'].includes(o.status || ''))
-      .map(o => (o.promoCode || '').toUpperCase())
-  );
+  const usedPromoCodes = new Set([
+    ...orders
+      .filter(o => o.promoCode && !isCancelled(o.status))
+      .map(o => safeUpper(o.promoCode)),
+    ...localOrders
+      .filter(o =>
+        o.promoCode &&
+        !isCancelled(o.status) &&
+        (!normalizedCustomerEmail || o.shippingAddress?.email?.toLowerCase() === normalizedCustomerEmail)
+      )
+      .map(o => safeUpper(o.promoCode)),
+  ]);
 
   const copyCode = (code) => {
     navigator.clipboard.writeText(code);
@@ -464,7 +483,12 @@ const CustomerDashboard = () => {
                 </div>
 
                 {/* Rewards Card */}
-                <RewardsCard deliveredOrderCount={deliveredOrderCount} promoConfig={promoConfig} orders={orders} />
+                <RewardsCard
+                  deliveredOrderCount={deliveredOrderCount}
+                  promoConfig={promoConfig}
+                  orders={orders}
+                  customerEmail={customer?.email}
+                />
               </>
             )}
           </div>
@@ -776,4 +800,3 @@ const CustomerDashboard = () => {
 };
 
 export default CustomerDashboard;
-
