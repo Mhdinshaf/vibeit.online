@@ -20,12 +20,11 @@ const CATEGORIES = [
 ];
 
 const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect }) => {
-  const [expandedCategory, setExpandedCategory] = useState(searchParams.get('category') || null);
-  
   const category = searchParams.get('category');
   const subcategory = searchParams.get('subcategory');
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
+  const expandedCategory = category || null;
 
   return (
     <div className="bg-white rounded-lg p-5 sm:p-6 border border-slate-200">
@@ -83,11 +82,9 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
                     if (isSelected) {
                       setParam('category', '');
                       setParam('subcategory', '');
-                      setExpandedCategory(null);
                     } else {
                       setParam('category', cat.name);
                       setParam('subcategory', '');
-                      setExpandedCategory(cat.name);
                     }
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
@@ -424,5 +421,3 @@ const ShopPage = () => {
 };
 
 export default ShopPage;
-
-
