@@ -19,7 +19,7 @@ const CATEGORIES = [
   { name: 'Gents Clothing', icon: Briefcase, subcategories: ['T-Shirts', 'Trousers', 'Shirts', 'Shorts', 'Formal Wear'] },
 ];
 
-const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect }) => {
+const FilterPanel = ({ searchParams, setParam, setParams, clearFilters, onSubcategorySelect }) => {
   const category = searchParams.get('category');
   const subcategory = searchParams.get('subcategory');
   const minPrice = searchParams.get('minPrice') || '';
@@ -80,11 +80,9 @@ const FilterPanel = ({ searchParams, setParam, clearFilters, onSubcategorySelect
                 <button
                   onClick={() => {
                     if (isSelected) {
-                      setParam('category', '');
-                      setParam('subcategory', '');
+                      setParams({ category: '', subcategory: '' });
                     } else {
-                      setParam('category', cat.name);
-                      setParam('subcategory', '');
+                      setParams({ category: cat.name, subcategory: '' });
                     }
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
@@ -154,6 +152,21 @@ const ShopPage = () => {
     }
     // Reset page when filters change
     if (key !== 'page') {
+      newParams.delete('page');
+    }
+    setSearchParams(newParams);
+  };
+
+  const setParams = (updates) => {
+    const newParams = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value);
+      } else {
+        newParams.delete(key);
+      }
+    });
+    if (!Object.prototype.hasOwnProperty.call(updates, 'page')) {
       newParams.delete('page');
     }
     setSearchParams(newParams);
@@ -231,6 +244,7 @@ const ShopPage = () => {
               <FilterPanel
                 searchParams={searchParams}
                 setParam={setParam}
+                setParams={setParams}
                 clearFilters={clearFilters}
                 onSubcategorySelect={handleSubcategorySelect}
               />
@@ -409,6 +423,7 @@ const ShopPage = () => {
               <FilterPanel
                 searchParams={searchParams}
                 setParam={setParam}
+                setParams={setParams}
                 clearFilters={clearFilters}
                 onSubcategorySelect={handleSubcategorySelect}
               />
