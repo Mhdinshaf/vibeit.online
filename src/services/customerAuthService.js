@@ -101,6 +101,23 @@ export const customerAuthService = {
   },
 
   /**
+   * Get authenticated customer details
+   * @returns {Promise<object>}
+   */
+  async getMe() {
+    try {
+      const response = await api.get('/customer/auth/me');
+      const customer = response.data?.customer || response.data;
+      if (customer) {
+        localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(customer));
+      }
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
    * Update customer profile
    * @param {object} data 
    * @returns {Promise<{customer: object}>}
@@ -142,6 +159,37 @@ export const customerAuthService = {
   async resetPassword(token, newPassword) {
     try {
       const response = await api.post(`/customer/auth/reset-password/${token}`, { newPassword });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Send MFA OTP
+   * @returns {Promise<object>}
+   */
+  async sendMfaOtp() {
+    try {
+      const response = await api.post('/customer/auth/mfa/send-otp');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Verify MFA OTP
+   * @param {string} otp
+   * @returns {Promise<object>}
+   */
+  async verifyMfaOtp(otp) {
+    try {
+      const response = await api.post('/customer/auth/mfa/verify-otp', { otp });
+      const customer = response.data?.customer || response.data?.user;
+      if (customer) {
+        localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(customer));
+      }
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

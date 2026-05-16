@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useCustomerStore } from '../../context/store';
-import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search, ChevronLeft, ChevronRight, Gift, Lock, Copy, CheckCircle } from 'lucide-react';
+import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search, ChevronLeft, ChevronRight, Gift, Lock, Copy, CheckCircle, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getCustomerOrders, getProductById } from '../../services/api';
+import { customerAuthService } from '../../services/customerAuthService';
 import { getPromoConfig, getEarnedPromos, getNextMilestone, PROMO_CONFIG_EVENT } from '../../utils/promotions';
 
 const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEmail }) => {
@@ -145,7 +146,7 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
-  const { customer, logout, updateProfile } = useCustomerAuth();
+  const { customer, logout, updateProfile, refreshCustomer } = useCustomerAuth();
   const { orders, setOrders } = useCustomerStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
@@ -164,6 +165,11 @@ const CustomerDashboard = () => {
     lastName: '',
     phone: '',
   });
+  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [hasLoadedMfa, setHasLoadedMfa] = useState(false);
 
   useEffect(() => {
     if (customer) {
@@ -174,6 +180,26 @@ const CustomerDashboard = () => {
       });
     }
   }, [customer]);
+
+  useEffect(() => {
+    if (!customer) return;
+    const enabled = customer.mfaEnabled ?? customer.mfa?.enabled ?? false;
+    setMfaEnabled(Boolean(enabled));
+  }, [customer]);
+
+  useEffect(() => {
+    if (!customer || hasLoadedMfa) return;
+    const loadMfaStatus = async () => {
+      try {
+        await refreshCustomer();
+      } catch {
+        // Silent - surface errors on explicit actions
+      } finally {
+        setHasLoadedMfa(true);
+      }
+    };
+    loadMfaStatus();
+  }, [customer, hasLoadedMfa, refreshCustomer]);
 
   useEffect(() => {
     const handler = () => setPromoConfig(getPromoConfig());
@@ -197,6 +223,39 @@ const CustomerDashboard = () => {
     }
   };
 
+  const handleSendOtp = async () => {
+    try {
+      setIsSendingOtp(true);
+      await customerAuthService.sendMfaOtp();
+      toast.success('OTP sent. Check your email or device to continue.');
+    } catch (error) {
+      toast.error(error?.message || error?.response?.data?.message || 'Failed to send OTP');
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    const otp = otpCode.trim();
+    if (otp.length !== 6) {
+      toast.error('Enter the 6-digit OTP to continue.');
+      return;
+    }
+    try {
+      setIsVerifyingOtp(true);
+      await customerAuthService.verifyMfaOtp(otp);
+      await refreshCustomer();
+      setMfaEnabled(true);
+      setOtpCode('');
+      toast.success('MFA enabled successfully.');
+    } catch (error) {
+      toast.error(error?.message || error?.response?.data?.message || 'OTP verification failed');
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
   useEffect(() => {
     const loadOrders = async () => {
       try {
@@ -206,7 +265,7 @@ const CustomerDashboard = () => {
         const response = await getCustomerOrders({ page: 1, limit: 500 });
         const orders = response?.orders || [];
         setOrders(orders);
-      } catch (error) {
+      } catch {
         setOrderError('Failed to load orders. Please try again later.');
       } finally {
         setIsLoadingOrders(false);
@@ -791,6 +850,74 @@ const CustomerDashboard = () => {
                   </div>
                 </>
               )}
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm max-w-3xl">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900">Account Security</h2>
+                  <p className="text-sm text-slate-500 mt-1">Protect your account with MFA.</p>
+                </div>
+                {mfaEnabled ? (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    MFA Enabled
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                    <Lock className="w-3.5 h-3.5" />
+                    MFA Disabled
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-slate-200 p-4 bg-slate-50">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
+                      <ShieldCheck className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">One-time password</p>
+                      <p className="text-xs text-slate-500">Send a verification code to enable MFA.</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={isSendingOtp || mfaEnabled}
+                    className="mt-4 w-full px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-colors disabled:opacity-50"
+                  >
+                    {isSendingOtp ? 'Sending OTP…' : mfaEnabled ? 'MFA Already Enabled' : 'Send OTP'}
+                  </button>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 p-4 bg-white">
+                  <p className="text-sm font-semibold text-slate-900 mb-2">Verify OTP</p>
+                  {mfaEnabled ? (
+                    <p className="text-sm text-slate-500">MFA is active for this account.</p>
+                  ) : (
+                    <form onSubmit={handleVerifyOtp} className="space-y-3">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        placeholder="Enter 6-digit code"
+                        className="w-full border border-slate-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:border-blue-500"
+                      />
+                      <button
+                        type="submit"
+                        disabled={isVerifyingOtp}
+                        className="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+                      >
+                        {isVerifyingOtp ? 'Verifying…' : 'Verify OTP'}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}

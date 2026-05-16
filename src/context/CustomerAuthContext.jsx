@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { customerAuthService } from '../services/customerAuthService';
 
 const CustomerAuthContext = createContext(null);
@@ -161,6 +161,19 @@ export const CustomerAuthProvider = ({ children }) => {
   };
 
   /**
+   * Refresh customer from auth endpoint
+   * @returns {Promise<object>}
+   */
+  const refreshCustomer = useCallback(async () => {
+    const response = await customerAuthService.getMe();
+    const customerData = response.customer || response;
+    if (customerData) {
+      setCustomer(customerData);
+    }
+    return response;
+  }, []);
+
+  /**
    * Check if customer is authenticated
    * @returns {boolean}
    */
@@ -176,6 +189,7 @@ export const CustomerAuthProvider = ({ children }) => {
     startGoogleLogin,
     logout,
     updateProfile,
+    refreshCustomer,
     isAuthenticated,
   };
 
