@@ -843,6 +843,12 @@ export const getAdminCustomers = async (params = {}) => {
   return response.data;
 };
 
+// Admin MFA Status APIs
+export const getAdminMfaStatus = async () => {
+  const response = await api.get('/admin/mfa-status');
+  return response.data;
+};
+
 export const getAdminCustomerOrders = async (id) => {
   const response = await api.get(`/admin/customers/${encodeURIComponent(id)}/orders`);
   return response.data;

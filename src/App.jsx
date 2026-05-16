@@ -37,6 +37,7 @@ const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
 const AdminOrderDetail = lazy(() => import('./pages/admin/AdminOrderDetail'));
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'));
 const AdminPromotions = lazy(() => import('./pages/admin/AdminPromotions'));
+const AdminMfaStatus = lazy(() => import('./pages/admin/AdminMfaStatus'));
 
 // Loading Spinner
 const LoadingSpinner = () => (
@@ -91,6 +92,7 @@ export default function App() {
             <Route path="/admin/orders/:id" element={<Suspense fallback={<LoadingSpinner />}><AdminOrderDetail /></Suspense>} />
             <Route path="/admin/customers" element={<Suspense fallback={<LoadingSpinner />}><AdminCustomers /></Suspense>} />
             <Route path="/admin/promotions" element={<Suspense fallback={<LoadingSpinner />}><AdminPromotions /></Suspense>} />
+            <Route path="/admin/mfa-status" element={<Suspense fallback={<LoadingSpinner />}><AdminMfaStatus /></Suspense>} />
           </Route>
         </Route>
       </Routes>
