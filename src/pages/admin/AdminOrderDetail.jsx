@@ -181,6 +181,13 @@ const AdminOrderDetail = () => {
         <p className="text-sm text-gray-600 mt-2">Phone: {order?.shippingAddress?.phone}</p>
         <p className="text-sm text-gray-600">Email: {order?.shippingAddress?.email}</p>
       </div>
+
+      {order?.notes && (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Order Notes</h2>
+          <p className="text-sm text-gray-600 whitespace-pre-wrap">{order.notes}</p>
+        </div>
+      )}
     </div>
   );
 };

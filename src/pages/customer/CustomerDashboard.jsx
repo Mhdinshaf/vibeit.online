@@ -676,6 +676,13 @@ const CustomerDashboard = () => {
                         <p className="text-sm text-slate-600">No item details available for this order.</p>
                       )}
                     </div>
+
+                    {searchedOrder?.notes && (
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800 mb-2">Order Notes</p>
+                        <p className="text-sm text-slate-600 whitespace-pre-wrap">{searchedOrder.notes}</p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <p className="text-sm font-medium text-red-700">No order found for “{orderSearchQuery}”.</p>

@@ -199,6 +199,11 @@ const AdminOrders = () => {
                     <p className="text-sm text-gray-600 mt-1">{customerName}</p>
                     <p className="text-xs text-gray-500">{itemCount} items</p>
                     <p className="text-sm font-semibold text-gray-900">රු{Number(order.total || 0).toLocaleString()}</p>
+                    {order?.notes && (
+                      <p className="text-xs text-gray-500 mt-2 line-clamp-2">
+                        Notes: {order.notes}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
@@ -297,5 +302,4 @@ const AdminOrders = () => {
 };
 
 export default AdminOrders;
-
 
