@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useCustomerStore } from '../../context/store';
 import { Menu, X, LayoutDashboard, ShoppingBag, User, LogOut, Loader2, AlertCircle, Search, ChevronLeft, ChevronRight, Gift, Lock, Copy, CheckCircle, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { getCustomerOrders, getProductById } from '../../services/api';
+import { getCustomerOrders, getProductById, ORDER_SYNC_EVENT } from '../../services/api';
 import { customerAuthService } from '../../services/customerAuthService';
 import { getPromoConfig, getEarnedPromos, getNextMilestone, PROMO_CONFIG_EVENT } from '../../utils/promotions';
 
@@ -256,26 +256,40 @@ const CustomerDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    const loadOrders = async () => {
-      try {
-        setIsLoadingOrders(true);
-        setOrderError(null);
-        // Use getCustomerOrders to fetch only this customer's orders
-        const response = await getCustomerOrders({ page: 1, limit: 500 });
-        const orders = response?.orders || [];
-        setOrders(orders);
-      } catch {
-        setOrderError('Failed to load orders. Please try again later.');
-      } finally {
-        setIsLoadingOrders(false);
-      }
-    };
-
-    if (customer) {
-      loadOrders();
+  const loadOrders = useCallback(async () => {
+    if (!customer) return;
+    try {
+      setIsLoadingOrders(true);
+      setOrderError(null);
+      // Use getCustomerOrders to fetch only this customer's orders
+      const response = await getCustomerOrders({ page: 1, limit: 500 });
+      const orders = response?.orders || [];
+      setOrders(orders);
+    } catch {
+      setOrderError('Failed to load orders. Please try again later.');
+    } finally {
+      setIsLoadingOrders(false);
     }
   }, [customer, setOrders]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
+
+  useEffect(() => {
+    if (!customer) return;
+    const refreshOrders = () => {
+      loadOrders();
+    };
+
+    window.addEventListener(ORDER_SYNC_EVENT, refreshOrders);
+    window.addEventListener('storage', refreshOrders);
+
+    return () => {
+      window.removeEventListener(ORDER_SYNC_EVENT, refreshOrders);
+      window.removeEventListener('storage', refreshOrders);
+    };
+  }, [customer, loadOrders]);
 
   const handleLogout = () => {
     logout();
