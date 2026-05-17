@@ -171,6 +171,43 @@ const CustomerDashboard = () => {
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [hasLoadedMfa, setHasLoadedMfa] = useState(false);
 
+  const readLocalOrders = useCallback(() => {
+    try {
+      const cached = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
+      if (!Array.isArray(cached)) return [];
+      const customerEmail = customer?.email?.toLowerCase();
+      if (!customerEmail) return cached;
+      return cached.filter(
+        (order) => order?.shippingAddress?.email?.toLowerCase() === customerEmail
+      );
+    } catch {
+      return [];
+    }
+  }, [customer?.email]);
+
+  const mergeOrders = useCallback((remoteOrders = []) => {
+    const merged = new Map();
+    const localOrders = readLocalOrders();
+
+    for (const localOrder of localOrders) {
+      const key = localOrder?.orderNumber || localOrder?._id;
+      if (key) {
+        merged.set(String(key), localOrder);
+      }
+    }
+
+    for (const remoteOrder of remoteOrders) {
+      const key = remoteOrder?.orderNumber || remoteOrder?._id;
+      if (key) {
+        merged.set(String(key), remoteOrder);
+      }
+    }
+
+    return Array.from(merged.values()).sort(
+      (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+    );
+  }, [readLocalOrders]);
+
   useEffect(() => {
     if (customer) {
       setProfileForm({
@@ -263,14 +300,15 @@ const CustomerDashboard = () => {
       setOrderError(null);
       // Use getCustomerOrders to fetch only this customer's orders
       const response = await getCustomerOrders({ page: 1, limit: 500 });
-      const orders = response?.orders || [];
-      setOrders(orders);
+      const remoteOrders = response?.orders || [];
+      setOrders(mergeOrders(remoteOrders));
     } catch {
       setOrderError('Failed to load orders. Please try again later.');
+      setOrders(mergeOrders([]));
     } finally {
       setIsLoadingOrders(false);
     }
-  }, [customer, setOrders]);
+  }, [customer, mergeOrders, setOrders]);
 
   useEffect(() => {
     loadOrders();
