@@ -179,7 +179,7 @@ const AdminCustomers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedId, setExpandedId] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ firstName: '', lastName: '', phone: '' });
+  const [editForm, setEditForm] = useState({ firstName: '', lastName: '', phone: '', isReseller: false });
   const [isSaving, setIsSaving] = useState(false);
   const [promoConfig, setPromoConfig] = useState(getPromoConfig());
 
@@ -238,7 +238,12 @@ const AdminCustomers = () => {
 
   const startEdit = (c) => {
     setEditingId(c._id);
-    setEditForm({ firstName: c.firstName, lastName: c.lastName, phone: c.phone || '' });
+    setEditForm({
+      firstName: c.firstName,
+      lastName: c.lastName,
+      phone: c.phone || '',
+      isReseller: Boolean(c.isReseller || c.reseller),
+    });
   };
 
   const saveEdit = async (id) => {
@@ -330,6 +335,7 @@ const AdminCustomers = () => {
                     <th className="text-center py-4 px-6 font-semibold text-slate-700">Orders</th>
                     <th className="text-center py-4 px-6 font-semibold text-slate-700">Delivered</th>
                     <th className="text-left py-4 px-6 font-semibold text-slate-700">Earned Tier</th>
+                    <th className="text-center py-4 px-6 font-semibold text-slate-700">Reseller</th>
                     <th className="text-left py-4 px-6 font-semibold text-slate-700">Joined</th>
                     <th className="py-4 px-6" />
                   </tr>
@@ -377,6 +383,27 @@ const AdminCustomers = () => {
                         <td className="py-4 px-6">
                           <TierBadge deliveredOrders={c.deliveredOrders ?? 0} config={promoConfig} />
                         </td>
+                        <td className="py-4 px-6 text-center">
+                          {editingId === c._id ? (
+                            <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600">
+                              <input
+                                type="checkbox"
+                                checked={editForm.isReseller}
+                                onChange={(e) => setEditForm(p => ({ ...p, isReseller: e.target.checked }))}
+                                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                              />
+                              Reseller
+                            </label>
+                          ) : (
+                            c.isReseller ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                                Reseller
+                              </span>
+                            ) : (
+                              <span className="text-xs text-slate-400">—</span>
+                            )
+                          )}
+                        </td>
                         <td className="py-4 px-6 text-slate-500 text-xs">
                           {new Date(c.createdAt).toLocaleDateString()}
                         </td>
@@ -420,7 +447,7 @@ const AdminCustomers = () => {
                       {/* Expanded orders row */}
                       {expandedId === c._id && (
                         <tr key={`${c._id}-orders`} className="bg-slate-50 border-b border-slate-200">
-                          <td colSpan={7} className="px-8 py-5">
+                          <td colSpan={8} className="px-8 py-5">
                             <CustomerOrdersPanel
                               customerId={c._id}
                               isApiConnected={isApiConnected}

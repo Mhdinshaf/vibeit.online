@@ -11,6 +11,26 @@ const DEFAULT_CONFIG = {
   ],
 };
 
+export const RESELLER_PROMO = {
+  promoCode: 'RESELLER10',
+  discountType: 'percent',
+  discountValue: 10,
+  description: 'Reseller 10% off every order',
+};
+
+export const isResellerCustomer = (customer) => (
+  Boolean(
+    customer?.isReseller ||
+    customer?.reseller ||
+    customer?.customerType === 'reseller' ||
+    customer?.role === 'reseller'
+  )
+);
+
+export const getResellerPromo = (customer) => (
+  isResellerCustomer(customer) ? { ...RESELLER_PROMO } : null
+);
+
 export const getPromoConfig = () => {
   try {
     const raw = localStorage.getItem(PROMO_CONFIG_KEY);
