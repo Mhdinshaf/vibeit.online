@@ -3,7 +3,7 @@ import { ShoppingCart, Trash2, Lock, Minus, Plus, ArrowRight, Gift, ShoppingBag,
 import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useState } from 'react';
-import { getPromoConfig, getResellerPromo, validatePromoCode } from '../../utils/promotions';
+import { getAutoResellerPromo, getPromoConfig, validatePromoCode } from '../../utils/promotions';
 import toast from 'react-hot-toast';
 
 const PROMO_STORAGE_KEY = 'vibeit_cart_promo';
@@ -50,11 +50,6 @@ const CartPage = () => {
     return '/placeholder.jpg';
   };
 
-  const promoConfig = getPromoConfig();
-  const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
-  const resellerPromo = getResellerPromo(customer);
-  const effectivePromo = resellerPromo || appliedPromo;
-
   // Count delivered orders for this customer (for promo validation)
   const customerEmail = customer?.email?.toLowerCase();
   const localOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
@@ -62,6 +57,11 @@ const CartPage = () => {
     o.shippingAddress?.email?.toLowerCase() === customerEmail &&
     ['Delivered', 'delivered'].includes(o.status)
   ).length;
+
+  const promoConfig = getPromoConfig();
+  const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
+  const resellerPromo = getAutoResellerPromo(deliveredOrderCount, promoConfig, customer);
+  const effectivePromo = resellerPromo || appliedPromo;
 
   const applyPromoCode = () => {
     if (resellerPromo) {
@@ -80,7 +80,7 @@ const CartPage = () => {
       )
       .map(o => o.promoCode);
 
-    const promo = validatePromoCode(code, deliveredOrderCount, promoConfig, usedPromoCodes);
+    const promo = validatePromoCode(code, deliveredOrderCount, promoConfig, usedPromoCodes, customer);
     
     if (promo) {
       if (promo.alreadyUsed) {

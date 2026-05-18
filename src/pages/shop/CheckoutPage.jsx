@@ -6,7 +6,7 @@ import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { createOrder } from '../../services/api';
 import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
-import { getPromoConfig, getResellerPromo, validatePromoCode } from '../../utils/promotions';
+import { getAutoResellerPromo, getPromoConfig, validatePromoCode } from '../../utils/promotions';
 import toast from 'react-hot-toast';
 
 const SRI_LANKA_DISTRICTS = [
@@ -90,14 +90,19 @@ const CheckoutPage = () => {
 
   const promoConfig = getPromoConfig();
   const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
-  const resellerPromo = getResellerPromo(customer);
+  const customerEmail = customer?.email?.toLowerCase();
+  const localOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
+  const deliveredOrderCount = localOrders.filter(o =>
+    o.shippingAddress?.email?.toLowerCase() === customerEmail &&
+    ['Delivered', 'delivered'].includes(o.status)
+  ).length;
+  const resellerPromo = getAutoResellerPromo(deliveredOrderCount, promoConfig, customer);
   const effectivePromo = resellerPromo || appliedPromo;
 
   // Re-validate promo on load to ensure it hasn't been used since applied to cart
   useEffect(() => {
     if (appliedPromo && customer && !resellerPromo) {
       const email = customer.email?.toLowerCase();
-      const localOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
       const usedPromoCodes = localOrders
         .filter(o => 
           o.shippingAddress?.email?.toLowerCase() === email && 
@@ -112,7 +117,7 @@ const CheckoutPage = () => {
         ['Delivered', 'delivered'].includes(o.status)
       ).length;
 
-      const promo = validatePromoCode(appliedPromo.promoCode, deliveredCount, promoConfig, usedPromoCodes);
+      const promo = validatePromoCode(appliedPromo.promoCode, deliveredCount, promoConfig, usedPromoCodes, customer);
       if (!promo || promo.alreadyUsed) {
         localStorage.removeItem('vibeit_cart_promo');
         setAppliedPromo(null);

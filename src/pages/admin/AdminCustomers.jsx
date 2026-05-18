@@ -8,8 +8,8 @@ const ORDERS_PER_PAGE = 5;
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // ─── Tier Badge ───────────────────────────────────────────────────────────────
-const TierBadge = ({ deliveredOrders, config }) => {
-  const tier = getHighestEarnedTier(deliveredOrders, config);
+const TierBadge = ({ deliveredOrders, config, customer }) => {
+  const tier = getHighestEarnedTier(deliveredOrders, config, customer);
   if (!tier) return <span className="text-xs text-slate-400">—</span>;
   return (
     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getTierBadgeColor(tier.id)}`}>
@@ -382,7 +382,7 @@ const AdminCustomers = () => {
                         <td className="py-4 px-6 text-center font-medium text-slate-900">{c.totalOrders ?? 0}</td>
                         <td className="py-4 px-6 text-center font-medium text-emerald-700">{c.deliveredOrders ?? 0}</td>
                         <td className="py-4 px-6">
-                          <TierBadge deliveredOrders={c.deliveredOrders ?? 0} config={promoConfig} />
+                          <TierBadge deliveredOrders={c.deliveredOrders ?? 0} config={promoConfig} customer={c} />
                         </td>
                         <td className="py-4 px-6 text-center">
                           {editingId === c._id ? (

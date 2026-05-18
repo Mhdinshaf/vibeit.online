@@ -27,6 +27,16 @@ export const isResellerCustomer = (customer) => (
   )
 );
 
+const isResellerTier = (tier) => Boolean(tier?.resellerOnly);
+
+const getEligibleTiers = (config, customer) => {
+  const cfg = config || getPromoConfig();
+  const tiers = cfg.promoTiers || [];
+  return isResellerCustomer(customer)
+    ? tiers.filter(isResellerTier)
+    : tiers.filter((tier) => !isResellerTier(tier));
+};
+
 export const getResellerPromo = (customer) => (
   isResellerCustomer(customer) ? { ...RESELLER_PROMO } : null
 );
@@ -46,23 +56,22 @@ export const savePromoConfig = (config) => {
   window.dispatchEvent(new CustomEvent(PROMO_CONFIG_EVENT));
 };
 
-export const getEarnedPromos = (deliveredOrderCount, config) => {
-  const cfg = config || getPromoConfig();
-  const sorted = [...(cfg.promoTiers || [])].sort((a, b) => a.minOrders - b.minOrders);
+export const getEarnedPromos = (deliveredOrderCount, config, customer) => {
+  const sorted = [...getEligibleTiers(config, customer)].sort((a, b) => a.minOrders - b.minOrders);
   return sorted.map(tier => ({ ...tier, earned: deliveredOrderCount >= tier.minOrders }));
 };
 
-export const getNextMilestone = (deliveredOrderCount, config) => {
-  const cfg = config || getPromoConfig();
-  const sorted = [...(cfg.promoTiers || [])].sort((a, b) => a.minOrders - b.minOrders);
+export const getNextMilestone = (deliveredOrderCount, config, customer) => {
+  const sorted = [...getEligibleTiers(config, customer)].sort((a, b) => a.minOrders - b.minOrders);
   return sorted.find(t => deliveredOrderCount < t.minOrders) || null;
 };
 
-export const validatePromoCode = (code, deliveredOrderCount, config, usedPromoCodes = []) => {
+export const validatePromoCode = (code, deliveredOrderCount, config, usedPromoCodes = [], customer) => {
   if (!code) return null;
-  const cfg = config || getPromoConfig();
   const normalizedCode = code.trim().toUpperCase();
-  const tier = (cfg.promoTiers || []).find(t => t.promoCode.toUpperCase() === normalizedCode);
+  const tier = getEligibleTiers(config, customer).find(
+    t => t.promoCode.toUpperCase() === normalizedCode
+  );
   if (!tier) return null;
   if (deliveredOrderCount < tier.minOrders) return null;
 
@@ -122,7 +131,13 @@ export const getTierBadgeColor = (tierId) => {
   return colors[tierId] || 'bg-slate-100 text-slate-700';
 };
 
-export const getHighestEarnedTier = (deliveredOrderCount, config) => {
-  const promos = getEarnedPromos(deliveredOrderCount, config);
+export const getHighestEarnedTier = (deliveredOrderCount, config, customer) => {
+  const promos = getEarnedPromos(deliveredOrderCount, config, customer);
   return [...promos].reverse().find(p => p.earned) || null;
+};
+
+export const getAutoResellerPromo = (deliveredOrderCount, config, customer) => {
+  if (!isResellerCustomer(customer)) return null;
+  const highest = getHighestEarnedTier(deliveredOrderCount, config, customer);
+  return highest ? { ...highest } : { ...RESELLER_PROMO };
 };

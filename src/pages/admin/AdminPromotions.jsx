@@ -49,7 +49,7 @@ const MilestoneView = ({ tiers, selectedMonth, selectedYear }) => {
         </thead>
         <tbody>
           {filtered.map(c => {
-            const tier = getHighestEarnedTier(c.deliveredOrders, config);
+            const tier = getHighestEarnedTier(c.deliveredOrders, config, c);
             return (
               <tr key={c._id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50">
                 <td className="py-3 px-4">
@@ -98,7 +98,7 @@ const PromoTracker = ({ config }) => {
 
       const results = await Promise.all(
         customers.map(async (c) => {
-          const highestTier = getHighestEarnedTier(c.totalOrders, config);
+          const highestTier = getHighestEarnedTier(c.totalOrders, config, c);
           if (!highestTier) return null;
 
           // Fetch their order list to check promo usage
@@ -262,6 +262,7 @@ const AdminPromotions = () => {
     const newTier = {
       id: generateId(), minOrders: 5, label: 'New Reward',
       promoCode: 'NEWCODE', discountType: 'percent', discountValue: 5, description: '5% off your order',
+      resellerOnly: false,
     };
     const updated = { ...config, promoTiers: [...config.promoTiers, newTier] };
     persist(updated);
@@ -327,6 +328,7 @@ const AdminPromotions = () => {
                 <th className="text-left py-4 px-6 font-semibold text-slate-700">Min Orders</th>
                 <th className="text-left py-4 px-6 font-semibold text-slate-700">Promo Code</th>
                 <th className="text-left py-4 px-6 font-semibold text-slate-700">Discount</th>
+                <th className="text-center py-4 px-6 font-semibold text-slate-700">Reseller Only</th>
                 <th className="text-left py-4 px-6 font-semibold text-slate-700">Description</th>
                 <th className="py-4 px-6" />
               </tr>
@@ -350,6 +352,14 @@ const AdminPromotions = () => {
                           )}
                         </div>
                       </td>
+                      <td className="py-3 px-6 text-center">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(editTierForm.resellerOnly)}
+                          onChange={e => setEditTierForm(p => ({ ...p, resellerOnly: e.target.checked }))}
+                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                      </td>
                       <td className="py-3 px-6"><input value={editTierForm.description} onChange={e => setEditTierForm(p => ({ ...p, description: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-40" /></td>
                       <td className="py-3 px-6">
                         <div className="flex items-center gap-1">
@@ -365,6 +375,15 @@ const AdminPromotions = () => {
                       <td className="py-4 px-6"><code className="bg-slate-900 text-white px-2.5 py-1 rounded font-mono text-xs font-bold">{tier.promoCode}</code></td>
                       <td className="py-4 px-6 font-medium text-slate-900">
                         {tier.discountType === 'freeDelivery' ? <span className="text-emerald-600">Free Delivery</span> : `${tier.discountValue}% off`}
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        {tier.resellerOnly ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                            Reseller
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
                       </td>
                       <td className="py-4 px-6 text-slate-500">{tier.description}</td>
                       <td className="py-4 px-6">
