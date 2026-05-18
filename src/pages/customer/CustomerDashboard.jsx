@@ -13,6 +13,7 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
   const promos = getEarnedPromos(deliveredOrderCount, promoConfig, customer);
   const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig, customer);
   const resellerCustomer = isResellerCustomer(customer);
+  const resellerPromos = (promoConfig?.promoTiers || []).filter((tier) => tier.resellerOnly);
   const prevMilestone = [...promos].reverse().find(p => p.earned);
   const progressFrom = prevMilestone ? prevMilestone.minOrders : 0;
   const progressTo = nextMilestone ? nextMilestone.minOrders : (prevMilestone ? prevMilestone.minOrders : 5);
@@ -73,6 +74,54 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
           <div>
             <p className="text-sm font-semibold text-emerald-800">🎉 Free Delivery Active!</p>
             <p className="text-xs text-emerald-600">Admin has enabled free delivery for all orders right now.</p>
+          </div>
+        </div>
+      )}
+
+      {resellerCustomer && resellerPromos.length > 0 && (
+        <div className="mb-5">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Reseller Promotions</p>
+              <p className="text-xs text-slate-500">Available only for approved reseller customers</p>
+            </div>
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">
+              Approved
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {resellerPromos.map((promo) => {
+              const isUsed = usedPromoCodes.has(promo.promoCode.toUpperCase());
+              return (
+                <div
+                  key={promo.id}
+                  className={`rounded-xl border p-4 transition-all ${
+                    isUsed ? 'border-slate-200 bg-slate-50' : 'border-blue-200 bg-blue-50'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{promo.label}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{promo.description}</p>
+                      <p className="text-xs text-slate-400 mt-1">Reseller only promotion</p>
+                    </div>
+                    {isUsed ? (
+                      <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-200 text-slate-500 uppercase tracking-wide">
+                        Used
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => copyCode(promo.promoCode)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+                      >
+                        {copied === promo.promoCode ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copied === promo.promoCode ? 'Copied!' : promo.promoCode}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
