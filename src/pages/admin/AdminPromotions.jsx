@@ -323,7 +323,7 @@ const AdminPromotions = () => {
 
       {/* Normal Promotions */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 gap-3">
           <div className="flex items-center gap-3">
             <Gift className="w-5 h-5 text-slate-700" />
             <div>
@@ -341,12 +341,12 @@ const AdminPromotions = () => {
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Label</th>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Min Orders</th>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Promo Code</th>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Discount</th>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Description</th>
-                <th className="py-4 px-6" />
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700">Label</th>
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden md:table-cell">Min Orders</th>
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700">Promo Code</th>
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden sm:table-cell">Discount</th>
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden lg:table-cell">Description</th>
+                <th className="py-3 sm:py-4 px-4 sm:px-6" />
               </tr>
             </thead>
             <tbody>
@@ -354,10 +354,10 @@ const AdminPromotions = () => {
                 <tr key={tier.id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50">
                   {editingTierId === tier.id ? (
                     <>
-                      <td className="py-3 px-6"><input value={editTierForm.label} onChange={e => setEditTierForm(p => ({ ...p, label: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-36" /></td>
-                      <td className="py-3 px-6"><input type="number" min="1" value={editTierForm.minOrders} onChange={e => setEditTierForm(p => ({ ...p, minOrders: Number(e.target.value) }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-20" /></td>
-                      <td className="py-3 px-6"><input value={editTierForm.promoCode} onChange={e => setEditTierForm(p => ({ ...p, promoCode: e.target.value.toUpperCase() }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-28 font-mono" /></td>
-                      <td className="py-3 px-6">
+                      <td className="py-3 px-4 sm:px-6"><input value={editTierForm.label} onChange={e => setEditTierForm(p => ({ ...p, label: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-28 sm:w-36" /></td>
+                      <td className="py-3 px-4 sm:px-6 hidden md:table-cell"><input type="number" min="1" value={editTierForm.minOrders} onChange={e => setEditTierForm(p => ({ ...p, minOrders: Number(e.target.value) }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-20" /></td>
+                      <td className="py-3 px-4 sm:px-6"><input value={editTierForm.promoCode} onChange={e => setEditTierForm(p => ({ ...p, promoCode: e.target.value.toUpperCase() }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-28 font-mono" /></td>
+                      <td className="py-3 px-4 sm:px-6 hidden sm:table-cell">
                         <div className="flex items-center gap-2">
                           <select value={editTierForm.discountType} onChange={e => setEditTierForm(p => ({ ...p, discountType: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm">
                             <option value="percent">%</option>
@@ -368,8 +368,8 @@ const AdminPromotions = () => {
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-6"><input value={editTierForm.description} onChange={e => setEditTierForm(p => ({ ...p, description: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-40" /></td>
-                      <td className="py-3 px-6">
+                      <td className="py-3 px-4 sm:px-6 hidden lg:table-cell"><input value={editTierForm.description} onChange={e => setEditTierForm(p => ({ ...p, description: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-40" /></td>
+                      <td className="py-3 px-4 sm:px-6">
                         <div className="flex items-center gap-1">
                           <button onClick={saveEditTier} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg"><Check className="w-4 h-4" /></button>
                           <button onClick={() => setEditingTierId(null)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4" /></button>
@@ -378,14 +378,14 @@ const AdminPromotions = () => {
                     </>
                   ) : (
                     <>
-                      <td className="py-4 px-6 font-semibold text-slate-900">{tier.label}</td>
-                      <td className="py-4 px-6"><span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-lg text-xs font-semibold">{tier.minOrders}+ orders</span></td>
-                      <td className="py-4 px-6"><code className="bg-slate-900 text-white px-2.5 py-1 rounded font-mono text-xs font-bold">{tier.promoCode}</code></td>
-                      <td className="py-4 px-6 font-medium text-slate-900">
+                      <td className="py-4 px-4 sm:px-6 font-semibold text-slate-900">{tier.label}</td>
+                      <td className="py-4 px-4 sm:px-6 hidden md:table-cell"><span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-lg text-xs font-semibold">{tier.minOrders}+ orders</span></td>
+                      <td className="py-4 px-4 sm:px-6"><code className="bg-slate-900 text-white px-2.5 py-1 rounded font-mono text-xs font-bold">{tier.promoCode}</code></td>
+                      <td className="py-4 px-4 sm:px-6 font-medium text-slate-900 hidden sm:table-cell">
                         {tier.discountType === 'freeDelivery' ? <span className="text-emerald-600">Free Delivery</span> : `${tier.discountValue}% off`}
                       </td>
-                      <td className="py-4 px-6 text-slate-500">{tier.description}</td>
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-4 sm:px-6 text-slate-500 hidden lg:table-cell">{tier.description}</td>
+                      <td className="py-4 px-4 sm:px-6">
                         <div className="flex items-center justify-end gap-1">
                           <button onClick={() => startEditTier(tier)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-lg"><Edit2 className="w-4 h-4" /></button>
                           <button onClick={() => deleteTier(tier.id)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
@@ -402,7 +402,7 @@ const AdminPromotions = () => {
 
       {/* Reseller Promotions */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 gap-3">
           <div className="flex items-center gap-3">
             <Gift className="w-5 h-5 text-blue-600" />
             <div>
@@ -420,12 +420,12 @@ const AdminPromotions = () => {
           <table className="min-w-full text-sm">
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Label</th>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Min Orders</th>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Promo Code</th>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Discount</th>
-                <th className="text-left py-4 px-6 font-semibold text-slate-700">Description</th>
-                <th className="py-4 px-6" />
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700">Label</th>
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden md:table-cell">Min Orders</th>
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700">Promo Code</th>
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden sm:table-cell">Discount</th>
+                <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden lg:table-cell">Description</th>
+                <th className="py-3 sm:py-4 px-4 sm:px-6" />
               </tr>
             </thead>
             <tbody>
@@ -433,10 +433,10 @@ const AdminPromotions = () => {
                 <tr key={tier.id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50">
                   {editingTierId === tier.id ? (
                     <>
-                      <td className="py-3 px-6"><input value={editTierForm.label} onChange={e => setEditTierForm(p => ({ ...p, label: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-36" /></td>
-                      <td className="py-3 px-6"><input type="number" min="1" value={editTierForm.minOrders} onChange={e => setEditTierForm(p => ({ ...p, minOrders: Number(e.target.value) }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-20" /></td>
-                      <td className="py-3 px-6"><input value={editTierForm.promoCode} onChange={e => setEditTierForm(p => ({ ...p, promoCode: e.target.value.toUpperCase() }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-28 font-mono" /></td>
-                      <td className="py-3 px-6">
+                      <td className="py-3 px-4 sm:px-6"><input value={editTierForm.label} onChange={e => setEditTierForm(p => ({ ...p, label: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-28 sm:w-36" /></td>
+                      <td className="py-3 px-4 sm:px-6 hidden md:table-cell"><input type="number" min="1" value={editTierForm.minOrders} onChange={e => setEditTierForm(p => ({ ...p, minOrders: Number(e.target.value) }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-20" /></td>
+                      <td className="py-3 px-4 sm:px-6"><input value={editTierForm.promoCode} onChange={e => setEditTierForm(p => ({ ...p, promoCode: e.target.value.toUpperCase() }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-28 font-mono" /></td>
+                      <td className="py-3 px-4 sm:px-6 hidden sm:table-cell">
                         <div className="flex items-center gap-2">
                           <select value={editTierForm.discountType} onChange={e => setEditTierForm(p => ({ ...p, discountType: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm">
                             <option value="percent">%</option>
@@ -447,8 +447,8 @@ const AdminPromotions = () => {
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-6"><input value={editTierForm.description} onChange={e => setEditTierForm(p => ({ ...p, description: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-40" /></td>
-                      <td className="py-3 px-6">
+                      <td className="py-3 px-4 sm:px-6 hidden lg:table-cell"><input value={editTierForm.description} onChange={e => setEditTierForm(p => ({ ...p, description: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-40" /></td>
+                      <td className="py-3 px-4 sm:px-6">
                         <div className="flex items-center gap-1">
                           <button onClick={saveEditTier} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg"><Check className="w-4 h-4" /></button>
                           <button onClick={() => setEditingTierId(null)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4" /></button>
@@ -457,14 +457,14 @@ const AdminPromotions = () => {
                     </>
                   ) : (
                     <>
-                      <td className="py-4 px-6 font-semibold text-slate-900">{tier.label}</td>
-                      <td className="py-4 px-6"><span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-lg text-xs font-semibold">{tier.minOrders}+ orders</span></td>
-                      <td className="py-4 px-6"><code className="bg-slate-900 text-white px-2.5 py-1 rounded font-mono text-xs font-bold">{tier.promoCode}</code></td>
-                      <td className="py-4 px-6 font-medium text-slate-900">
+                      <td className="py-4 px-4 sm:px-6 font-semibold text-slate-900">{tier.label}</td>
+                      <td className="py-4 px-4 sm:px-6 hidden md:table-cell"><span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-lg text-xs font-semibold">{tier.minOrders}+ orders</span></td>
+                      <td className="py-4 px-4 sm:px-6"><code className="bg-slate-900 text-white px-2.5 py-1 rounded font-mono text-xs font-bold">{tier.promoCode}</code></td>
+                      <td className="py-4 px-4 sm:px-6 font-medium text-slate-900 hidden sm:table-cell">
                         {tier.discountType === 'freeDelivery' ? <span className="text-emerald-600">Free Delivery</span> : `${tier.discountValue}% off`}
                       </td>
-                      <td className="py-4 px-6 text-slate-500">{tier.description}</td>
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-4 sm:px-6 text-slate-500 hidden lg:table-cell">{tier.description}</td>
+                      <td className="py-4 px-4 sm:px-6">
                         <div className="flex items-center justify-end gap-1">
                           <button onClick={() => startEditTier(tier)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-lg"><Edit2 className="w-4 h-4" /></button>
                           <button onClick={() => deleteTier(tier.id)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>

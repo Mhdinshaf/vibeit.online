@@ -114,7 +114,11 @@ const AdminProducts = () => {
                     {['Product', 'Category', 'Price', 'Stock', 'Status', 'Actions'].map((header) => (
                       <th 
                         key={header} 
-                        className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                        className={`px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider ${
+                          header === 'Category' || header === 'Stock' || header === 'Status'
+                            ? 'hidden md:table-cell'
+                            : ''
+                        }`}
                       >
                         {header}
                       </th>
@@ -130,12 +134,12 @@ const AdminProducts = () => {
                       className="hover:bg-blue-50/50 transition-colors duration-200"
                     >
                       {/* Product */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
+                      <td className="px-4 sm:px-6 py-4">
+                        <div className="flex items-center gap-3 sm:gap-4">
                           <img
                             src={getImageUrl(product.images?.[0])}
                             alt={product.name || 'Product'}
-                            className="w-14 h-14 rounded-xl object-cover border border-gray-100"
+                            className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-gray-100"
                           />
                           <div>
                             <p className="font-semibold text-gray-900 line-clamp-1 max-w-xs">
@@ -149,14 +153,14 @@ const AdminProducts = () => {
                       </td>
 
                       {/* Category */}
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
                         <span className="inline-block px-3 py-1.5 text-xs font-medium bg-blue-50 text-blue-700 rounded-lg">
                           {product.category || 'Uncategorized'}
                         </span>
                       </td>
 
                       {/* Price */}
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4">
                         <div>
                           <p className="font-semibold text-gray-900">
                             රු{(product.originalPrice || 0).toLocaleString()}
@@ -170,7 +174,7 @@ const AdminProducts = () => {
                       </td>
 
                       {/* Stock */}
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
                         <span
                           className={`font-semibold ${
                             product.stockQuantity === 0
@@ -185,7 +189,7 @@ const AdminProducts = () => {
                       </td>
 
                       {/* Status */}
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
                         {product.isActive ? (
                           <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
                             Active
@@ -198,18 +202,18 @@ const AdminProducts = () => {
                       </td>
 
                       {/* Actions */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
+                      <td className="px-4 sm:px-6 py-4">
+                        <div className="flex items-center gap-2 justify-end sm:justify-start">
                           <Link
                             to={`/admin/products/edit/${product._id}`}
-                            className="p-2.5 text-blue-600 hover:bg-blue-100 rounded-xl transition-colors duration-200"
+                            className="p-2 sm:p-2.5 text-blue-600 hover:bg-blue-100 rounded-xl transition-colors duration-200"
                             title="Edit"
                           >
                             <Edit className="w-4 h-4" />
                           </Link>
                           <button
                             onClick={() => confirmDelete(product._id, product.name)}
-                            className="p-2.5 text-red-600 hover:bg-red-100 rounded-xl transition-colors duration-200"
+                            className="p-2 sm:p-2.5 text-red-600 hover:bg-red-100 rounded-xl transition-colors duration-200"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />

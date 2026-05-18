@@ -332,14 +332,14 @@ const AdminCustomers = () => {
               <table className="min-w-full text-sm">
                 <thead className="border-b border-slate-200 bg-slate-50">
                   <tr>
-                    <th className="text-left py-4 px-6 font-semibold text-slate-700">Customer</th>
-                    <th className="text-left py-4 px-6 font-semibold text-slate-700">Phone</th>
-                    <th className="text-center py-4 px-6 font-semibold text-slate-700">Orders</th>
-                    <th className="text-center py-4 px-6 font-semibold text-slate-700">Delivered</th>
-                    <th className="text-left py-4 px-6 font-semibold text-slate-700">Earned Tier</th>
-                    <th className="text-center py-4 px-6 font-semibold text-slate-700">Reseller</th>
-                    <th className="text-left py-4 px-6 font-semibold text-slate-700">Joined</th>
-                    <th className="py-4 px-6" />
+                    <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700">Customer</th>
+                    <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden md:table-cell">Phone</th>
+                    <th className="text-center py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700">Orders</th>
+                    <th className="text-center py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden lg:table-cell">Delivered</th>
+                    <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden lg:table-cell">Earned Tier</th>
+                    <th className="text-center py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700">Reseller</th>
+                    <th className="text-left py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-700 hidden xl:table-cell">Joined</th>
+                    <th className="py-3 sm:py-4 px-4 sm:px-6" />
                   </tr>
                 </thead>
                 <tbody>
@@ -348,15 +348,15 @@ const AdminCustomers = () => {
                       <tr key={c._id}
                         className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${expandedId === c._id ? 'bg-blue-50/30' : ''}`}>
                         {/* Name / Email */}
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-4 sm:px-6">
                           {editingId === c._id ? (
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                               <input value={editForm.firstName}
                                 onChange={e => setEditForm(p => ({ ...p, firstName: e.target.value }))}
-                                className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-24" placeholder="First" />
+                                className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-full sm:w-24" placeholder="First" />
                               <input value={editForm.lastName}
                                 onChange={e => setEditForm(p => ({ ...p, lastName: e.target.value }))}
-                                className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-24" placeholder="Last" />
+                                className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-full sm:w-24" placeholder="Last" />
                             </div>
                           ) : (
                             <div>
@@ -371,7 +371,7 @@ const AdminCustomers = () => {
                           )}
                         </td>
                         {/* Phone */}
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-4 sm:px-6 hidden md:table-cell">
                           {editingId === c._id ? (
                             <input value={editForm.phone}
                               onChange={e => setEditForm(p => ({ ...p, phone: e.target.value }))}
@@ -380,12 +380,12 @@ const AdminCustomers = () => {
                             <span className="text-slate-600">{c.phone || '—'}</span>
                           )}
                         </td>
-                        <td className="py-4 px-6 text-center font-medium text-slate-900">{c.totalOrders ?? 0}</td>
-                        <td className="py-4 px-6 text-center font-medium text-emerald-700">{c.deliveredOrders ?? 0}</td>
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-4 sm:px-6 text-center font-medium text-slate-900">{c.totalOrders ?? 0}</td>
+                        <td className="py-4 px-4 sm:px-6 text-center font-medium text-emerald-700 hidden lg:table-cell">{c.deliveredOrders ?? 0}</td>
+                        <td className="py-4 px-4 sm:px-6 hidden lg:table-cell">
                           <TierBadge deliveredOrders={c.deliveredOrders ?? 0} config={promoConfig} customer={c} />
                         </td>
-                        <td className="py-4 px-6 text-center">
+                        <td className="py-4 px-4 sm:px-6 text-center">
                           {editingId === c._id ? (
                             <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600">
                               <input
@@ -406,11 +406,11 @@ const AdminCustomers = () => {
                             )
                           )}
                         </td>
-                        <td className="py-4 px-6 text-slate-500 text-xs">
+                        <td className="py-4 px-4 sm:px-6 text-slate-500 text-xs hidden xl:table-cell">
                           {new Date(c.createdAt).toLocaleDateString()}
                         </td>
                         {/* Actions */}
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-4 sm:px-6">
                           <div className="flex items-center justify-end gap-1">
                             {editingId === c._id ? (
                               <>
