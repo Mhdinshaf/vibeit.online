@@ -249,6 +249,7 @@ const AdminCustomers = () => {
   const saveEdit = async (id) => {
     setIsSaving(true);
     try {
+      const payload = { ...editForm, reseller: editForm.isReseller };
       if (isApiConnected) {
         const res = await fetch(`${API_BASE}/admin/customers/${id}`, {
           method: 'PUT',
@@ -256,11 +257,11 @@ const AdminCustomers = () => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('vibeit_token')}`,
           },
-          body: JSON.stringify(editForm),
+          body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('Failed');
       }
-      setCustomers(prev => prev.map(c => c._id === id ? { ...c, ...editForm } : c));
+      setCustomers(prev => prev.map(c => c._id === id ? { ...c, ...payload } : c));
       toast.success('Customer updated');
       setEditingId(null);
     } catch {
@@ -395,7 +396,7 @@ const AdminCustomers = () => {
                               Reseller
                             </label>
                           ) : (
-                            c.isReseller ? (
+                            (c.isReseller || c.reseller) ? (
                               <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700">
                                 Reseller
                               </span>
