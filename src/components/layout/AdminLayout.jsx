@@ -104,9 +104,9 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex min-h-screen w-full overflow-x-hidden bg-gray-50">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-slate-900 fixed left-0 top-0 bottom-0 z-40">
+      <aside className="hidden lg:flex lg:flex-col w-64 bg-slate-900 fixed left-0 top-0 bottom-0 z-40 overflow-y-auto">
         <SidebarContent location={location} navLinks={navLinks} admin={admin} handleLogout={handleLogout} setSidebarOpen={setSidebarOpen} />
       </aside>
 
@@ -120,7 +120,7 @@ const AdminLayout = () => {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 z-50 transform transition-transform duration-300 lg:hidden ${
+        className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 z-50 transform transition-transform duration-300 lg:hidden overflow-y-auto ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -128,7 +128,7 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col lg:ml-64">
+      <div className="flex-1 min-w-0 flex flex-col lg:ml-64">
         {/* Top Header */}
         <header className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
           <div className="flex items-center justify-between px-4 lg:px-8 py-4">
@@ -163,7 +163,7 @@ const AdminLayout = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8">
+        <main className="flex-1 min-h-0 overflow-y-auto p-4 lg:p-8">
           <Outlet />
         </main>
       </div>
