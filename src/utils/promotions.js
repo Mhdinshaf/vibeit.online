@@ -47,8 +47,12 @@ export const savePromoConfig = (config) => {
 };
 
 export const getEarnedPromos = (deliveredOrderCount, config, customer) => {
+  const resellerCustomer = isResellerCustomer(customer);
   const sorted = [...getEligibleTiers(config, customer)].sort((a, b) => a.minOrders - b.minOrders);
-  return sorted.map(tier => ({ ...tier, earned: deliveredOrderCount >= tier.minOrders }));
+  return sorted.map(tier => ({
+    ...tier,
+    earned: tier.resellerOnly ? resellerCustomer : deliveredOrderCount >= tier.minOrders,
+  }));
 };
 
 export const getNextMilestone = (deliveredOrderCount, config, customer) => {
@@ -58,12 +62,14 @@ export const getNextMilestone = (deliveredOrderCount, config, customer) => {
 
 export const validatePromoCode = (code, deliveredOrderCount, config, usedPromoCodes = [], customer) => {
   if (!code) return null;
+  const resellerCustomer = isResellerCustomer(customer);
   const normalizedCode = code.trim().toUpperCase();
   const tier = getEligibleTiers(config, customer).find(
     t => t.promoCode.toUpperCase() === normalizedCode
   );
   if (!tier) return null;
-  if (deliveredOrderCount < tier.minOrders) return null;
+  if (!tier.resellerOnly && deliveredOrderCount < tier.minOrders) return null;
+  if (tier.resellerOnly && !resellerCustomer) return null;
 
   // Check if already used
   const isUsed = usedPromoCodes.some(c => String(c || '').toUpperCase() === normalizedCode);
