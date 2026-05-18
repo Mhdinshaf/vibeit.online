@@ -3,7 +3,7 @@ import { ShoppingCart, Trash2, Lock, Minus, Plus, ArrowRight, Gift, ShoppingBag,
 import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useState } from 'react';
-import { getAutoResellerPromo, getPromoConfig, validatePromoCode } from '../../utils/promotions';
+import { getPromoConfig, validatePromoCode } from '../../utils/promotions';
 import toast from 'react-hot-toast';
 
 const PROMO_STORAGE_KEY = 'vibeit_cart_promo';
@@ -60,14 +60,8 @@ const CartPage = () => {
 
   const promoConfig = getPromoConfig();
   const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
-  const resellerPromo = getAutoResellerPromo(deliveredOrderCount, promoConfig, customer);
-  const effectivePromo = resellerPromo || appliedPromo;
 
   const applyPromoCode = () => {
-    if (resellerPromo) {
-      toast.error('Reseller accounts already receive 10% off. Promo codes are disabled.');
-      return;
-    }
     const code = promoInput.trim();
     if (!code) return;
 
@@ -104,9 +98,9 @@ const CartPage = () => {
   };
 
   const baseShippingCost = subtotal >= 5000 ? 0 : 400;
-  const shippingCost = freeDeliveryEnabled || effectivePromo?.discountType === 'freeDelivery' ? 0 : baseShippingCost;
-  const discountAmount = effectivePromo?.discountType === 'percent'
-    ? Math.round((subtotal * effectivePromo.discountValue) / 100)
+  const shippingCost = freeDeliveryEnabled || appliedPromo?.discountType === 'freeDelivery' ? 0 : baseShippingCost;
+  const discountAmount = appliedPromo?.discountType === 'percent'
+    ? Math.round((subtotal * appliedPromo.discountValue) / 100)
     : 0;
   const total = subtotal + shippingCost - discountAmount;
   const freeShippingRemaining = subtotal >= 5000 ? 0 : 5000 - subtotal;
@@ -320,7 +314,7 @@ const CartPage = () => {
                     </div>
                     {discountAmount > 0 && (
                       <div className="flex items-center justify-between">
-                        <span className="text-emerald-600 text-sm">Discount ({effectivePromo?.promoCode})</span>
+                        <span className="text-emerald-600 text-sm">Discount ({appliedPromo?.promoCode})</span>
                         <span className="font-semibold text-emerald-600">-Rs {discountAmount.toLocaleString()}</span>
                       </div>
                     )}
@@ -337,17 +331,7 @@ const CartPage = () => {
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                       🎟️ Promo Code
                     </label>
-                    {resellerPromo ? (
-                      <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-md px-3 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm font-semibold text-blue-800">{resellerPromo.promoCode}</p>
-                            <p className="text-xs text-blue-600">{resellerPromo.description}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ) : appliedPromo ? (
+                    {appliedPromo ? (
                       <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2.5">
                         <div className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />

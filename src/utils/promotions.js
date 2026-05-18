@@ -11,13 +11,6 @@ const DEFAULT_CONFIG = {
   ],
 };
 
-export const RESELLER_PROMO = {
-  promoCode: 'RESELLER10',
-  discountType: 'percent',
-  discountValue: 10,
-  description: 'Reseller 10% off every order',
-};
-
 export const isResellerCustomer = (customer) => (
   Boolean(
     customer?.isReseller ||
@@ -37,9 +30,6 @@ const getEligibleTiers = (config, customer) => {
     : tiers.filter((tier) => !isResellerTier(tier));
 };
 
-export const getResellerPromo = (customer) => (
-  isResellerCustomer(customer) ? { ...RESELLER_PROMO } : null
-);
 
 export const getPromoConfig = () => {
   try {
@@ -134,10 +124,4 @@ export const getTierBadgeColor = (tierId) => {
 export const getHighestEarnedTier = (deliveredOrderCount, config, customer) => {
   const promos = getEarnedPromos(deliveredOrderCount, config, customer);
   return [...promos].reverse().find(p => p.earned) || null;
-};
-
-export const getAutoResellerPromo = (deliveredOrderCount, config, customer) => {
-  if (!isResellerCustomer(customer)) return null;
-  const highest = getHighestEarnedTier(deliveredOrderCount, config, customer);
-  return highest ? { ...highest } : { ...RESELLER_PROMO };
 };

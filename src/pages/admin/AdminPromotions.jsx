@@ -258,16 +258,18 @@ const AdminPromotions = () => {
     persist({ ...config, promoTiers: config.promoTiers.filter(t => t.id !== id) });
   };
 
-  const addTier = () => {
+  const addTier = (resellerOnly = false) => {
     const newTier = {
       id: generateId(), minOrders: 5, label: 'New Reward',
       promoCode: 'NEWCODE', discountType: 'percent', discountValue: 5, description: '5% off your order',
-      resellerOnly: false,
+      resellerOnly,
     };
     const updated = { ...config, promoTiers: [...config.promoTiers, newTier] };
     persist(updated);
     startEditTier(newTier);
   };
+
+  const addResellerTier = () => addTier(true);
 
   const years = [];
   for (let y = 2025; y <= now.getFullYear(); y++) years.push(y);
@@ -307,16 +309,19 @@ const AdminPromotions = () => {
         </div>
       </div>
 
-      {/* Promo Tiers */}
+      {/* Normal Promotions */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <Gift className="w-5 h-5 text-slate-700" />
-            <h2 className="text-lg font-semibold text-slate-900">Loyalty Tiers</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Promotions</h2>
+              <p className="text-xs text-slate-500">Available to normal customers</p>
+            </div>
           </div>
-          <button onClick={addTier}
+          <button onClick={() => addTier(false)}
             className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-700 transition-colors">
-            <Plus className="w-4 h-4" /> Add Tier
+            <Plus className="w-4 h-4" /> Add Promotion
           </button>
         </div>
 
@@ -328,13 +333,12 @@ const AdminPromotions = () => {
                 <th className="text-left py-4 px-6 font-semibold text-slate-700">Min Orders</th>
                 <th className="text-left py-4 px-6 font-semibold text-slate-700">Promo Code</th>
                 <th className="text-left py-4 px-6 font-semibold text-slate-700">Discount</th>
-                <th className="text-center py-4 px-6 font-semibold text-slate-700">Reseller Only</th>
                 <th className="text-left py-4 px-6 font-semibold text-slate-700">Description</th>
                 <th className="py-4 px-6" />
               </tr>
             </thead>
             <tbody>
-              {config.promoTiers.map(tier => (
+              {config.promoTiers.filter(t => !t.resellerOnly).map(tier => (
                 <tr key={tier.id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50">
                   {editingTierId === tier.id ? (
                     <>
@@ -352,14 +356,6 @@ const AdminPromotions = () => {
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-6 text-center">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(editTierForm.resellerOnly)}
-                          onChange={e => setEditTierForm(p => ({ ...p, resellerOnly: e.target.checked }))}
-                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                        />
-                      </td>
                       <td className="py-3 px-6"><input value={editTierForm.description} onChange={e => setEditTierForm(p => ({ ...p, description: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-40" /></td>
                       <td className="py-3 px-6">
                         <div className="flex items-center gap-1">
@@ -376,14 +372,84 @@ const AdminPromotions = () => {
                       <td className="py-4 px-6 font-medium text-slate-900">
                         {tier.discountType === 'freeDelivery' ? <span className="text-emerald-600">Free Delivery</span> : `${tier.discountValue}% off`}
                       </td>
-                      <td className="py-4 px-6 text-center">
-                        {tier.resellerOnly ? (
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700">
-                            Reseller
-                          </span>
-                        ) : (
-                          <span className="text-xs text-slate-400">—</span>
-                        )}
+                      <td className="py-4 px-6 text-slate-500">{tier.description}</td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center justify-end gap-1">
+                          <button onClick={() => startEditTier(tier)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-lg"><Edit2 className="w-4 h-4" /></button>
+                          <button onClick={() => deleteTier(tier.id)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Reseller Promotions */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <Gift className="w-5 h-5 text-blue-600" />
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Reseller Promotions</h2>
+              <p className="text-xs text-slate-500">Visible and valid only for reseller customers</p>
+            </div>
+          </div>
+          <button onClick={addResellerTier}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors">
+            <Plus className="w-4 h-4" /> Add Reseller Promo
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50">
+              <tr>
+                <th className="text-left py-4 px-6 font-semibold text-slate-700">Label</th>
+                <th className="text-left py-4 px-6 font-semibold text-slate-700">Min Orders</th>
+                <th className="text-left py-4 px-6 font-semibold text-slate-700">Promo Code</th>
+                <th className="text-left py-4 px-6 font-semibold text-slate-700">Discount</th>
+                <th className="text-left py-4 px-6 font-semibold text-slate-700">Description</th>
+                <th className="py-4 px-6" />
+              </tr>
+            </thead>
+            <tbody>
+              {config.promoTiers.filter(t => t.resellerOnly).map(tier => (
+                <tr key={tier.id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50">
+                  {editingTierId === tier.id ? (
+                    <>
+                      <td className="py-3 px-6"><input value={editTierForm.label} onChange={e => setEditTierForm(p => ({ ...p, label: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-36" /></td>
+                      <td className="py-3 px-6"><input type="number" min="1" value={editTierForm.minOrders} onChange={e => setEditTierForm(p => ({ ...p, minOrders: Number(e.target.value) }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-20" /></td>
+                      <td className="py-3 px-6"><input value={editTierForm.promoCode} onChange={e => setEditTierForm(p => ({ ...p, promoCode: e.target.value.toUpperCase() }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-28 font-mono" /></td>
+                      <td className="py-3 px-6">
+                        <div className="flex items-center gap-2">
+                          <select value={editTierForm.discountType} onChange={e => setEditTierForm(p => ({ ...p, discountType: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm">
+                            <option value="percent">%</option>
+                            <option value="freeDelivery">Free Delivery</option>
+                          </select>
+                          {editTierForm.discountType === 'percent' && (
+                            <input type="number" min="1" max="100" value={editTierForm.discountValue} onChange={e => setEditTierForm(p => ({ ...p, discountValue: Number(e.target.value) }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-16" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 px-6"><input value={editTierForm.description} onChange={e => setEditTierForm(p => ({ ...p, description: e.target.value }))} className="border border-slate-300 rounded-lg px-2 py-1 text-sm w-40" /></td>
+                      <td className="py-3 px-6">
+                        <div className="flex items-center gap-1">
+                          <button onClick={saveEditTier} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg"><Check className="w-4 h-4" /></button>
+                          <button onClick={() => setEditingTierId(null)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-lg"><X className="w-4 h-4" /></button>
+                        </div>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="py-4 px-6 font-semibold text-slate-900">{tier.label}</td>
+                      <td className="py-4 px-6"><span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-lg text-xs font-semibold">{tier.minOrders}+ orders</span></td>
+                      <td className="py-4 px-6"><code className="bg-slate-900 text-white px-2.5 py-1 rounded font-mono text-xs font-bold">{tier.promoCode}</code></td>
+                      <td className="py-4 px-6 font-medium text-slate-900">
+                        {tier.discountType === 'freeDelivery' ? <span className="text-emerald-600">Free Delivery</span> : `${tier.discountValue}% off`}
                       </td>
                       <td className="py-4 px-6 text-slate-500">{tier.description}</td>
                       <td className="py-4 px-6">

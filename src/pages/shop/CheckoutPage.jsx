@@ -6,7 +6,7 @@ import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { createOrder } from '../../services/api';
 import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
-import { getAutoResellerPromo, getPromoConfig, validatePromoCode } from '../../utils/promotions';
+import { getPromoConfig, validatePromoCode } from '../../utils/promotions';
 import toast from 'react-hot-toast';
 
 const SRI_LANKA_DISTRICTS = [
@@ -92,16 +92,10 @@ const CheckoutPage = () => {
   const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
   const customerEmail = customer?.email?.toLowerCase();
   const localOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');
-  const deliveredOrderCount = localOrders.filter(o =>
-    o.shippingAddress?.email?.toLowerCase() === customerEmail &&
-    ['Delivered', 'delivered'].includes(o.status)
-  ).length;
-  const resellerPromo = getAutoResellerPromo(deliveredOrderCount, promoConfig, customer);
-  const effectivePromo = resellerPromo || appliedPromo;
 
   // Re-validate promo on load to ensure it hasn't been used since applied to cart
   useEffect(() => {
-    if (appliedPromo && customer && !resellerPromo) {
+    if (appliedPromo && customer) {
       const email = customer.email?.toLowerCase();
       const usedPromoCodes = localOrders
         .filter(o => 
@@ -127,12 +121,12 @@ const CheckoutPage = () => {
         );
       }
     }
-  }, [appliedPromo, customer, promoConfig, resellerPromo]);
+  }, [appliedPromo, customer, promoConfig]);
 
   const baseShippingFee = subtotal >= 5000 ? 0 : 400;
-  const shippingFee = freeDeliveryEnabled || effectivePromo?.discountType === 'freeDelivery' ? 0 : baseShippingFee;
-  const discountAmount = effectivePromo?.discountType === 'percent'
-    ? Math.round((subtotal * effectivePromo.discountValue) / 100)
+  const shippingFee = freeDeliveryEnabled || appliedPromo?.discountType === 'freeDelivery' ? 0 : baseShippingFee;
+  const discountAmount = appliedPromo?.discountType === 'percent'
+    ? Math.round((subtotal * appliedPromo.discountValue) / 100)
     : 0;
   const total = subtotal + shippingFee - discountAmount;
 
@@ -225,7 +219,7 @@ const CheckoutPage = () => {
       shippingFee,
       subtotal,
       discount: discountAmount,
-      promoCode: effectivePromo?.promoCode || null,
+      promoCode: appliedPromo?.promoCode || null,
       total,
       notes: form.notes,
     };
@@ -530,12 +524,12 @@ const CheckoutPage = () => {
                   Order Summary
                 </h2>
 
-                {effectivePromo && (
+                {appliedPromo && (
                   <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2.5 mb-4">
                     <span className="text-emerald-600 text-lg">🎟️</span>
                     <div className="flex-1">
-                      <p className="text-xs font-bold text-emerald-800">{effectivePromo.promoCode} applied</p>
-                      <p className="text-xs text-emerald-600">{effectivePromo.description}</p>
+                      <p className="text-xs font-bold text-emerald-800">{appliedPromo.promoCode} applied</p>
+                      <p className="text-xs text-emerald-600">{appliedPromo.description}</p>
                     </div>
                   </div>
                 )}
@@ -589,7 +583,7 @@ const CheckoutPage = () => {
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-emerald-600">Discount ({effectivePromo?.promoCode})</span>
+                      <span className="text-emerald-600">Discount ({appliedPromo?.promoCode})</span>
                       <span className="font-bold text-emerald-600">-Rs {discountAmount.toLocaleString()}</span>
                     </div>
                   )}
