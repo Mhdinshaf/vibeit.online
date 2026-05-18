@@ -11,9 +11,9 @@ import { getPromoConfig, getEarnedPromos, getNextMilestone, isResellerCustomer, 
 const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEmail, customer }) => {
   const [copied, setCopied] = useState(null);
   const promos = getEarnedPromos(deliveredOrderCount, promoConfig, customer);
-  const visiblePromos = resellerCustomer ? promos.filter((promo) => !promo.resellerOnly) : promos;
   const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig, customer);
   const resellerCustomer = isResellerCustomer(customer);
+  const visiblePromos = resellerCustomer ? promos.filter((promo) => !promo.resellerOnly) : promos;
   const resellerPromos = (promoConfig?.promoTiers || []).filter((tier) => tier.resellerOnly);
   const prevMilestone = [...promos].reverse().find(p => p.earned);
   const progressFrom = prevMilestone ? prevMilestone.minOrders : 0;
