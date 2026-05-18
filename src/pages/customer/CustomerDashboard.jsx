@@ -6,12 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getCustomerOrders, getProductById, ORDER_SYNC_EVENT } from '../../services/api';
 import { customerAuthService } from '../../services/customerAuthService';
-import { getPromoConfig, getEarnedPromos, getNextMilestone, PROMO_CONFIG_EVENT } from '../../utils/promotions';
+import { getPromoConfig, getEarnedPromos, getNextMilestone, isResellerCustomer, PROMO_CONFIG_EVENT } from '../../utils/promotions';
 
-const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEmail }) => {
+const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEmail, customer }) => {
   const [copied, setCopied] = useState(null);
-  const promos = getEarnedPromos(deliveredOrderCount, promoConfig);
-  const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig);
+  const promos = getEarnedPromos(deliveredOrderCount, promoConfig, customer);
+  const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig, customer);
+  const resellerCustomer = isResellerCustomer(customer);
   const prevMilestone = [...promos].reverse().find(p => p.earned);
   const progressFrom = prevMilestone ? prevMilestone.minOrders : 0;
   const progressTo = nextMilestone ? nextMilestone.minOrders : (prevMilestone ? prevMilestone.minOrders : 5);
@@ -60,7 +61,9 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
         </div>
         <div>
           <h2 className="text-lg font-semibold text-slate-900">Your Rewards</h2>
-          <p className="text-sm text-slate-500">{deliveredOrderCount} delivered orders</p>
+          <p className="text-sm text-slate-500">
+            {resellerCustomer ? 'Reseller approved' : `${deliveredOrderCount} delivered orders`}
+          </p>
         </div>
       </div>
 
@@ -115,7 +118,9 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
                     )}
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">{promo.description}</p>
-                  <p className="text-xs text-slate-400 mt-1">{promo.minOrders}+ delivered orders</p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {promo.resellerOnly ? 'Reseller only promotion' : `${promo.minOrders}+ delivered orders`}
+                  </p>
                 </div>
                 {promo.earned ? (
                   isUsed ? (
@@ -599,6 +604,7 @@ const CustomerDashboard = () => {
                   promoConfig={promoConfig}
                   orders={orders}
                   customerEmail={customer?.email}
+                  customer={customer}
                 />
               </>
             )}

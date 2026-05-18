@@ -57,6 +57,7 @@ export const getEarnedPromos = (deliveredOrderCount, config, customer) => {
 
 export const getNextMilestone = (deliveredOrderCount, config, customer) => {
   const sorted = [...getEligibleTiers(config, customer)].sort((a, b) => a.minOrders - b.minOrders);
+  if (sorted.some((tier) => tier.resellerOnly)) return null;
   return sorted.find(t => deliveredOrderCount < t.minOrders) || null;
 };
 
