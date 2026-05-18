@@ -11,6 +11,7 @@ import { getPromoConfig, getEarnedPromos, getNextMilestone, isResellerCustomer, 
 const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEmail, customer }) => {
   const [copied, setCopied] = useState(null);
   const promos = getEarnedPromos(deliveredOrderCount, promoConfig, customer);
+  const visiblePromos = resellerCustomer ? promos.filter((promo) => !promo.resellerOnly) : promos;
   const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig, customer);
   const resellerCustomer = isResellerCustomer(customer);
   const resellerPromos = (promoConfig?.promoTiers || []).filter((tier) => tier.resellerOnly);
@@ -142,8 +143,9 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
         </div>
       )}
 
+      {!resellerCustomer && (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {promos.map(promo => {
+        {visiblePromos.map(promo => {
           const isUsed = usedPromoCodes.has(promo.promoCode.toUpperCase());
           return (
             <div key={promo.id}
@@ -194,6 +196,7 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
           );
         })}
       </div>
+      )}
     </div>
   );
 };
