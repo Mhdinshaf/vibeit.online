@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Search, ChevronLeft, ChevronRight, Eye, Edit2, X, Check, Loader2, AlertCircle, ShoppingBag, Package, Tag } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { getPromoConfig, getHighestEarnedTier, getTierBadgeColor, deriveCustomersFromOrders, PROMO_CONFIG_EVENT } from '../../utils/promotions';
+import { getPromoConfig, getHighestEarnedTier, getTierBadgeColor, deriveCustomersFromOrders, PROMO_CONFIG_EVENT, loadPromoConfigFromServer } from '../../utils/promotions';
 
 const CUSTOMERS_PER_PAGE = 15;
 const ORDERS_PER_PAGE = 5;
@@ -186,6 +186,7 @@ const AdminCustomers = () => {
   useEffect(() => {
     const handler = () => setPromoConfig(getPromoConfig());
     window.addEventListener(PROMO_CONFIG_EVENT, handler);
+    loadPromoConfigFromServer().then(setPromoConfig).catch(() => {});
     return () => window.removeEventListener(PROMO_CONFIG_EVENT, handler);
   }, []);
 

@@ -1,3 +1,5 @@
+import { getPromotionsConfig, updatePromotionsConfig } from '../services/api';
+
 const PROMO_CONFIG_KEY = 'vibeit_promo_config';
 export const PROMO_CONFIG_EVENT = 'vibeit:promo-config-updated';
 
@@ -10,6 +12,12 @@ const DEFAULT_CONFIG = {
     { id: 'tier20', minOrders: 20, label: 'VIP Reward',        promoCode: 'FREESHIP', discountType: 'freeDelivery', discountValue: 0,  description: 'Free Delivery on every order' },
   ],
 };
+
+const mergeConfig = (config) => ({
+  ...structuredClone(DEFAULT_CONFIG),
+  ...config,
+  promoTiers: Array.isArray(config?.promoTiers) ? config.promoTiers : structuredClone(DEFAULT_CONFIG.promoTiers),
+});
 
 export const isResellerCustomer = (customer) => (
   Boolean(
@@ -35,15 +43,32 @@ export const getPromoConfig = () => {
   try {
     const raw = localStorage.getItem(PROMO_CONFIG_KEY);
     if (!raw) return structuredClone(DEFAULT_CONFIG);
-    return { ...structuredClone(DEFAULT_CONFIG), ...JSON.parse(raw) };
+    return mergeConfig(JSON.parse(raw));
   } catch {
     return structuredClone(DEFAULT_CONFIG);
   }
 };
 
-export const savePromoConfig = (config) => {
-  localStorage.setItem(PROMO_CONFIG_KEY, JSON.stringify(config));
+export const applyPromoConfig = (config) => {
+  const merged = mergeConfig(config);
+  localStorage.setItem(PROMO_CONFIG_KEY, JSON.stringify(merged));
   window.dispatchEvent(new CustomEvent(PROMO_CONFIG_EVENT));
+  return merged;
+};
+
+export const loadPromoConfigFromServer = async () => {
+  try {
+    const remote = await getPromotionsConfig();
+    return applyPromoConfig(remote);
+  } catch {
+    return getPromoConfig();
+  }
+};
+
+export const savePromoConfig = async (config) => {
+  const merged = applyPromoConfig(config);
+  await updatePromotionsConfig(merged);
+  return merged;
 };
 
 export const getEarnedPromos = (deliveredOrderCount, config, customer) => {

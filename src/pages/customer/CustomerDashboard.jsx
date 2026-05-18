@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getCustomerOrders, getProductById, ORDER_SYNC_EVENT } from '../../services/api';
 import { customerAuthService } from '../../services/customerAuthService';
-import { getPromoConfig, getEarnedPromos, getNextMilestone, isResellerCustomer, PROMO_CONFIG_EVENT } from '../../utils/promotions';
+import { getPromoConfig, getEarnedPromos, getNextMilestone, isResellerCustomer, PROMO_CONFIG_EVENT, loadPromoConfigFromServer } from '../../utils/promotions';
 
 const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEmail, customer }) => {
   const [copied, setCopied] = useState(null);
@@ -246,6 +246,7 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const handler = () => setPromoConfig(getPromoConfig());
     window.addEventListener(PROMO_CONFIG_EVENT, handler);
+    loadPromoConfigFromServer().then(setPromoConfig).catch(() => {});
     return () => window.removeEventListener(PROMO_CONFIG_EVENT, handler);
   }, []);
 

@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import {
   getPromoConfig, savePromoConfig, getEarnedPromos,
   getTierBadgeColor, getHighestEarnedTier, deriveCustomersFromOrders, PROMO_CONFIG_EVENT,
+  loadPromoConfigFromServer,
 } from '../../utils/promotions';
 import { getAdminCustomers, getAdminCustomerOrders } from '../../services/api';
 
@@ -227,13 +228,24 @@ const AdminPromotions = () => {
   useEffect(() => {
     const handler = () => setConfig(getPromoConfig());
     window.addEventListener(PROMO_CONFIG_EVENT, handler);
+    loadPromoConfigFromServer().then(setConfig).catch(() => {
+      toast.error('Failed to load promotions');
+    });
     return () => window.removeEventListener(PROMO_CONFIG_EVENT, handler);
   }, []);
 
-  const persist = (updated) => {
-    setConfig(updated);
-    savePromoConfig(updated);
-    toast.success('Promotions saved');
+  const persist = async (updated) => {
+    setIsSaving(true);
+    try {
+      const saved = await savePromoConfig(updated);
+      setConfig(saved);
+      toast.success('Promotions saved');
+    } catch (error) {
+      setConfig(updated);
+      toast.error(error?.response?.data?.message || 'Failed to save promotions');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleFreeDelivery = () => {

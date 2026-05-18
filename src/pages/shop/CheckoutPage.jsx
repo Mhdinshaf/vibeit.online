@@ -6,7 +6,7 @@ import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { createOrder } from '../../services/api';
 import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
-import { getPromoConfig, validatePromoCode } from '../../utils/promotions';
+import { getPromoConfig, loadPromoConfigFromServer, PROMO_CONFIG_EVENT, validatePromoCode } from '../../utils/promotions';
 import toast from 'react-hot-toast';
 
 const SRI_LANKA_DISTRICTS = [
@@ -82,13 +82,19 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('Bank Transfer');
   const [showNotes, setShowNotes] = useState(false);
   const [isOrderFinalizing, setIsOrderFinalizing] = useState(false);
+  const [promoConfig, setPromoConfig] = useState(getPromoConfig());
 
   // Read promo applied in cart (from localStorage)
   const [appliedPromo, setAppliedPromo] = useState(() => {
     try { return JSON.parse(localStorage.getItem('vibeit_cart_promo') || 'null'); } catch { return null; }
   });
 
-  const promoConfig = getPromoConfig();
+  useEffect(() => {
+    const handler = () => setPromoConfig(getPromoConfig());
+    window.addEventListener(PROMO_CONFIG_EVENT, handler);
+    loadPromoConfigFromServer().then(setPromoConfig).catch(() => {});
+    return () => window.removeEventListener(PROMO_CONFIG_EVENT, handler);
+  }, []);
   const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
   const customerEmail = customer?.email?.toLowerCase();
   const localOrders = JSON.parse(localStorage.getItem('vibeit_orders_db') || '[]');

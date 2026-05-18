@@ -717,6 +717,17 @@ export const getOrderStats = async () => {
   }
 };
 
+// Promotions APIs
+export const getPromotionsConfig = async () => {
+  const response = await api.get('/promotions');
+  return response.data;
+};
+
+export const updatePromotionsConfig = async (data) => {
+  const response = await api.put('/admin/promotions', data);
+  return response.data;
+};
+
 // Auth APIs
 export const loginAdmin = async (data) => {
   const response = await api.post('/auth/login', data);

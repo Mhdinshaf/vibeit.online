@@ -2,8 +2,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Trash2, Lock, Minus, Plus, ArrowRight, Gift, ShoppingBag, Truck, CheckCircle, X } from 'lucide-react';
 import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
-import { useState } from 'react';
-import { getPromoConfig, validatePromoCode } from '../../utils/promotions';
+import { useEffect, useState } from 'react';
+import { getPromoConfig, loadPromoConfigFromServer, PROMO_CONFIG_EVENT, validatePromoCode } from '../../utils/promotions';
 import toast from 'react-hot-toast';
 
 const PROMO_STORAGE_KEY = 'vibeit_cart_promo';
@@ -13,6 +13,7 @@ const CartPage = () => {
   const { isAuthenticated, customer } = useCustomerAuth();
   const { items, removeItem, updateQuantity, clearCart } = useCartStore();
   const [promoInput, setPromoInput] = useState('');
+  const [promoConfig, setPromoConfig] = useState(getPromoConfig());
   const [appliedPromo, setAppliedPromo] = useState(() => {
     try { return JSON.parse(localStorage.getItem(PROMO_STORAGE_KEY) || 'null'); } catch { return null; }
   });
@@ -58,7 +59,13 @@ const CartPage = () => {
     ['Delivered', 'delivered'].includes(o.status)
   ).length;
 
-  const promoConfig = getPromoConfig();
+  useEffect(() => {
+    const handler = () => setPromoConfig(getPromoConfig());
+    window.addEventListener(PROMO_CONFIG_EVENT, handler);
+    loadPromoConfigFromServer().then(setPromoConfig).catch(() => {});
+    return () => window.removeEventListener(PROMO_CONFIG_EVENT, handler);
+  }, []);
+
   const freeDeliveryEnabled = promoConfig.freeDeliveryEnabled;
 
   const applyPromoCode = () => {
