@@ -352,7 +352,7 @@ const CartPage = () => {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <input
                           type="text"
                           value={promoInput}
@@ -363,7 +363,7 @@ const CartPage = () => {
                         />
                         <button
                           onClick={applyPromoCode}
-                          className="px-4 py-2 bg-slate-900 text-white font-bold text-sm rounded-md hover:bg-slate-700 transition-colors uppercase tracking-wider"
+                          className="w-full sm:w-auto px-4 py-2 bg-slate-900 text-white font-bold text-sm rounded-md hover:bg-slate-700 transition-colors uppercase tracking-wider"
                         >
                           Apply
                         </button>
