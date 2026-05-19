@@ -353,13 +353,11 @@ const HomePage = () => {
                     { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple', invertDark: true },
                     { name: 'Nike', iconUrl: 'https://cdn.simpleicons.org/nike', invertDark: true },
                     { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true },
-                    { name: 'Rolex', iconUrl: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@v11/icons/rolex.svg', invertDark: true },
                     { name: 'Dior', iconUrl: 'https://cdn.simpleicons.org/dior', invertDark: true },
                     { name: 'Adidas', iconUrl: 'https://cdn.simpleicons.org/adidas', invertDark: true },
                     { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple', invertDark: true },
                     { name: 'Nike', iconUrl: 'https://cdn.simpleicons.org/nike', invertDark: true },
                     { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true },
-                    { name: 'Rolex', iconUrl: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@v11/icons/rolex.svg', invertDark: true },
                     { name: 'Dior', iconUrl: 'https://cdn.simpleicons.org/dior', invertDark: true },
                     { name: 'Adidas', iconUrl: 'https://cdn.simpleicons.org/adidas', invertDark: true },
                   ].map((brand, idx) => (
