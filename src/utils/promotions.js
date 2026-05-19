@@ -99,7 +99,7 @@ export const validatePromoCode = (code, deliveredOrderCount, config, usedPromoCo
 
   // Check if already used
   const isUsed = usedPromoCodes.some(c => String(c || '').toUpperCase() === normalizedCode);
-  if (isUsed) {
+  if (isUsed && (!tier.resellerOnly || !resellerCustomer)) {
     return { ...tier, alreadyUsed: true };
   }
 
