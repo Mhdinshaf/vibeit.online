@@ -8,7 +8,7 @@ import logo from '../../assets/favicon.jpeg';
 const CustomerLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, startGoogleLogin, isAuthenticated } = useCustomerAuth();
+  const { login, verifyMfa, resendMfa, startGoogleLogin, isAuthenticated } = useCustomerAuth();
   
   // Determine where to redirect after login
   const searchParams = new URLSearchParams(location.search);
@@ -21,7 +21,13 @@ const CustomerLogin = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifyingMfa, setIsVerifyingMfa] = useState(false);
+  const [isResendingMfa, setIsResendingMfa] = useState(false);
   const [error, setError] = useState('');
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaToken, setMfaToken] = useState('');
+  const [mfaMethod, setMfaMethod] = useState('');
+  const [otpCode, setOtpCode] = useState('');
 
   // Redirect if already logged in - use useEffect
   useEffect(() => {
@@ -59,7 +65,15 @@ const CustomerLogin = () => {
       }
 
       const response = await login(formData.email, formData.password);
-      
+
+      if (response?.mfaRequired) {
+        setMfaRequired(true);
+        setMfaToken(response.mfaToken || '');
+        setMfaMethod(response.method || 'email');
+        toast.success('Enter your verification code to continue.');
+        return;
+      }
+
       toast.success('Login successful!');
       
       // Force re-render by reading fresh data from localStorage
@@ -75,6 +89,55 @@ const CustomerLogin = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVerifyMfa = async (e) => {
+    e.preventDefault();
+    setError('');
+    const trimmed = otpCode.trim();
+    if (trimmed.length !== 6) {
+      setError('Enter the 6-digit verification code.');
+      return;
+    }
+
+    try {
+      setIsVerifyingMfa(true);
+      await verifyMfa(mfaToken, trimmed);
+      toast.success('Login successful!');
+      await new Promise(resolve => setTimeout(resolve, 50));
+      navigate(from);
+    } catch (err) {
+      const errorMsg = err.message || 'Verification failed. Please try again.';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setIsVerifyingMfa(false);
+    }
+  };
+
+  const handleResendMfa = async () => {
+    try {
+      setIsResendingMfa(true);
+      const response = await resendMfa(mfaToken);
+      if (response?.mfaToken) {
+        setMfaToken(response.mfaToken);
+      }
+      toast.success('A new code has been sent.');
+    } catch (err) {
+      const errorMsg = err.message || 'Failed to resend code.';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setIsResendingMfa(false);
+    }
+  };
+
+  const handleResetMfa = () => {
+    setMfaRequired(false);
+    setMfaToken('');
+    setMfaMethod('');
+    setOtpCode('');
+    setError('');
   };
 
   const handleGoogleLogin = () => {
@@ -114,103 +177,163 @@ const CustomerLogin = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          {mfaRequired ? (
+            <form onSubmit={handleVerifyMfa} className="space-y-5">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                {mfaMethod === 'totp'
+                  ? 'Open your authenticator app and enter the 6-digit code.'
+                  : 'We sent a verification code to your email. Enter it below.'}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Verification Code
+                </label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Email Address"
-                  className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
-                  disabled={isLoading}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Enter 6-digit code"
+                  className="w-full pl-4 pr-4 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
+                  disabled={isVerifyingMfa}
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                  className="w-full pl-12 pr-12 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
-                  disabled={isLoading}
-                />
+              <button
+                type="submit"
+                disabled={isVerifyingMfa}
+                className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              >
+                {isVerifyingMfa ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  'Verify & Continue'
+                )}
+              </button>
+
+              {mfaMethod === 'email' && (
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                  disabled={isLoading}
+                  onClick={handleResendMfa}
+                  disabled={isResendingMfa}
+                  className="w-full py-2.5 px-4 border border-slate-300 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {isResendingMfa ? 'Resending...' : 'Resend code'}
                 </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                  disabled={isLoading}
-                />
-                <span className="text-sm text-slate-600">Remember me</span>
-              </label>
-              <Link
-                to="/auth/customer/forgot-password"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Logging in...
-                </>
-              ) : (
-                <>
-                  Login
-                </>
               )}
-            </button>
 
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              className="w-full py-2.5 px-4 border border-slate-300 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#4285F4" d="M21.35 11.1H12v2.98h5.35c-.23 1.5-1.73 4.4-5.35 4.4-3.22 0-5.84-2.67-5.84-5.97s2.62-5.97 5.84-5.97c1.84 0 3.07.79 3.78 1.46l2.58-2.5C16.7 3.94 14.56 3 12 3 7.03 3 3 7.03 3 12s4.03 9 9 9c5.19 0 8.62-3.64 8.62-8.77 0-.59-.06-1.04-.27-1.13z" />
-              </svg>
-              Sign in with Google
-            </button>
-          </form>
+              <button
+                type="button"
+                onClick={handleResetMfa}
+                className="w-full text-sm text-slate-500 hover:text-slate-700 transition-colors"
+              >
+                Use a different account
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email Address"
+                    className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    className="w-full pl-12 pr-12 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="rememberMe"
+                    checked={formData.rememberMe}
+                    onChange={handleChange}
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    disabled={isLoading}
+                  />
+                  <span className="text-sm text-slate-600">Remember me</span>
+                </label>
+                <Link
+                  to="/auth/customer/forgot-password"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  <>
+                    Login
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="w-full py-2.5 px-4 border border-slate-300 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="#4285F4" d="M21.35 11.1H12v2.98h5.35c-.23 1.5-1.73 4.4-5.35 4.4-3.22 0-5.84-2.67-5.84-5.97s2.62-5.97 5.84-5.97c1.84 0 3.07.79 3.78 1.46l2.58-2.5C16.7 3.94 14.56 3 12 3 7.03 3 3 7.03 3 12s4.03 9 9 9c5.19 0 8.62-3.64 8.62-8.77 0-.59-.06-1.04-.27-1.13z" />
+                </svg>
+                Sign in with Google
+              </button>
+            </form>
+          )}
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">

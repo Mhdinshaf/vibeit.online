@@ -201,6 +201,26 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
   );
 };
 
+const normalizeMfaStatus = (payload, fallbackCustomer) => {
+  const source = payload || fallbackCustomer || {};
+  const enabledRaw =
+    source?.enabled ??
+    source?.mfaEnabled ??
+    source?.mfa?.enabled ??
+    fallbackCustomer?.mfaEnabled ??
+    fallbackCustomer?.mfa?.enabled;
+  const methodRaw =
+    source?.method ??
+    source?.mfaMethod ??
+    source?.mfa?.method ??
+    fallbackCustomer?.mfa?.method ??
+    '';
+  return {
+    enabled: Boolean(enabledRaw),
+    method: methodRaw || '',
+  };
+};
+
 const CustomerDashboard = () => {
   const navigate = useNavigate();
   const { customer, logout, updateProfile, refreshCustomer } = useCustomerAuth();
@@ -223,9 +243,11 @@ const CustomerDashboard = () => {
     phone: '',
   });
   const [mfaEnabled, setMfaEnabled] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [isSendingOtp, setIsSendingOtp] = useState(false);
-  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [mfaMethod, setMfaMethod] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const [totpSetup, setTotpSetup] = useState(null);
+  const [isStartingTotp, setIsStartingTotp] = useState(false);
+  const [isVerifyingTotp, setIsVerifyingTotp] = useState(false);
   const [hasLoadedMfa, setHasLoadedMfa] = useState(false);
 
   const readLocalOrders = useCallback(() => {
@@ -275,17 +297,26 @@ const CustomerDashboard = () => {
     }
   }, [customer]);
 
+  const applyMfaStatus = useCallback((payload, fallbackCustomer) => {
+    const normalized = normalizeMfaStatus(payload, fallbackCustomer);
+    setMfaEnabled(normalized.enabled);
+    if (normalized.method) {
+      setMfaMethod(normalized.method);
+    }
+    return normalized;
+  }, []);
+
   useEffect(() => {
     if (!customer) return;
-    const enabled = customer.mfaEnabled ?? customer.mfa?.enabled ?? false;
-    setMfaEnabled(Boolean(enabled));
-  }, [customer]);
+    applyMfaStatus(null, customer);
+  }, [customer, applyMfaStatus]);
 
   useEffect(() => {
     if (!customer || hasLoadedMfa) return;
     const loadMfaStatus = async () => {
       try {
-        await refreshCustomer();
+        const response = await customerAuthService.getMfaStatus();
+        applyMfaStatus(response, customer);
       } catch {
         // Silent - surface errors on explicit actions
       } finally {
@@ -293,7 +324,7 @@ const CustomerDashboard = () => {
       }
     };
     loadMfaStatus();
-  }, [customer, hasLoadedMfa, refreshCustomer]);
+  }, [customer, hasLoadedMfa, applyMfaStatus]);
 
   useEffect(() => {
     const handler = () => setPromoConfig(getPromoConfig());
@@ -318,36 +349,47 @@ const CustomerDashboard = () => {
     }
   };
 
-  const handleSendOtp = async () => {
+  const handleStartTotpSetup = async () => {
     try {
-      setIsSendingOtp(true);
-      await customerAuthService.sendMfaOtp();
-      toast.success('OTP sent. Check your email or device to continue.');
+      setIsStartingTotp(true);
+      const response = await customerAuthService.startTotpSetup();
+      setTotpSetup({
+        qrCode:
+          response?.qrCodeDataUrl ||
+          response?.qrCode ||
+          response?.qrCodeUrl ||
+          response?.qr ||
+          '',
+        otpauthUrl: response?.otpauthUrl || response?.otpAuthUrl || response?.uri || '',
+        secret: response?.secret || response?.sharedSecret || '',
+      });
+      toast.success('Scan the QR code to set up your authenticator app.');
     } catch (error) {
-      toast.error(error?.message || error?.response?.data?.message || 'Failed to send OTP');
+      toast.error(error?.message || error?.response?.data?.message || 'Failed to start MFA setup');
     } finally {
-      setIsSendingOtp(false);
+      setIsStartingTotp(false);
     }
   };
 
-  const handleVerifyOtp = async (e) => {
+  const handleVerifyTotpSetup = async (e) => {
     e.preventDefault();
-    const otp = otpCode.trim();
-    if (otp.length !== 6) {
-      toast.error('Enter the 6-digit OTP to continue.');
+    const code = totpCode.trim();
+    if (code.length !== 6) {
+      toast.error('Enter the 6-digit code from your authenticator.');
       return;
     }
     try {
-      setIsVerifyingOtp(true);
-      await customerAuthService.verifyMfaOtp(otp);
+      setIsVerifyingTotp(true);
+      const response = await customerAuthService.verifyTotpSetup(code);
+      applyMfaStatus(response, customer);
       await refreshCustomer();
-      setMfaEnabled(true);
-      setOtpCode('');
+      setTotpCode('');
+      setTotpSetup(null);
       toast.success('MFA enabled successfully.');
     } catch (error) {
-      toast.error(error?.message || error?.response?.data?.message || 'OTP verification failed');
+      toast.error(error?.message || error?.response?.data?.message || 'Verification failed');
     } finally {
-      setIsVerifyingOtp(false);
+      setIsVerifyingTotp(false);
     }
   };
 
@@ -988,6 +1030,11 @@ const CustomerDashboard = () => {
                   </span>
                 )}
               </div>
+              {mfaEnabled && (
+                <p className="text-xs text-slate-500 mt-2">
+                  Method: {mfaMethod || 'Authenticator app'}
+                </p>
+              )}
 
               <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="rounded-xl border border-slate-200 p-4 bg-slate-50">
@@ -996,43 +1043,70 @@ const CustomerDashboard = () => {
                       <ShieldCheck className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">One-time password</p>
-                      <p className="text-xs text-slate-500">Send a verification code to enable MFA.</p>
+                      <p className="text-sm font-semibold text-slate-900">Authenticator app (TOTP)</p>
+                      <p className="text-xs text-slate-500">Scan a QR code to enable MFA.</p>
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={handleSendOtp}
-                    disabled={isSendingOtp || mfaEnabled}
+                    onClick={handleStartTotpSetup}
+                    disabled={isStartingTotp || mfaEnabled}
                     className="mt-4 w-full px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-colors disabled:opacity-50"
                   >
-                    {isSendingOtp ? 'Sending OTP…' : mfaEnabled ? 'MFA Already Enabled' : 'Send OTP'}
+                    {isStartingTotp
+                      ? 'Starting setup…'
+                      : mfaEnabled
+                        ? 'MFA Already Enabled'
+                        : totpSetup
+                          ? 'Restart setup'
+                          : 'Start setup'}
                   </button>
                 </div>
 
                 <div className="rounded-xl border border-slate-200 p-4 bg-white">
-                  <p className="text-sm font-semibold text-slate-900 mb-2">Verify OTP</p>
+                  <p className="text-sm font-semibold text-slate-900 mb-2">Verify setup</p>
                   {mfaEnabled ? (
                     <p className="text-sm text-slate-500">MFA is active for this account.</p>
-                  ) : (
-                    <form onSubmit={handleVerifyOtp} className="space-y-3">
+                  ) : totpSetup ? (
+                    <form onSubmit={handleVerifyTotpSetup} className="space-y-3">
+                      {totpSetup.qrCode ? (
+                        <div className="flex justify-center">
+                          <img
+                            src={totpSetup.qrCode}
+                            alt="Authenticator QR code"
+                            className="h-32 w-32 rounded-lg border border-slate-200 bg-white p-2"
+                          />
+                        </div>
+                      ) : totpSetup.otpauthUrl ? (
+                        <p className="text-xs text-slate-500 break-all">
+                          {totpSetup.otpauthUrl}
+                        </p>
+                      ) : totpSetup.secret ? (
+                        <p className="text-xs text-slate-500">
+                          Secret: <span className="font-semibold">{totpSetup.secret}</span>
+                        </p>
+                      ) : null}
                       <input
                         type="text"
                         inputMode="numeric"
                         maxLength={6}
-                        value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        value={totpCode}
+                        onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                         placeholder="Enter 6-digit code"
                         className="w-full border border-slate-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:border-blue-500"
                       />
                       <button
                         type="submit"
-                        disabled={isVerifyingOtp}
+                        disabled={isVerifyingTotp}
                         className="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
                       >
-                        {isVerifyingOtp ? 'Verifying…' : 'Verify OTP'}
+                        {isVerifyingTotp ? 'Verifying…' : 'Verify & Enable'}
                       </button>
                     </form>
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      Start setup to get your QR code and enable MFA.
+                    </p>
                   )}
                 </div>
               </div>

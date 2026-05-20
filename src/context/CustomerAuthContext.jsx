@@ -120,16 +120,44 @@ export const CustomerAuthProvider = ({ children }) => {
    */
   const login = async (email, password) => {
     const response = await customerAuthService.login(email, password);
+    if (response?.token) {
+      const customerData = response.customer || response;
+      setCustomer(customerData);
+      
+      // Emit auth updated event so any listeners know to refresh
+      window.dispatchEvent(new CustomEvent('vibeit:auth-updated', {
+        detail: { customerData }
+      }));
+    }
     
+    return response;
+  };
+
+  /**
+   * Verify MFA OTP during login
+   * @param {string} mfaToken
+   * @param {string} otp
+   * @returns {Promise<object>}
+   */
+  const verifyMfa = async (mfaToken, otp) => {
+    const response = await customerAuthService.verifyMfa(mfaToken, otp);
     const customerData = response.customer || response;
     setCustomer(customerData);
     
-    // Emit auth updated event so any listeners know to refresh
     window.dispatchEvent(new CustomEvent('vibeit:auth-updated', {
       detail: { customerData }
     }));
     
     return response;
+  };
+
+  /**
+   * Resend MFA OTP during login
+   * @param {string} mfaToken
+   * @returns {Promise<object>}
+   */
+  const resendMfa = async (mfaToken) => {
+    return customerAuthService.resendMfa(mfaToken);
   };
 
   /**
@@ -186,6 +214,8 @@ export const CustomerAuthProvider = ({ children }) => {
     loading,
     register,
     login,
+    verifyMfa,
+    resendMfa,
     startGoogleLogin,
     logout,
     updateProfile,

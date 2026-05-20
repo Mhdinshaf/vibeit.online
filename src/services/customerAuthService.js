@@ -42,7 +42,7 @@ export const customerAuthService = {
    * Login customer user
    * @param {string} email 
    * @param {string} password 
-   * @returns {Promise<{token: string, customer: object}>}
+   * @returns {Promise<{token?: string, customer?: object, mfaRequired?: boolean, method?: string, mfaToken?: string}>}
    */
   async login(email, password) {
     try {
@@ -50,17 +50,54 @@ export const customerAuthService = {
       
       const { token, customer } = response.data;
       
+      if (token) {
+        // Store in localStorage
+        localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
+        localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(customer));
+        
+        // Set auth header for future requests
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
+      
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Verify MFA OTP during login
+   * @param {string} mfaToken
+   * @param {string} otp
+   * @returns {Promise<{token: string, customer: object}>}
+   */
+  async verifyMfa(mfaToken, otp) {
+    try {
+      const response = await api.post('/customer/auth/mfa/verify', { mfaToken, otp });
+      const { token, customer } = response.data;
+
       if (!token) {
         throw new Error('No token received from backend');
       }
-      
-      // Store in localStorage
+
       localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
       localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(customer));
-      
-      // Set auth header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
+
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Resend MFA OTP during login
+   * @param {string} mfaToken
+   * @returns {Promise<{mfaToken: string}>}
+   */
+  async resendMfa(mfaToken) {
+    try {
+      const response = await api.post('/customer/auth/mfa/resend', { mfaToken });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -166,12 +203,12 @@ export const customerAuthService = {
   },
 
   /**
-   * Send MFA OTP
+   * Start TOTP setup for MFA
    * @returns {Promise<object>}
    */
-  async sendMfaOtp() {
+  async startTotpSetup() {
     try {
-      const response = await api.post('/customer/auth/mfa/send-otp');
+      const response = await api.post('/customer/auth/mfa/totp/setup/start');
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -179,17 +216,26 @@ export const customerAuthService = {
   },
 
   /**
-   * Verify MFA OTP
-   * @param {string} otp
+   * Verify TOTP setup for MFA
+   * @param {string} code
    * @returns {Promise<object>}
    */
-  async verifyMfaOtp(otp) {
+  async verifyTotpSetup(code) {
     try {
-      const response = await api.post('/customer/auth/mfa/verify-otp', { otp });
-      const customer = response.data?.customer || response.data?.user;
-      if (customer) {
-        localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(customer));
-      }
+      const response = await api.post('/customer/auth/mfa/totp/setup/verify', { code });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Get MFA status for customer
+   * @returns {Promise<object>}
+   */
+  async getMfaStatus() {
+    try {
+      const response = await api.get('/customer/auth/mfa/status');
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
