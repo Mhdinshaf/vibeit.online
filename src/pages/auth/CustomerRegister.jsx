@@ -8,7 +8,7 @@ import logo from '../../assets/favicon.jpeg';
 const CustomerRegister = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { register, isAuthenticated } = useCustomerAuth();
+  const { register, verifyMfa, resendMfa, isAuthenticated } = useCustomerAuth();
   
   // Determine where to redirect after registration
   const from = location.state?.from?.pathname || '/customer/dashboard';
@@ -25,7 +25,14 @@ const CustomerRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifyingMfa, setIsVerifyingMfa] = useState(false);
+  const [isResendingMfa, setIsResendingMfa] = useState(false);
   const [error, setError] = useState('');
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaToken, setMfaToken] = useState('');
+  const [mfaMethod, setMfaMethod] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   // Redirect if already logged in - use useEffect
   useEffect(() => {
@@ -103,13 +110,22 @@ const CustomerRegister = () => {
         return;
       }
 
-      await register(
+      const response = await register(
         formData.email,
         formData.password,
         formData.firstName,
         formData.lastName,
         formData.phone
       );
+      if (response?.mfaRequired) {
+        setMfaRequired(true);
+        setMfaToken(response.mfaToken || '');
+        setMfaMethod(response.method || 'email');
+        setResendCooldown(response.method === 'email' ? 60 : 0);
+        toast.success('Enter your verification code to continue.');
+        return;
+      }
+
       toast.success('Registration successful! Welcome to VIBEIT');
       navigate(from);
     } catch (err) {
@@ -119,6 +135,81 @@ const CustomerRegister = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (!mfaRequired || resendCooldown <= 0 || mfaMethod !== 'email') return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [mfaRequired, resendCooldown, mfaMethod]);
+
+  const resolveMfaErrorMessage = (err, fallback) => {
+    const message =
+      err?.response?.data?.message ||
+      err?.message ||
+      '';
+    const normalized = message.toLowerCase();
+    if (
+      normalized.includes('smtp') ||
+      normalized.includes('email') && normalized.includes('unavailable') ||
+      normalized.includes('delivery')
+    ) {
+      return 'OTP delivery is temporarily unavailable. Try again later or use an authenticator.';
+    }
+    return fallback;
+  };
+
+  const handleVerifyMfa = async (e) => {
+    e.preventDefault();
+    setError('');
+    const trimmed = otpCode.trim();
+    if (trimmed.length !== 6) {
+      setError('Enter the 6-digit verification code.');
+      return;
+    }
+
+    try {
+      setIsVerifyingMfa(true);
+      await verifyMfa(mfaToken, trimmed);
+      toast.success('Registration complete! Welcome to VIBEIT');
+      await new Promise(resolve => setTimeout(resolve, 50));
+      navigate(from);
+    } catch (err) {
+      const errorMsg = resolveMfaErrorMessage(err, 'Verification failed. Please try again.');
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setIsVerifyingMfa(false);
+    }
+  };
+
+  const handleResendMfa = async () => {
+    try {
+      setIsResendingMfa(true);
+      const response = await resendMfa(mfaToken);
+      if (response?.mfaToken) {
+        setMfaToken(response.mfaToken);
+      }
+      setResendCooldown(60);
+      toast.success('A new code has been sent.');
+    } catch (err) {
+      const errorMsg = resolveMfaErrorMessage(err, 'Failed to resend code.');
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setIsResendingMfa(false);
+    }
+  };
+
+  const handleResetMfa = () => {
+    setMfaRequired(false);
+    setMfaToken('');
+    setMfaMethod('');
+    setOtpCode('');
+    setResendCooldown(0);
+    setError('');
   };
 
   return (
@@ -153,181 +244,245 @@ const CustomerRegister = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {mfaRequired ? (
+            <form onSubmit={handleVerifyMfa} className="space-y-4">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                {mfaMethod === 'totp'
+                  ? 'Open your authenticator app and enter the 6-digit code.'
+                  : 'We sent a verification code to your email. Enter it below.'}
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  First Name
+                  Verification Code
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    placeholder="John"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Last Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    placeholder="Doe"
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Email Address"
-                  className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
-                  disabled={isLoading}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Enter 6-digit code"
+                  className="w-full pl-4 pr-4 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
+                  disabled={isVerifyingMfa}
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Phone Number
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Phone Number"
-                  className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
+              <button
+                type="submit"
+                disabled={isVerifyingMfa}
+                className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2 text-sm"
+              >
+                {isVerifyingMfa ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  'Verify & Continue'
+                )}
+              </button>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                  className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
-                  disabled={isLoading}
-                />
+              {mfaMethod === 'email' && (
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                  disabled={isLoading}
+                  onClick={handleResendMfa}
+                  disabled={isResendingMfa || resendCooldown > 0}
+                  className="w-full py-2.5 px-4 border border-slate-300 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
+                  {isResendingMfa
+                    ? 'Resending...'
+                    : resendCooldown > 0
+                      ? `Resend available in ${resendCooldown}s`
+                      : 'Resend code'}
                 </button>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                Min 8 chars, 1 uppercase, 1 lowercase, 1 number
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm Password"
-                  className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                  disabled={isLoading}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <label className="flex items-start gap-2 cursor-pointer pt-2">
-              <input
-                type="checkbox"
-                name="agreeTerms"
-                checked={formData.agreeTerms}
-                onChange={handleChange}
-                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer mt-0.5"
-                disabled={isLoading}
-              />
-              <span className="text-xs text-slate-600">
-                I agree to the{' '}
-                <a href="/about" className="text-slate-700 hover:underline">
-                  Terms & Conditions
-                </a>{' '}
-                and{' '}
-                <a href="/about" className="text-slate-700 hover:underline">
-                  Privacy Policy
-                </a>
-              </span>
-            </label>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-sm"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Creating Account...
-                </>
-              ) : (
-                <>
-                  Create Account
-                </>
               )}
-            </button>
-          </form>
+
+              <button
+                type="button"
+                onClick={handleResetMfa}
+                className="w-full text-sm text-slate-500 hover:text-slate-700 transition-colors"
+              >
+                Use a different account
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    First Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      placeholder="John"
+                      className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Last Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder="Doe"
+                      className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email Address"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Phone Number"
+                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Min 8 chars, 1 uppercase, 1 lowercase, 1 number
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm Password"
+                    className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm text-slate-900 placeholder-slate-400"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                    disabled={isLoading}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <label className="flex items-start gap-2 cursor-pointer pt-2">
+                <input
+                  type="checkbox"
+                  name="agreeTerms"
+                  checked={formData.agreeTerms}
+                  onChange={handleChange}
+                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer mt-0.5"
+                  disabled={isLoading}
+                />
+                <span className="text-xs text-slate-600">
+                  I agree to the{' '}
+                  <a href="/about" className="text-slate-700 hover:underline">
+                    Terms & Conditions
+                  </a>{' '}
+                  and{' '}
+                  <a href="/about" className="text-slate-700 hover:underline">
+                    Privacy Policy
+                  </a>
+                </span>
+              </label>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 text-sm"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                  </>
+                )}
+              </button>
+            </form>
+          )}
 
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">

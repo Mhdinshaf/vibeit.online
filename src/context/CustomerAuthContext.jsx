@@ -107,8 +107,14 @@ export const CustomerAuthProvider = ({ children }) => {
    */
   const register = async (email, password, firstName, lastName, phone) => {
     const response = await customerAuthService.register(email, password, firstName, lastName, phone);
-    const customerData = response.customer || response;
-    setCustomer(customerData);
+    if (response?.token) {
+      const customerData = response.customer || response;
+      setCustomer(customerData);
+      
+      window.dispatchEvent(new CustomEvent('vibeit:auth-updated', {
+        detail: { customerData }
+      }));
+    }
     return response;
   };
 

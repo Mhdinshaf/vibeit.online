@@ -12,7 +12,7 @@ export const customerAuthService = {
    * @param {string} firstName 
    * @param {string} lastName 
    * @param {string} phone 
-   * @returns {Promise<{token: string, customer: object}>}
+   * @returns {Promise<{token?: string, customer?: object, mfaRequired?: boolean, method?: string, mfaToken?: string}>}
    */
   async register(email, password, firstName, lastName, phone) {
     try {
@@ -25,12 +25,14 @@ export const customerAuthService = {
       });
       const { token, customer } = response.data;
       
-      // Store in localStorage
-      localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
-      localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(customer));
-      
-      // Set auth header for future requests
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      if (token) {
+        // Store in localStorage
+        localStorage.setItem(CUSTOMER_TOKEN_KEY, token);
+        localStorage.setItem(CUSTOMER_DATA_KEY, JSON.stringify(customer));
+        
+        // Set auth header for future requests
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
       
       return response.data;
     } catch (error) {
@@ -73,7 +75,11 @@ export const customerAuthService = {
    */
   async verifyMfa(mfaToken, otp) {
     try {
-      const response = await api.post('/customer/auth/mfa/verify', { mfaToken, otp });
+      const response = await api.post(
+        '/customer/auth/mfa/verify',
+        { mfaToken, otp },
+        mfaToken ? { headers: { Authorization: `Bearer ${mfaToken}` } } : undefined
+      );
       const { token, customer } = response.data;
 
       if (!token) {
