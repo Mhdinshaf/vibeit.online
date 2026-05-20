@@ -28,6 +28,7 @@ const CustomerLogin = () => {
   const [mfaToken, setMfaToken] = useState('');
   const [mfaMethod, setMfaMethod] = useState('');
   const [otpCode, setOtpCode] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   // Redirect if already logged in - use useEffect
   useEffect(() => {
@@ -70,6 +71,7 @@ const CustomerLogin = () => {
         setMfaRequired(true);
         setMfaToken(response.mfaToken || '');
         setMfaMethod(response.method || 'email');
+        setResendCooldown(response.method === 'email' ? 60 : 0);
         toast.success('Enter your verification code to continue.');
         return;
       }
@@ -91,6 +93,30 @@ const CustomerLogin = () => {
     }
   };
 
+  useEffect(() => {
+    if (!mfaRequired || resendCooldown <= 0 || mfaMethod !== 'email') return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [mfaRequired, resendCooldown, mfaMethod]);
+
+  const resolveMfaErrorMessage = (err, fallback) => {
+    const message =
+      err?.response?.data?.message ||
+      err?.message ||
+      '';
+    const normalized = message.toLowerCase();
+    if (
+      normalized.includes('smtp') ||
+      normalized.includes('email') && normalized.includes('unavailable') ||
+      normalized.includes('delivery')
+    ) {
+      return 'OTP delivery is temporarily unavailable. Try again later or use an authenticator.';
+    }
+    return fallback;
+  };
+
   const handleVerifyMfa = async (e) => {
     e.preventDefault();
     setError('');
@@ -107,7 +133,7 @@ const CustomerLogin = () => {
       await new Promise(resolve => setTimeout(resolve, 50));
       navigate(from);
     } catch (err) {
-      const errorMsg = err.message || 'Verification failed. Please try again.';
+      const errorMsg = resolveMfaErrorMessage(err, 'Verification failed. Please try again.');
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -122,9 +148,10 @@ const CustomerLogin = () => {
       if (response?.mfaToken) {
         setMfaToken(response.mfaToken);
       }
+      setResendCooldown(60);
       toast.success('A new code has been sent.');
     } catch (err) {
-      const errorMsg = err.message || 'Failed to resend code.';
+      const errorMsg = resolveMfaErrorMessage(err, 'Failed to resend code.');
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -137,6 +164,7 @@ const CustomerLogin = () => {
     setMfaToken('');
     setMfaMethod('');
     setOtpCode('');
+    setResendCooldown(0);
     setError('');
   };
 
@@ -220,10 +248,14 @@ const CustomerLogin = () => {
                 <button
                   type="button"
                   onClick={handleResendMfa}
-                  disabled={isResendingMfa}
+                  disabled={isResendingMfa || resendCooldown > 0}
                   className="w-full py-2.5 px-4 border border-slate-300 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
                 >
-                  {isResendingMfa ? 'Resending...' : 'Resend code'}
+                  {isResendingMfa
+                    ? 'Resending...'
+                    : resendCooldown > 0
+                      ? `Resend available in ${resendCooldown}s`
+                      : 'Resend code'}
                 </button>
               )}
 
