@@ -233,22 +233,22 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Tall Right Card (Yellow) */}
+            {/* Tall Right Card (Yellow) - Trending Items */}
             <div className="sm:col-span-1 lg:row-span-2 bg-yellow-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between h-auto sm:h-[400px] lg:h-full group overflow-hidden relative hover:shadow-lg transition-all">
               <div className="absolute -bottom-8 -right-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                <ShoppingCart className="w-40 h-40 sm:w-48 sm:h-48 text-slate-900" />
+                <Flame className="w-40 h-40 sm:w-48 sm:h-48 text-slate-900" />
               </div>
               <div className="relative z-10">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="bg-slate-900/20 text-slate-900 px-4 py-1 rounded-full text-xs font-bold">Grocery</span>
-                  <span className="bg-slate-900/20 text-slate-900 px-4 py-1 rounded-full text-xs font-bold">Food</span>
+                  <span className="bg-slate-900/20 text-slate-900 px-4 py-1 rounded-full text-xs font-bold">Trending</span>
+                  <span className="bg-slate-900/20 text-slate-900 px-4 py-1 rounded-full text-xs font-bold">Hot</span>
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Grocery & Food</h3>
+                <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Trending Items</h3>
               </div>
               <div className="relative z-10 flex justify-center my-4">
-                <ShoppingBag className="w-24 sm:w-32 h-24 sm:h-32 text-slate-900 drop-shadow-lg" />
+                <Zap className="w-24 sm:w-32 h-24 sm:h-32 text-slate-900 drop-shadow-lg" />
               </div>
-              <Link to="/shop?search=grocery" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-sm font-bold transition-colors w-fit">
+              <Link to="/shop?category=Trending%20Items" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-sm font-bold transition-colors w-fit">
                 Explore product
                 <ArrowRight className="w-4 h-4" />
               </Link>
