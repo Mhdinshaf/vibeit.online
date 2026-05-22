@@ -1,23 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight } from 'lucide-react';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { getActiveCampaign } from '../../services/api';
 
 const HeroSection = () => {
   // Fetch active campaign
   const { data: activeCampaign, isLoading } = useQuery({
     queryKey: ['campaigns/active'],
-    queryFn: async () => {
-      try {
-        const res = await axios.get(`${API_URL}/campaigns/active`);
-        return res.data;
-      } catch (error) {
-        console.error('Failed to fetch campaign:', error);
-        return null;
-      }
-    },
+    queryFn: getActiveCampaign,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 

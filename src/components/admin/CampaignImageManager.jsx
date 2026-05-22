@@ -96,7 +96,7 @@ const CampaignImageManager = () => {
     },
   });
 
-  const selectedCampaign = campaigns.find(c => c._id === selectedCampaignId);
+  const selectedCampaign = Array.isArray(campaigns) && campaigns.find(c => c._id === selectedCampaignId);
   const isActiveCampaign = activeCampaign?._id === selectedCampaignId;
 
   if (campaignsLoading) {

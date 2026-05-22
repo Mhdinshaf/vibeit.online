@@ -787,12 +787,35 @@ export const uploadImages = async (formData) => {
 // Campaign APIs
 export const getCampaigns = async () => {
   const response = await api.get('/campaigns');
-  return response.data;
+  const data = response.data;
+  // Normalize response - ensure it's always an array
+  if (Array.isArray(data)) {
+    return data;
+  }
+  if (data && typeof data === 'object') {
+    // Handle wrapped response like { data: [...] } or { campaigns: [...] }
+    if (Array.isArray(data.data)) return data.data;
+    if (Array.isArray(data.campaigns)) return data.campaigns;
+  }
+  return [];
 };
 
 export const getActiveCampaign = async () => {
-  const response = await api.get('/campaigns/active');
-  return response.data;
+  try {
+    const response = await api.get('/campaigns/active');
+    const data = response.data;
+    // Return the campaign object or null if not found
+    if (data === null || data === undefined) {
+      return null;
+    }
+    return data;
+  } catch (error) {
+    // If 404, no active campaign exists yet
+    if (error.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
 };
 
 export const createCampaign = async (data) => {
