@@ -276,8 +276,14 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error('Invalid file type. Only JPG, PNG, and WebP are allowed.');
+      return;
+    }
+
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image exceeds 5MB limit');
+      toast.error('Image exceeds 5MB limit. Please choose a smaller file.');
       return;
     }
 
@@ -285,25 +291,35 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
     try {
       const formDataObj = new FormData();
       formDataObj.append('images', file);
+      
+      console.log('Uploading image:', { name: file.name, size: file.size });
       const response = await uploadImages(formDataObj);
 
       let uploadedUrl = '';
-      if (response && response.urls && Array.isArray(response.urls)) {
+      if (response && response.urls && Array.isArray(response.urls) && response.urls.length > 0) {
         uploadedUrl = response.urls[0];
-      } else if (Array.isArray(response)) {
+      } else if (Array.isArray(response) && response.length > 0) {
         uploadedUrl = response[0]?.url || response[0];
-      } else if (response && response.data && Array.isArray(response.data)) {
+      } else if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
         uploadedUrl = response.data[0];
+      } else if (typeof response === 'string') {
+        uploadedUrl = response;
       }
 
-      if (!uploadedUrl) {
-        throw new Error('No URL returned from upload');
+      if (!uploadedUrl || !uploadedUrl.startsWith('http')) {
+        console.error('Invalid URL received:', uploadedUrl);
+        throw new Error('Invalid image URL received from server');
       }
 
+      // Update the image URL in state
       handleUpdateImage(index, 'imageUrl', uploadedUrl);
-      toast.success('Image uploaded successfully');
+      toast.success(`✓ Image uploaded! Click "Save Changes" to finalize.`);
+      
+      console.log('Upload successful:', uploadedUrl);
     } catch (error) {
-      toast.error(error.message || 'Failed to upload image');
+      console.error('Upload error:', error);
+      const errorMsg = error.message || error.response?.data?.message || 'Failed to upload image';
+      toast.error(errorMsg);
     } finally {
       setUploadingIndex(null);
       if (fileInputRefs.current[index]) {
@@ -333,7 +349,7 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
               : 'border-transparent text-slate-600 hover:text-slate-900'
           }`}
         >
-          Hero Section
+          🏠 Hero Section
         </button>
         <button
           onClick={() => setActiveTab('trendingCategories')}
@@ -343,16 +359,17 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
               : 'border-transparent text-slate-600 hover:text-slate-900'
           }`}
         >
-          Trending Categories
+          🔥 Trending Categories
         </button>
       </div>
 
       {/* Images List */}
       <div className="space-y-4">
         {images.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">
-            <Upload className="w-8 h-8 mx-auto mb-2 text-slate-400" />
-            <p>No images yet. Click "Add Image" to get started.</p>
+          <div className="text-center py-12 text-slate-500">
+            <Upload className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+            <p className="font-medium mb-1">No images yet</p>
+            <p className="text-sm">Click "Add Image" below to create your first {activeTab === 'hero' ? 'hero' : 'category'} image.</p>
           </div>
         ) : (
           images.map((image, index) => (
@@ -371,24 +388,39 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
         )}
       </div>
 
-      {/* Add Image Button */}
-      <div className="mt-6 flex gap-2">
+      {/* Action Buttons */}
+      <div className="mt-8 flex gap-2 flex-wrap">
         <button
           onClick={handleAddImage}
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5" />
           Add Image
         </button>
 
         {images.length > 0 && (
-          <button
-            onClick={handleSave}
-            disabled={updateSectionMutation.isPending}
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            {updateSectionMutation.isPending ? 'Saving...' : 'Save Changes'}
-          </button>
+          <>
+            <button
+              onClick={handleSave}
+              disabled={updateSectionMutation.isPending}
+              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+            >
+              {updateSectionMutation.isPending ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  ✓ Save Changes
+                </>
+              )}
+            </button>
+            
+            <div className="flex-1 flex items-center text-sm text-slate-600 bg-blue-50 px-4 py-3 rounded-lg border border-blue-200">
+              <span>💡 Upload images, fill in details, then click "Save Changes" to finalize.</span>
+            </div>
+          </>
         )}
       </div>
     </div>
@@ -405,102 +437,133 @@ const ImageItem = ({
   onUpload,
   onRemove,
 }) => {
+  const hasImage = image.imageUrl && image.imageUrl.trim() !== '';
+
   return (
-    <div className="p-4 border border-slate-200 rounded-lg space-y-3">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="font-medium text-slate-900">Image {index + 1}</h4>
+    <div className="p-4 border border-slate-200 rounded-lg space-y-3 hover:border-slate-300 transition-colors">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="font-medium text-slate-900">Image {index + 1} {hasImage && <span className="text-xs bg-emerald-100 text-emerald-700 ml-2 px-2 py-1 rounded">✓ Uploaded</span>}</h4>
         <button
           onClick={() => onRemove(index)}
-          className="text-red-600 hover:text-red-700 transition-colors"
+          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
+          title="Remove this image"
         >
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
 
-      <input
-        type="text"
-        placeholder="Title"
-        value={image.title}
-        onChange={(e) => onUpdate(index, 'title', e.target.value)}
-        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-      />
-
-      <textarea
-        placeholder="Description"
-        value={image.description}
-        onChange={(e) => onUpdate(index, 'description', e.target.value)}
-        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-        rows="2"
-      />
-
-      {activeTab === 'trendingCategories' && (
-        <input
-          type="text"
-          placeholder="Badge (e.g., Electronic, Fashion)"
-          value={image.badge}
-          onChange={(e) => onUpdate(index, 'badge', e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-        />
-      )}
-
-      <div className="flex gap-2 items-center">
-        <input
-          type="text"
-          placeholder="Image URL"
-          value={image.imageUrl}
-          onChange={(e) => onUpdate(index, 'imageUrl', e.target.value)}
-          className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-        />
-        <input
-          type="file"
-          ref={(el) => (fileInputRefs.current[index] = el)}
-          onChange={(e) => onUpload(e, index)}
-          accept="image/jpeg,image/png,image/webp"
-          className="hidden"
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRefs.current[index]?.click()}
-          disabled={uploadingIndex === index}
-          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors border border-slate-300 disabled:opacity-50 text-sm flex items-center gap-2"
-        >
-          {uploadingIndex === index ? (
-            <div className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <Upload className="w-3 h-3" />
-          )}
-          Upload
-        </button>
+      {/* Image Upload Section - PRIORITY */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <label className="block text-xs font-semibold text-slate-700 mb-2">📸 UPLOAD IMAGE</label>
+        <div className="flex gap-2 items-stretch">
+          <input
+            type="file"
+            ref={(el) => (fileInputRefs.current[index] = el)}
+            onChange={(e) => onUpload(e, index)}
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRefs.current[index]?.click()}
+            disabled={uploadingIndex === index}
+            className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm"
+            title="Click to select and upload image"
+          >
+            {uploadingIndex === index ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4" />
+                {hasImage ? 'Change Image' : 'Upload Image'}
+              </>
+            )}
+          </button>
+        </div>
+        <p className="text-xs text-slate-500 mt-2">JPG, PNG, WebP • Max 5MB • Click button to choose file</p>
       </div>
 
-      {image.imageUrl && (
-        <div className="p-3 bg-slate-50 rounded-lg">
+      {/* Image Preview */}
+      {hasImage && (
+        <div className="relative rounded-lg overflow-hidden bg-slate-100 border border-slate-300">
           <img
             src={image.imageUrl}
             alt="Preview"
-            className="max-h-40 object-contain mx-auto"
+            className="w-full h-48 object-cover"
             onError={(e) => {
-              e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f3f4f6" width="200" height="200"/%3E%3C/svg%3E';
+              e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="200"%3E%3Crect fill="%23f3f4f6" width="400" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-family="sans-serif"%3EImage Preview%3C/text%3E%3C/svg%3E';
             }}
+          />
+          <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
+            ✓ Ready
+          </div>
+        </div>
+      )}
+
+      {/* Title */}
+      <div>
+        <label className="block text-xs font-medium text-slate-600 mb-1">Title *</label>
+        <input
+          type="text"
+          placeholder={activeTab === 'hero' ? 'e.g., Summer Sale' : 'e.g., Laptops'}
+          value={image.title}
+          onChange={(e) => onUpdate(index, 'title', e.target.value)}
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+        />
+      </div>
+
+      {/* Description */}
+      <div>
+        <label className="block text-xs font-medium text-slate-600 mb-1">Description *</label>
+        <textarea
+          placeholder={activeTab === 'hero' ? 'e.g., Get 50% off all items this season' : 'e.g., Browse the latest laptops'}
+          value={image.description}
+          onChange={(e) => onUpdate(index, 'description', e.target.value)}
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm resize-none"
+          rows="2"
+        />
+      </div>
+
+      {/* Badge for Trending Categories */}
+      {activeTab === 'trendingCategories' && (
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1">Badge *</label>
+          <input
+            type="text"
+            placeholder="e.g., Electronics, Fashion, Hot, New"
+            value={image.badge}
+            onChange={(e) => onUpdate(index, 'badge', e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
           />
         </div>
       )}
 
-      <input
-        type="text"
-        placeholder="Action Link (e.g., /shop?category=Tech)"
-        value={image.actionLink}
-        onChange={(e) => onUpdate(index, 'actionLink', e.target.value)}
-        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-      />
+      {/* Action Link */}
+      <div>
+        <label className="block text-xs font-medium text-slate-600 mb-1">Action Link (Optional)</label>
+        <input
+          type="text"
+          placeholder="e.g., /shop?category=tech or /products/laptops"
+          value={image.actionLink}
+          onChange={(e) => onUpdate(index, 'actionLink', e.target.value)}
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="Action Text (default: Explore)"
-        value={image.actionText}
-        onChange={(e) => onUpdate(index, 'actionText', e.target.value)}
-        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
-      />
+      {/* Action Text */}
+      <div>
+        <label className="block text-xs font-medium text-slate-600 mb-1">Button Text (Optional)</label>
+        <input
+          type="text"
+          placeholder="e.g., Shop Now, Explore, Learn More (default: Explore)"
+          value={image.actionText}
+          onChange={(e) => onUpdate(index, 'actionText', e.target.value)}
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+        />
+      </div>
     </div>
   );
 };
