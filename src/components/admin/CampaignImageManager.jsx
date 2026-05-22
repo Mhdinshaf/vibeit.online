@@ -389,13 +389,14 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-8 flex gap-2 flex-wrap">
+      <div className="mt-8 flex gap-2 flex-wrap sm:flex-nowrap">
         <button
           onClick={handleAddImage}
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+          className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm text-xs sm:text-sm whitespace-nowrap"
         >
-          <Plus className="w-5 h-5" />
-          Add Image
+          <Plus className="w-4 h-4" />
+          <span className="hidden sm:inline">Add Image</span>
+          <span className="sm:hidden">Add</span>
         </button>
 
         {images.length > 0 && (
@@ -403,22 +404,28 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
             <button
               onClick={handleSave}
               disabled={updateSectionMutation.isPending}
-              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+              className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white px-3 sm:px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm text-xs sm:text-sm whitespace-nowrap"
             >
               {updateSectionMutation.isPending ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Saving...
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                  <span className="hidden sm:inline">Saving...</span>
+                  <span className="sm:hidden">Save...</span>
                 </>
               ) : (
                 <>
-                  ✓ Save Changes
+                  ✓ <span className="hidden sm:inline">Save Changes</span>
+                  <span className="sm:hidden">Save</span>
                 </>
               )}
             </button>
             
-            <div className="flex-1 flex items-center text-sm text-slate-600 bg-blue-50 px-4 py-3 rounded-lg border border-blue-200">
+            <div className="flex-1 hidden sm:flex items-center text-sm text-slate-600 bg-blue-50 px-4 py-3 rounded-lg border border-blue-200 min-w-max">
               <span>💡 Upload images, fill in details, then click "Save Changes" to finalize.</span>
+            </div>
+            
+            <div className="w-full sm:hidden text-xs text-slate-600 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+              <span>💡 Upload, fill details, save!</span>
             </div>
           </>
         )}
@@ -455,7 +462,7 @@ const ImageItem = ({
       {/* Image Upload Section - PRIORITY */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <label className="block text-xs font-semibold text-slate-700 mb-2">📸 UPLOAD IMAGE</label>
-        <div className="flex gap-2 items-stretch">
+        <div className="flex gap-2 items-stretch flex-col sm:flex-row">
           <input
             type="file"
             ref={(el) => (fileInputRefs.current[index] = el)}
@@ -467,23 +474,25 @@ const ImageItem = ({
             type="button"
             onClick={() => fileInputRefs.current[index]?.click()}
             disabled={uploadingIndex === index}
-            className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm"
+            className="flex-1 px-3 sm:px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-nowrap"
             title="Click to select and upload image"
           >
             {uploadingIndex === index ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Uploading...
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                <span className="hidden sm:inline">Uploading...</span>
+                <span className="sm:hidden">Upload...</span>
               </>
             ) : (
               <>
-                <Upload className="w-4 h-4" />
-                {hasImage ? 'Change Image' : 'Upload Image'}
+                <Upload className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">{hasImage ? 'Change Image' : 'Upload Image'}</span>
+                <span className="sm:hidden">{hasImage ? 'Change' : 'Upload'}</span>
               </>
             )}
           </button>
         </div>
-        <p className="text-xs text-slate-500 mt-2">JPG, PNG, WebP • Max 5MB • Click button to choose file</p>
+        <p className="text-xs text-slate-500 mt-2">JPG, PNG, WebP • Max 5MB • Tap button to choose</p>
       </div>
 
       {/* Image Preview */}
@@ -492,7 +501,7 @@ const ImageItem = ({
           <img
             src={image.imageUrl}
             alt="Preview"
-            className="w-full h-48 object-cover"
+            className="w-full h-32 sm:h-48 object-cover"
             onError={(e) => {
               e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="200"%3E%3Crect fill="%23f3f4f6" width="400" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-family="sans-serif"%3EImage Preview%3C/text%3E%3C/svg%3E';
             }}
@@ -511,7 +520,7 @@ const ImageItem = ({
           placeholder={activeTab === 'hero' ? 'e.g., Summer Sale' : 'e.g., Laptops'}
           value={image.title}
           onChange={(e) => onUpdate(index, 'title', e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+          className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm"
         />
       </div>
 
@@ -522,7 +531,7 @@ const ImageItem = ({
           placeholder={activeTab === 'hero' ? 'e.g., Get 50% off all items this season' : 'e.g., Browse the latest laptops'}
           value={image.description}
           onChange={(e) => onUpdate(index, 'description', e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm resize-none"
+          className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm resize-none"
           rows="2"
         />
       </div>
@@ -536,7 +545,7 @@ const ImageItem = ({
             placeholder="e.g., Electronics, Fashion, Hot, New"
             value={image.badge}
             onChange={(e) => onUpdate(index, 'badge', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+            className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm"
           />
         </div>
       )}
@@ -549,7 +558,7 @@ const ImageItem = ({
           placeholder="e.g., /shop?category=tech or /products/laptops"
           value={image.actionLink}
           onChange={(e) => onUpdate(index, 'actionLink', e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+          className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm"
         />
       </div>
 
@@ -561,7 +570,7 @@ const ImageItem = ({
           placeholder="e.g., Shop Now, Explore, Learn More (default: Explore)"
           value={image.actionText}
           onChange={(e) => onUpdate(index, 'actionText', e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+          className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm"
         />
       </div>
     </div>
