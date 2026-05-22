@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Upload, Calendar, Eye } from 'lucide-react';
+import { Plus, Trash2, Upload, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   uploadImages,
@@ -265,12 +265,12 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
   const [uploadingIndex, setUploadingIndex] = useState(null);
 
   const currentImages = campaign.sections?.[activeTab] || [];
-  const [images, setImages] = useState(currentImages);
+  const [images, setImages] = useState(() => campaign.sections?.[activeTab] || []);
 
-  // Update images when tab changes
-  if (JSON.stringify(currentImages) !== JSON.stringify(images)) {
-    setImages(currentImages);
-  }
+  // Sync images when campaign or tab changes (useEffect = safe, not during render)
+  useEffect(() => {
+    setImages(campaign.sections?.[activeTab] || []);
+  }, [campaign._id, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateSectionMutation = useMutation({
     mutationFn: async (updatedImages) => {
