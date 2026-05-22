@@ -2,10 +2,15 @@ import { useEffect, useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, Upload, Calendar, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
-import { uploadImages } from '../../services/api';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import {
+  uploadImages,
+  getCampaigns,
+  getActiveCampaign,
+  createCampaign,
+  activateCampaign as activateCampaignApi,
+  deleteCampaign,
+  updateCampaign,
+} from '../../services/api';
 
 const CampaignImageManager = () => {
   const queryClient = useQueryClient();
@@ -18,19 +23,13 @@ const CampaignImageManager = () => {
   // Fetch campaigns
   const { data: campaigns = [], isLoading: campaignsLoading } = useQuery({
     queryKey: ['campaigns'],
-    queryFn: async () => {
-      const res = await axios.get(`${API_URL}/campaigns`);
-      return res.data;
-    },
+    queryFn: getCampaigns,
   });
 
   // Fetch active campaign
   const { data: activeCampaign } = useQuery({
     queryKey: ['campaigns/active'],
-    queryFn: async () => {
-      const res = await axios.get(`${API_URL}/campaigns/active`);
-      return res.data;
-    },
+    queryFn: getActiveCampaign,
   });
 
   const initializedRef = useRef(false);
@@ -48,7 +47,7 @@ const CampaignImageManager = () => {
   const createCampaignMutation = useMutation({
     mutationFn: async (campaignName) => {
       const campaignMonth = new Date(campaignName);
-      const res = await axios.post(`${API_URL}/campaigns`, {
+      return createCampaign({
         campaignName,
         campaignMonth,
         sections: {
@@ -56,7 +55,6 @@ const CampaignImageManager = () => {
           trendingCategories: [],
         },
       });
-      return res.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
@@ -72,10 +70,7 @@ const CampaignImageManager = () => {
 
   // Activate campaign mutation
   const activateCampaignMutation = useMutation({
-    mutationFn: async (campaignId) => {
-      const res = await axios.put(`${API_URL}/campaigns/${campaignId}/activate`);
-      return res.data;
-    },
+    mutationFn: activateCampaignApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns/active'] });
       toast.success('Campaign activated successfully');
@@ -87,9 +82,7 @@ const CampaignImageManager = () => {
 
   // Delete campaign mutation
   const deleteCampaignMutation = useMutation({
-    mutationFn: async (campaignId) => {
-      await axios.delete(`${API_URL}/campaigns/${campaignId}`);
-    },
+    mutationFn: deleteCampaign,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       if (selectedCampaignId === campaigns[0]?._id) {
@@ -291,10 +284,9 @@ const HeroAndCategoryEditor = ({ campaign, activeTab, campaignId, previewMode })
 
   const updateSectionMutation = useMutation({
     mutationFn: async (updatedImages) => {
-      const res = await axios.put(`${API_URL}/campaigns/${campaignId}`, {
+      return updateCampaign(campaignId, {
         [`sections.${activeTab}`]: updatedImages,
       });
-      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });

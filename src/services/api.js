@@ -784,6 +784,37 @@ export const uploadImages = async (formData) => {
   }
 };
 
+// Campaign APIs
+export const getCampaigns = async () => {
+  const response = await api.get('/campaigns');
+  return response.data;
+};
+
+export const getActiveCampaign = async () => {
+  const response = await api.get('/campaigns/active');
+  return response.data;
+};
+
+export const createCampaign = async (data) => {
+  const response = await api.post('/campaigns', data);
+  return response.data;
+};
+
+export const activateCampaign = async (campaignId) => {
+  const response = await api.put(`/campaigns/${campaignId}/activate`);
+  return response.data;
+};
+
+export const deleteCampaign = async (campaignId) => {
+  const response = await api.delete(`/campaigns/${campaignId}`);
+  return response.data;
+};
+
+export const updateCampaign = async (campaignId, data) => {
+  const response = await api.put(`/campaigns/${campaignId}`, data);
+  return response.data;
+};
+
 // Analytics API
 export const getDashboardStats = async () => {
   const localMetrics = getLocalOrderMetrics();
