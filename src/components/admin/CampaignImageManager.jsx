@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react'; // useRef used by HeroAndCategoryEditor
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, Upload, Calendar, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -37,16 +37,20 @@ const CampaignImageManager = () => {
     throwOnError: false,
   });
 
-  const initializedRef = useRef(false);
-
-  // Auto-select first campaign when campaigns load for the first time
+  // Auto-select first campaign, and keep selection valid after refetches
   useEffect(() => {
-    if (!initializedRef.current && campaigns.length > 0 && !selectedCampaignId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (campaigns.length === 0) return;
+    // If nothing is selected yet, pick the first campaign
+    if (!selectedCampaignId) {
       setSelectedCampaignId(campaigns[0]._id);
-      initializedRef.current = true;
+      return;
     }
-  }, [campaigns, selectedCampaignId]); // Dependencies are correct
+    // If the selected campaign no longer exists in the list (e.g. deleted), pick the first
+    const stillExists = campaigns.some(c => c._id === selectedCampaignId);
+    if (!stillExists) {
+      setSelectedCampaignId(campaigns[0]._id);
+    }
+  }, [campaigns]); // Re-run whenever campaigns list changes
 
   // Create campaign mutation
   const createCampaignMutation = useMutation({
