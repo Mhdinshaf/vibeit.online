@@ -2,10 +2,13 @@ import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, Edit2, Check, X, Gift, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { uploadImages } from '../../services/api';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import {
+  getAllPromotions,
+  createPromotion,
+  updatePromotion,
+  deletePromotion,
+} from '../../services/api';
 
 const PromotionalOfferManager = () => {
   const queryClient = useQueryClient();
@@ -27,21 +30,18 @@ const PromotionalOfferManager = () => {
   // Fetch promotions
   const { data: promotions = [], isLoading } = useQuery({
     queryKey: ['promotions'],
-    queryFn: async () => {
-      const res = await axios.get(`${API_URL}/promotions`);
-      return res.data;
-    },
+    queryFn: getAllPromotions,
+    retry: 1,
+    throwOnError: false,
   });
 
   // Create/Update promotion mutation
   const saveMutation = useMutation({
     mutationFn: async (data) => {
       if (editingId) {
-        const res = await axios.put(`${API_URL}/promotions/${editingId}`, data);
-        return res.data;
+        return updatePromotion(editingId, data);
       } else {
-        const res = await axios.post(`${API_URL}/promotions`, data);
-        return res.data;
+        return createPromotion(data);
       }
     },
     onSuccess: () => {
@@ -56,9 +56,7 @@ const PromotionalOfferManager = () => {
 
   // Delete promotion mutation
   const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      await axios.delete(`${API_URL}/promotions/${id}`);
-    },
+    mutationFn: (id) => deletePromotion(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['promotions'] });
       toast.success('Offer deleted successfully');

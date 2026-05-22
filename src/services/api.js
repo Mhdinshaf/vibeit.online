@@ -787,30 +787,24 @@ export const uploadImages = async (formData) => {
 // Campaign APIs
 export const getCampaigns = async () => {
   const response = await api.get('/campaigns');
-  const data = response.data;
-  // Normalize response - ensure it's always an array
-  if (Array.isArray(data)) {
-    return data;
-  }
-  if (data && typeof data === 'object') {
-    // Handle wrapped response like { data: [...] } or { campaigns: [...] }
-    if (Array.isArray(data.data)) return data.data;
-    if (Array.isArray(data.campaigns)) return data.campaigns;
-  }
+  const payload = response.data;
+  // Unwrap { success, data } envelope
+  if (payload && Array.isArray(payload.data)) return payload.data;
+  // Fallback for plain array
+  if (Array.isArray(payload)) return payload;
+  if (payload && Array.isArray(payload.campaigns)) return payload.campaigns;
   return [];
 };
 
 export const getActiveCampaign = async () => {
   try {
     const response = await api.get('/campaigns/active');
-    const data = response.data;
-    // Return the campaign object or null if not found
-    if (data === null || data === undefined) {
-      return null;
-    }
-    return data;
+    const payload = response.data;
+    // Unwrap { success, data } envelope
+    if (payload && payload.data) return payload.data;
+    return payload;
   } catch (error) {
-    // If 404, no active campaign exists yet
+    // If 404, no active campaign exists yet - treat as null, not an error
     if (error.response?.status === 404) {
       return null;
     }
@@ -820,7 +814,9 @@ export const getActiveCampaign = async () => {
 
 export const createCampaign = async (data) => {
   const response = await api.post('/campaigns', data);
-  return response.data;
+  const payload = response.data;
+  // Unwrap { success, data } envelope
+  return payload?.data || payload;
 };
 
 export const activateCampaign = async (campaignId) => {
@@ -835,6 +831,33 @@ export const deleteCampaign = async (campaignId) => {
 
 export const updateCampaign = async (campaignId, data) => {
   const response = await api.put(`/campaigns/${campaignId}`, data);
+  const payload = response.data;
+  // Unwrap { success, data } envelope
+  return payload?.data || payload;
+};
+
+// Promotions APIs (admin-authenticated)
+export const getAllPromotions = async () => {
+  const response = await api.get('/promotions');
+  const payload = response.data;
+  // Unwrap { success, data } envelope
+  if (payload && Array.isArray(payload.data)) return payload.data;
+  if (Array.isArray(payload)) return payload;
+  return [];
+};
+
+export const createPromotion = async (data) => {
+  const response = await api.post('/promotions', data);
+  return response.data;
+};
+
+export const updatePromotion = async (id, data) => {
+  const response = await api.put(`/promotions/${id}`, data);
+  return response.data;
+};
+
+export const deletePromotion = async (id) => {
+  const response = await api.delete(`/promotions/${id}`);
   return response.data;
 };
 
