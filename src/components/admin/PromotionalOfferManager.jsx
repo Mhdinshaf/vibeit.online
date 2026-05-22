@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Gift, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { uploadImages } from '../../services/api';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const PromotionalOfferManager = () => {
   const queryClient = useQueryClient();
+  const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -108,6 +111,46 @@ const PromotionalOfferManager = () => {
     }));
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image exceeds 5MB limit');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('images', file);
+      const response = await uploadImages(formDataObj);
+      
+      let uploadedUrl = '';
+      if (response && response.urls && Array.isArray(response.urls)) {
+        uploadedUrl = response.urls[0];
+      } else if (Array.isArray(response)) {
+        uploadedUrl = response[0]?.url || response[0];
+      } else if (response && response.data && Array.isArray(response.data)) {
+        uploadedUrl = response.data[0];
+      }
+      
+      if (!uploadedUrl) {
+        throw new Error('No URL returned from upload');
+      }
+
+      setFormData(prev => ({ ...prev, imageUrl: uploadedUrl }));
+      toast.success('Image uploaded successfully');
+    } catch (error) {
+      toast.error(error.message || 'Failed to upload image');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -173,14 +216,38 @@ const PromotionalOfferManager = () => {
             className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
 
-          <input
-            type="text"
-            name="imageUrl"
-            placeholder="Image URL"
-            value={formData.imageUrl}
-            onChange={handleChange}
-            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-          />
+          <div className="flex gap-4 items-center">
+            <input
+              type="text"
+              name="imageUrl"
+              placeholder="Image URL"
+              value={formData.imageUrl}
+              onChange={handleChange}
+              className="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            />
+            <div className="flex-shrink-0">
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleImageUpload} 
+                accept="image/jpeg,image/png,image/webp" 
+                className="hidden" 
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors inline-flex items-center gap-2 border border-slate-300 disabled:opacity-50"
+              >
+                {isUploading ? (
+                  <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Upload className="w-4 h-4" />
+                )}
+                Upload Photo
+              </button>
+            </div>
+          </div>
 
           {formData.imageUrl && (
             <div className="p-4 bg-slate-50 rounded-lg">
