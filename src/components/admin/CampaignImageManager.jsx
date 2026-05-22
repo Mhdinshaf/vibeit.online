@@ -24,12 +24,16 @@ const CampaignImageManager = () => {
   const { data: campaigns = [], isLoading: campaignsLoading } = useQuery({
     queryKey: ['campaigns'],
     queryFn: getCampaigns,
+    retry: 1,
+    throwOnError: false,
   });
 
   // Fetch active campaign
   const { data: activeCampaign } = useQuery({
     queryKey: ['campaigns/active'],
     queryFn: getActiveCampaign,
+    retry: 1,
+    throwOnError: false,
   });
 
   const initializedRef = useRef(false);

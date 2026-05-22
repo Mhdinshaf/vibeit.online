@@ -9,6 +9,8 @@ const TrendingCategories = () => {
     queryKey: ['campaigns/active'],
     queryFn: getActiveCampaign,
     staleTime: 1000 * 60 * 60, // 1 hour
+    retry: 1, // Retry once on failure
+    throwOnError: false, // Don't throw on error, let component handle it
   });
 
   const categoryImages = activeCampaign?.sections?.trendingCategories || [];
