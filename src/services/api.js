@@ -274,7 +274,11 @@ api.interceptors.request.use(
     const adminToken = localStorage.getItem('vibeit_token');
     
     // Use the admin token explicitly for admin endpoints
-    const isAdminEndpoint = config.url?.includes('/admin') || config.url?.includes('/analytics');
+    const isAdminEndpoint = config.url?.includes('/admin') || 
+                            config.url?.includes('/analytics') ||
+                            config.url?.includes('/campaigns') ||
+                            config.url?.includes('/promotions') ||
+                            config.url?.includes('/upload');
     const token = isAdminEndpoint ? adminToken : (customerToken || adminToken);
     
     if (token) {
@@ -821,6 +825,11 @@ export const createCampaign = async (data) => {
 
 export const activateCampaign = async (campaignId) => {
   const response = await api.put(`/campaigns/${campaignId}/activate`);
+  return response.data;
+};
+
+export const deactivateCampaign = async (campaignId) => {
+  const response = await api.put(`/campaigns/${campaignId}/deactivate`);
   return response.data;
 };
 
