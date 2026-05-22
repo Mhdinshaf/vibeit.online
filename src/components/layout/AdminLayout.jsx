@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingBag, Menu, X, LogOut, ExternalLink, Users, Gift, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Menu, X, LogOut, ExternalLink, Users, Gift, ShieldCheck, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -85,6 +85,7 @@ const AdminLayout = () => {
     { to: '/admin/products', label: 'Products', icon: Package },
     { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
     { to: '/admin/customers', label: 'Customers', icon: Users },
+    { to: '/admin/content', label: 'Content Management', icon: ImageIcon },
     { to: '/admin/promotions', label: 'Promotions', icon: Gift },
     { to: '/admin/mfa-status', label: 'MFA Status', icon: ShieldCheck },
   ];
@@ -98,6 +99,7 @@ const AdminLayout = () => {
     if (path.startsWith('/admin/orders/')) return 'Order Details';
     if (path.startsWith('/admin/orders')) return 'Orders';
     if (path.startsWith('/admin/customers')) return 'Customers';
+    if (path.startsWith('/admin/content')) return 'Content Management';
     if (path.startsWith('/admin/promotions')) return 'Promotions';
     if (path.startsWith('/admin/mfa-status')) return 'MFA Status';
     return 'Admin Panel';
