@@ -8,6 +8,7 @@ import {
   getActiveCampaign,
   createCampaign,
   activateCampaign,
+  deactivateCampaign,
   deleteCampaign,
   updateCampaign,
 } from '../../services/api';
@@ -69,6 +70,19 @@ const CampaignImageManager = () => {
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to activate campaign');
+    },
+  });
+
+  // Deactivate campaign mutation
+  const deactivateCampaignMutation = useMutation({
+    mutationFn: deactivateCampaign,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      queryClient.invalidateQueries({ queryKey: ['campaigns/active'] });
+      toast.success('Campaign deactivated successfully');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to deactivate campaign');
     },
   });
 
@@ -175,6 +189,18 @@ const CampaignImageManager = () => {
                           className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white text-sm rounded-lg transition-colors"
                         >
                           Activate
+                        </button>
+                      )}
+                      {isActiveCampaign && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deactivateCampaignMutation.mutate(campaign._id);
+                          }}
+                          disabled={deactivateCampaignMutation.isPending}
+                          className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-slate-400 text-white text-sm rounded-lg transition-colors"
+                        >
+                          {deactivateCampaignMutation.isPending ? 'Deactivating...' : 'Deactivate'}
                         </button>
                       )}
                       <button
