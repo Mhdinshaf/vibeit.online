@@ -309,14 +309,12 @@ const HeroAndCategoryEditor = ({ campaign, activeTab, campaignId, previewMode })
   const queryClient = useQueryClient();
   const fileInputRefs = useRef({});
   const [uploadingIndex, setUploadingIndex] = useState(null);
-  // Initialize images from campaign sections
-  const currentImages = campaign.sections?.[activeTab] || [];
-  const [images, setImages] = useState(currentImages);
+  const [images, setImages] = useState(() => campaign.sections?.[activeTab] || []);
 
-  // Update images when tab changes or campaign updates
-  if (JSON.stringify(currentImages) !== JSON.stringify(images)) {
-    setImages(currentImages);
-  }
+  // Sync images whenever the campaign data or active tab changes
+  useEffect(() => {
+    setImages(campaign.sections?.[activeTab] || []);
+  }, [campaign._id, activeTab, campaign.sections]);
 
   const updateSectionMutation = useMutation({
     mutationFn: async (updatedImages) => {
