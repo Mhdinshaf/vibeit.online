@@ -8,6 +8,7 @@ import {
   getActiveCampaign,
   createCampaign,
   activateCampaign as activateCampaignApi,
+  deactivateCampaign as deactivateCampaignApi,
   deleteCampaign,
   updateCampaign,
 } from '../../services/api';
@@ -76,11 +77,25 @@ const CampaignImageManager = () => {
   const activateCampaignMutation = useMutation({
     mutationFn: activateCampaignApi,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       queryClient.invalidateQueries({ queryKey: ['campaigns/active'] });
       toast.success('Campaign activated successfully');
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to activate campaign');
+    },
+  });
+
+  // Deactivate campaign mutation
+  const deactivateCampaignMutation = useMutation({
+    mutationFn: deactivateCampaignApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      queryClient.invalidateQueries({ queryKey: ['campaigns/active'] });
+      toast.success('Campaign deactivated successfully');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to deactivate campaign');
     },
   });
 
@@ -180,7 +195,20 @@ const CampaignImageManager = () => {
                     Created {new Date(campaign.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                {!isActiveCampaign && (
+                {/* Active campaign: show Deactivate button only */}
+                {campaign.isActive ? (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deactivateCampaignMutation.mutate(campaign._id);
+                      }}
+                      className="px-3 py-1 text-xs font-medium text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded transition-colors"
+                    >
+                      Deactivate
+                    </button>
+                  </div>
+                ) : (
                   <div className="flex gap-2">
                     <button
                       onClick={(e) => {
