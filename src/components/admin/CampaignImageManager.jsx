@@ -38,10 +38,7 @@ const CampaignImageManager = () => {
 
   // Auto-select first campaign if none selected
   useEffect(() => {
-    console.log('📊 [CAMPAIGNS] Campaigns loaded:', campaigns.length);
-    
     if (Array.isArray(campaigns) && campaigns.length > 0 && !selectedCampaignId) {
-      console.log('🔄 [CAMPAIGNS] Auto-selecting first campaign:', campaigns[0]._id);
       setSelectedCampaignId(campaigns[0]._id);
     }
   }, [campaigns, selectedCampaignId]);
@@ -110,7 +107,6 @@ const CampaignImageManager = () => {
   });
 
   const selectedCampaign = Array.isArray(campaigns) && campaigns.find(c => c._id === selectedCampaignId);
-  const isActiveCampaign = (activeCampaign?._id === selectedCampaignId) || (selectedCampaign?.isActive === true);
 
   if (campaignsLoading) {
     return (
@@ -183,13 +179,13 @@ const CampaignImageManager = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    {isActiveCampaign && (
+                    {campaign.isActive && (
                       <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
                         ACTIVE
                       </span>
                     )}
                     <div className="flex gap-2">
-                      {!isActiveCampaign && (
+                      {!campaign.isActive && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -201,7 +197,7 @@ const CampaignImageManager = () => {
                           Activate
                         </button>
                       )}
-                      {isActiveCampaign && (
+                      {campaign.isActive && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -220,7 +216,7 @@ const CampaignImageManager = () => {
                             deleteCampaignMutation.mutate(campaign._id);
                           }
                         }}
-                        disabled={deleteCampaignMutation.isPending || isActiveCampaign}
+                        disabled={deleteCampaignMutation.isPending || campaign.isActive}
                         className="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-slate-400 text-white text-sm rounded-lg transition-colors"
                       >
                         Delete
@@ -264,7 +260,6 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
   const fileInputRefs = useRef({});
   const [uploadingIndex, setUploadingIndex] = useState(null);
 
-  const currentImages = campaign.sections?.[activeTab] || [];
   const [images, setImages] = useState(() => campaign.sections?.[activeTab] || []);
 
   // Sync images when campaign or tab changes (useEffect = safe, not during render)
@@ -288,10 +283,8 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
   });
 
   const handleAddImage = () => {
-    console.log('🔵 [ADD IMAGE] Button clicked');
-    console.log('📊 Current images count:', images.length);
-    
     const newImage = {
+      _tempId: `temp-${Date.now()}-${Math.random()}`,
       title: '',
       description: '',
       badge: '',
@@ -300,16 +293,14 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
       actionText: 'Explore',
       order: images.length,
     };
-    
-    console.log('➕ Adding new image:', newImage);
-    setImages([...images, newImage]);
-    console.log('✅ [ADD IMAGE] Image added to state');
+    setImages(prev => [...prev, newImage]);
   };
 
   const handleUpdateImage = (index, field, value) => {
-    const updated = [...images];
-    updated[index][field] = value;
-    setImages(updated);
+    // Immutable update - creates new object instead of mutating in place
+    setImages(prev => prev.map((img, i) =>
+      i === index ? { ...img, [field]: value } : img
+    ));
   };
 
   const handleImageUpload = async (e, index) => {
@@ -342,55 +333,29 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
     try {
       const formDataObj = new FormData();
       formDataObj.append('images', file);
-      
-      console.log('📤 [UPLOAD] Sending to API...');
-      console.log('📋 FormData fields:', ['images']);
-      console.log('🔗 API endpoint:', '/upload/images');
-      
       const response = await uploadImages(formDataObj);
-      console.log('📥 [UPLOAD] Response received:', response);
 
       let uploadedUrl = '';
       if (response && response.urls && Array.isArray(response.urls) && response.urls.length > 0) {
         uploadedUrl = response.urls[0];
-        console.log('✅ [UPLOAD] URL extracted from response.urls[0]');
       } else if (Array.isArray(response) && response.length > 0) {
         uploadedUrl = response[0]?.url || response[0];
-        console.log('✅ [UPLOAD] URL extracted from response array');
       } else if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
         uploadedUrl = response.data[0];
-        console.log('✅ [UPLOAD] URL extracted from response.data');
       } else if (typeof response === 'string') {
         uploadedUrl = response;
-        console.log('✅ [UPLOAD] Response is string URL');
       }
 
-      console.log('🔗 Extracted URL:', uploadedUrl);
-
       if (!uploadedUrl || !uploadedUrl.startsWith('http')) {
-        console.error('❌ [UPLOAD] Invalid URL:', uploadedUrl);
         throw new Error('Invalid image URL received from server');
       }
 
-      // Update the image URL in state
-      console.log('💾 [UPLOAD] Updating state with URL...');
       handleUpdateImage(index, 'imageUrl', uploadedUrl);
-      
-      console.log('✅ [UPLOAD] Success! URL set');
-      toast.success(`✓ Image uploaded! Click "Save Changes" to finalize.`);
-      
-      console.log('✅ [UPLOAD] COMPLETE - uploadedUrl:', uploadedUrl);
+      toast.success('Image uploaded! Click "Save Changes" to finalize.');
     } catch (error) {
-      console.error('❌ [UPLOAD] ERROR occurred:');
-      console.error('   Message:', error.message);
-      console.error('   Status:', error.response?.status);
-      console.error('   Response:', error.response?.data);
-      console.error('   Full error:', error);
-      
       const errorMsg = error.message || error.response?.data?.message || 'Failed to upload image';
       toast.error(errorMsg);
     } finally {
-      console.log('🔄 [UPLOAD] Cleanup - setting uploading index to null');
       setUploadingIndex(null);
       if (fileInputRefs.current[index]) {
         fileInputRefs.current[index].value = '';
@@ -399,8 +364,7 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
   };
 
   const handleRemoveImage = (index) => {
-    const updated = images.filter((_, i) => i !== index);
-    setImages(updated.map((img, i) => ({ ...img, order: i })));
+    setImages(prev => prev.filter((_, i) => i !== index).map((img, i) => ({ ...img, order: i })));
   };
 
   const handleSave = () => {
@@ -444,7 +408,7 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
         ) : (
           images.map((image, index) => (
             <ImageItem
-              key={index}
+              key={image._tempId || image._id || index}
               index={index}
               image={image}
               activeTab={activeTab}
