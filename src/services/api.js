@@ -824,6 +824,12 @@ export const getActiveCampaign = async () => {
   try {
     const response = await api.get('/campaigns/active');
     const payload = response.data;
+
+    // Handle 204 No Content or empty body gracefully
+    if (response.status === 204 || payload == null || (typeof payload === 'object' && Object.keys(payload).length === 0) || payload === '') {
+      return null;
+    }
+
     // Unwrap { success, data } envelope
     if (payload && payload.data) return payload.data;
     return payload;

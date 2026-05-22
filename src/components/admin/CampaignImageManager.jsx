@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, Upload, Calendar, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -35,6 +35,16 @@ const CampaignImageManager = () => {
     retry: 1,
     throwOnError: false,
   });
+
+  // Auto-select first campaign if none selected
+  useEffect(() => {
+    console.log('📊 [CAMPAIGNS] Campaigns loaded:', campaigns.length);
+    
+    if (Array.isArray(campaigns) && campaigns.length > 0 && !selectedCampaignId) {
+      console.log('🔄 [CAMPAIGNS] Auto-selecting first campaign:', campaigns[0]._id);
+      setSelectedCampaignId(campaigns[0]._id);
+    }
+  }, [campaigns, selectedCampaignId]);
 
   // Create campaign mutation
   const createCampaignMutation = useMutation({
@@ -100,7 +110,7 @@ const CampaignImageManager = () => {
   });
 
   const selectedCampaign = Array.isArray(campaigns) && campaigns.find(c => c._id === selectedCampaignId);
-  const isActiveCampaign = activeCampaign?._id === selectedCampaignId;
+  const isActiveCampaign = (activeCampaign?._id === selectedCampaignId) || (selectedCampaign?.isActive === true);
 
   if (campaignsLoading) {
     return (
