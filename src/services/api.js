@@ -826,7 +826,7 @@ export const getActiveCampaign = async () => {
     const payload = response.data;
 
     // Handle 204 No Content or empty body gracefully
-    if (response.status === 204 || payload == null || (typeof payload === 'object' && Object.keys(payload).length === 0) || payload === '') {
+    if (response.status === 204 || payload == null || payload === '') {
       return null;
     }
 
@@ -834,11 +834,12 @@ export const getActiveCampaign = async () => {
     if (payload && payload.data) return payload.data;
     return payload;
   } catch (error) {
-    // If 404, no active campaign exists yet - treat as null, not an error
-    if (error.response?.status === 404) {
+    // 404 = no active campaign - this is normal, not an error
+    if (error.response?.status === 404 || error.response?.status === 204) {
       return null;
     }
-    throw error;
+    // For any other error, return null silently (don't break the UI)
+    return null;
   }
 };
 

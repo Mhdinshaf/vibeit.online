@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Upload, Calendar } from 'lucide-react';
+import { Plus, Trash2, Upload, Calendar, Zap, ZapOff, CheckCircle2, AlertCircle, ChevronRight, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   uploadImages,
@@ -13,6 +13,10 @@ import {
   updateCampaign,
 } from '../../services/api';
 
+/* ─────────────────────── helpers ─────────────────────── */
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
+
+/* ─────────────────────── main component ─────────────────────── */
 const CampaignImageManager = () => {
   const queryClient = useQueryClient();
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
@@ -20,99 +24,86 @@ const CampaignImageManager = () => {
   const [newCampaignName, setNewCampaignName] = useState('');
   const [activeTab, setActiveTab] = useState('hero');
 
-  // Fetch campaigns
+  /* ── queries ── */
   const { data: campaigns = [], isLoading: campaignsLoading } = useQuery({
     queryKey: ['campaigns'],
     queryFn: getCampaigns,
     retry: 1,
     throwOnError: false,
+    staleTime: 15000,
   });
 
-  // Fetch active campaign
   const { data: activeCampaign } = useQuery({
     queryKey: ['campaigns/active'],
     queryFn: getActiveCampaign,
-    retry: 1,
+    retry: 0,           // 404 = no active campaign — not an error, never retry
     throwOnError: false,
+    staleTime: 30000,
+    gcTime: 60000,
   });
 
-  // Auto-select first campaign if none selected
+  /* ── auto-select ── */
   useEffect(() => {
     if (Array.isArray(campaigns) && campaigns.length > 0 && !selectedCampaignId) {
       setSelectedCampaignId(campaigns[0]._id);
     }
   }, [campaigns, selectedCampaignId]);
 
-  // Create campaign mutation
-  const createCampaignMutation = useMutation({
-    mutationFn: async (campaignName) => {
-      return createCampaign({
-        campaignName,
-        campaignMonth: new Date(campaignName),
-        sections: {
-          hero: [],
-          trendingCategories: [],
-        },
-      });
-    },
+  /* ── mutations ── */
+  const createMutation = useMutation({
+    mutationFn: (name) => createCampaign({
+      campaignName: name,
+      campaignMonth: new Date(name),
+      sections: { hero: [], trendingCategories: [] },
+    }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       setSelectedCampaignId(data._id);
       setNewCampaignName('');
       setShowCreateForm(false);
-      toast.success('Campaign created successfully');
+      toast.success('Campaign created!');
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to create campaign');
-    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Failed to create campaign'),
   });
 
-  // Activate campaign mutation
-  const activateCampaignMutation = useMutation({
+  const activateMutation = useMutation({
     mutationFn: activateCampaign,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       queryClient.invalidateQueries({ queryKey: ['campaigns/active'] });
-      toast.success('Campaign activated successfully');
+      toast.success('Campaign activated!');
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to activate campaign');
-    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Activation failed'),
   });
 
-  // Deactivate campaign mutation
-  const deactivateCampaignMutation = useMutation({
+  const deactivateMutation = useMutation({
     mutationFn: deactivateCampaign,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       queryClient.invalidateQueries({ queryKey: ['campaigns/active'] });
-      toast.success('Campaign deactivated successfully');
+      toast.success('Campaign deactivated');
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to deactivate campaign');
-    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Deactivation failed'),
   });
 
-  // Delete campaign mutation
-  const deleteCampaignMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: deleteCampaign,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       setSelectedCampaignId(null);
-      toast.success('Campaign deleted successfully');
+      toast.success('Campaign deleted');
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to delete campaign');
-    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Delete failed'),
   });
 
   const selectedCampaign = Array.isArray(campaigns) && campaigns.find(c => c._id === selectedCampaignId);
 
+  /* ── loading skeleton ── */
   if (campaignsLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-24 bg-slate-200 rounded-xl animate-pulse" />
+          <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />
         ))}
       </div>
     );
@@ -120,13 +111,35 @@ const CampaignImageManager = () => {
 
   return (
     <div className="space-y-6">
+
+      {/* Active Campaign Banner */}
+      {activeCampaign && (
+        <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+          <span className="text-sm font-medium text-emerald-800">
+            Active on storefront: <span className="font-bold">{activeCampaign.campaignName}</span>
+          </span>
+        </div>
+      )}
+
+      {!activeCampaign && Array.isArray(campaigns) && campaigns.length > 0 && (
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+          <span className="text-sm font-medium text-amber-800">No campaign is currently active on the storefront.</span>
+        </div>
+      )}
+
       {/* Campaign Selector */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-900">Campaigns</h3>
+      <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 bg-white border-b border-slate-200">
+          <div>
+            <h3 className="font-semibold text-slate-900">Campaigns</h3>
+            <p className="text-xs text-slate-500 mt-0.5">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
+          </div>
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
             New Campaign
@@ -135,100 +148,101 @@ const CampaignImageManager = () => {
 
         {/* Create Form */}
         {showCreateForm && (
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <label className="block text-sm font-medium text-slate-900 mb-2">Campaign Month (YYYY-MM)</label>
+          <div className="px-5 py-4 bg-blue-50 border-b border-blue-100">
+            <label className="block text-sm font-semibold text-slate-800 mb-2">Campaign Month</label>
             <div className="flex gap-2">
               <input
                 type="month"
                 value={newCampaignName}
-                onChange={(e) => setNewCampaignName(e.target.value)}
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                onChange={e => setNewCampaignName(e.target.value)}
+                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
               <button
-                onClick={() => createCampaignMutation.mutate(newCampaignName)}
-                disabled={!newCampaignName || createCampaignMutation.isPending}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-lg font-medium transition-colors"
+                onClick={() => createMutation.mutate(newCampaignName)}
+                disabled={!newCampaignName || createMutation.isPending}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white rounded-lg text-sm font-semibold transition-colors"
               >
-                {createCampaignMutation.isPending ? 'Creating...' : 'Create'}
+                {createMutation.isPending ? 'Creating…' : 'Create'}
+              </button>
+              <button onClick={() => setShowCreateForm(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-lg transition-colors">
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
         {/* Campaign List */}
-        <div className="space-y-2 max-h-64 overflow-y-auto">
+        <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
           {Array.isArray(campaigns) && campaigns.length > 0 ? (
-            campaigns.map(campaign => (
-              <div
-                key={campaign._id}
-                onClick={() => setSelectedCampaignId(campaign._id)}
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                  selectedCampaignId === campaign._id
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-slate-500" />
-                    <div>
-                      <h4 className="font-medium text-slate-900">{campaign.campaignName}</h4>
-                      <p className="text-xs text-slate-500">
-                        {new Date(campaign.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {campaign.isActive && (
-                      <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
-                        ACTIVE
+            campaigns.map(campaign => {
+              const isSelected = selectedCampaignId === campaign._id;
+              return (
+                <div
+                  key={campaign._id}
+                  onClick={() => setSelectedCampaignId(campaign._id)}
+                  className={`flex items-center gap-3 px-5 py-3.5 cursor-pointer transition-colors ${
+                    isSelected ? 'bg-blue-50 border-l-2 border-l-blue-600' : 'bg-white hover:bg-slate-50 border-l-2 border-l-transparent'
+                  }`}
+                >
+                  <Calendar className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`font-semibold text-sm ${isSelected ? 'text-blue-800' : 'text-slate-800'}`}>
+                        {campaign.campaignName}
                       </span>
-                    )}
-                    <div className="flex gap-2">
-                      {!campaign.isActive && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            activateCampaignMutation.mutate(campaign._id);
-                          }}
-                          disabled={activateCampaignMutation.isPending}
-                          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white text-sm rounded-lg transition-colors"
-                        >
-                          Activate
-                        </button>
-                      )}
                       {campaign.isActive && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deactivateCampaignMutation.mutate(campaign._id);
-                          }}
-                          disabled={deactivateCampaignMutation.isPending}
-                          className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-slate-400 text-white text-sm rounded-lg transition-colors"
-                        >
-                          {deactivateCampaignMutation.isPending ? 'Deactivating...' : 'Deactivate'}
-                        </button>
+                        <span className="text-xs bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">LIVE</span>
                       )}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (window.confirm('Delete this campaign?')) {
-                            deleteCampaignMutation.mutate(campaign._id);
-                          }
-                        }}
-                        disabled={deleteCampaignMutation.isPending || campaign.isActive}
-                        className="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:bg-slate-400 text-white text-sm rounded-lg transition-colors"
-                      >
-                        Delete
-                      </button>
                     </div>
+                    <p className="text-xs text-slate-400 mt-0.5">Created {fmtDate(campaign.createdAt)}</p>
                   </div>
+
+                  <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                    {!campaign.isActive && (
+                      <button
+                        onClick={() => activateMutation.mutate(campaign._id)}
+                        disabled={activateMutation.isPending}
+                        title="Activate"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-lg transition-colors"
+                      >
+                        <Zap className="w-3 h-3" />
+                        <span className="hidden sm:inline">Activate</span>
+                      </button>
+                    )}
+                    {campaign.isActive && (
+                      <button
+                        onClick={() => deactivateMutation.mutate(campaign._id)}
+                        disabled={deactivateMutation.isPending}
+                        title="Deactivate"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-300 text-white text-xs font-semibold rounded-lg transition-colors"
+                      >
+                        <ZapOff className="w-3 h-3" />
+                        <span className="hidden sm:inline">Deactivate</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Delete campaign "${campaign.campaignName}"?`)) {
+                          deleteMutation.mutate(campaign._id);
+                        }
+                      }}
+                      disabled={campaign.isActive || deleteMutation.isPending}
+                      title={campaign.isActive ? 'Deactivate before deleting' : 'Delete'}
+                      className="p-1.5 text-red-500 hover:bg-red-50 disabled:text-slate-300 disabled:cursor-not-allowed rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {isSelected && <ChevronRight className="w-4 h-4 text-blue-400 flex-shrink-0" />}
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
-            <div className="text-center py-8 text-slate-500">
-              No campaigns yet. Create one to get started.
+            <div className="text-center py-10 text-slate-400 bg-white">
+              <Calendar className="w-10 h-10 mx-auto mb-2 opacity-40" />
+              <p className="text-sm font-medium">No campaigns yet</p>
+              <p className="text-xs mt-1">Click &quot;New Campaign&quot; to create one</p>
             </div>
           )}
         </div>
@@ -244,368 +258,321 @@ const CampaignImageManager = () => {
         />
       )}
 
-      {(!Array.isArray(campaigns) || campaigns.length === 0) && (
-        <div className="text-center py-12 bg-slate-50 rounded-lg border border-slate-200">
-          <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500 font-medium">No campaigns yet</p>
-          <p className="text-sm text-slate-400">Click "New Campaign" to create your first campaign</p>
+      {!selectedCampaign && Array.isArray(campaigns) && campaigns.length > 0 && (
+        <div className="text-center py-8 text-slate-400">
+          <p className="text-sm">Select a campaign above to edit its images</p>
         </div>
       )}
     </div>
   );
 };
 
+/* ─────────────────────── ImageEditor ─────────────────────── */
 const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
   const queryClient = useQueryClient();
   const fileInputRefs = useRef({});
   const [uploadingIndex, setUploadingIndex] = useState(null);
-
   const [images, setImages] = useState(() => campaign.sections?.[activeTab] || []);
 
-  // Sync images when campaign or tab changes (useEffect = safe, not during render)
   useEffect(() => {
     setImages(campaign.sections?.[activeTab] || []);
   }, [campaign._id, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const updateSectionMutation = useMutation({
-    mutationFn: async (updatedImages) => {
-      return updateCampaign(campaignId, {
-        [`sections.${activeTab}`]: updatedImages,
-      });
-    },
+  const saveMutation = useMutation({
+    mutationFn: (updatedImages) => updateCampaign(campaignId, {
+      [`sections.${activeTab}`]: updatedImages,
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
-      toast.success('Section updated successfully');
+      toast.success('Section saved!');
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update section');
-    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Save failed'),
   });
 
   const handleAddImage = () => {
-    const newImage = {
+    setImages(prev => [...prev, {
       _tempId: `temp-${Date.now()}-${Math.random()}`,
-      title: '',
-      description: '',
-      badge: '',
-      imageUrl: '',
-      actionLink: '',
-      actionText: 'Explore',
-      order: images.length,
-    };
-    setImages(prev => [...prev, newImage]);
+      title: '', description: '', badge: '', imageUrl: '', actionLink: '', actionText: 'Explore',
+      order: prev.length,
+    }]);
   };
 
-  const handleUpdateImage = (index, field, value) => {
-    // Immutable update - creates new object instead of mutating in place
-    setImages(prev => prev.map((img, i) =>
-      i === index ? { ...img, [field]: value } : img
-    ));
+  const handleUpdate = (index, field, value) => {
+    setImages(prev => prev.map((img, i) => i === index ? { ...img, [field]: value } : img));
   };
 
-  const handleImageUpload = async (e, index) => {
-    console.log('🟦 [UPLOAD] Upload button clicked, index:', index);
-    
+  const handleUpload = async (e, index) => {
     const file = e.target.files?.[0];
-    console.log('📁 File selected:', file ? { name: file.name, size: file.size, type: file.type } : 'NO FILE');
-    
-    if (!file) {
-      console.warn('⚠️ [UPLOAD] No file selected, returning');
-      return;
-    }
-
-    // Validate file
+    if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      console.error('❌ [UPLOAD] Invalid file type:', file.type);
-      toast.error('Invalid file type. Only JPG, PNG, and WebP are allowed.');
+      toast.error('Only JPG, PNG, WebP allowed');
       return;
     }
-    console.log('✅ [UPLOAD] File type valid:', file.type);
-
     if (file.size > 5 * 1024 * 1024) {
-      console.error('❌ [UPLOAD] File too large:', file.size / 1024 / 1024, 'MB');
-      toast.error('Image exceeds 5MB limit. Please choose a smaller file.');
+      toast.error('File exceeds 5MB');
       return;
     }
-    console.log('✅ [UPLOAD] File size valid:', file.size / 1024, 'KB');
-
     setUploadingIndex(index);
     try {
-      const formDataObj = new FormData();
-      formDataObj.append('images', file);
-      const response = await uploadImages(formDataObj);
-
-      let uploadedUrl = '';
-      if (response && response.urls && Array.isArray(response.urls) && response.urls.length > 0) {
-        uploadedUrl = response.urls[0];
-      } else if (Array.isArray(response) && response.length > 0) {
-        uploadedUrl = response[0]?.url || response[0];
-      } else if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
-        uploadedUrl = response.data[0];
-      } else if (typeof response === 'string') {
-        uploadedUrl = response;
-      }
-
-      if (!uploadedUrl || !uploadedUrl.startsWith('http')) {
-        throw new Error('Invalid image URL received from server');
-      }
-
-      handleUpdateImage(index, 'imageUrl', uploadedUrl);
-      toast.success('Image uploaded! Click "Save Changes" to finalize.');
-    } catch (error) {
-      const errorMsg = error.message || error.response?.data?.message || 'Failed to upload image';
-      toast.error(errorMsg);
+      const fd = new FormData();
+      fd.append('images', file);
+      const res = await uploadImages(fd);
+      const url = res?.urls?.[0] || (Array.isArray(res) ? res[0]?.url || res[0] : null);
+      if (!url || !url.startsWith('http')) throw new Error('No valid URL from server');
+      handleUpdate(index, 'imageUrl', url);
+      toast.success('Image uploaded! Save to apply.');
+    } catch (err) {
+      toast.error(err.message || 'Upload failed');
     } finally {
       setUploadingIndex(null);
-      if (fileInputRefs.current[index]) {
-        fileInputRefs.current[index].value = '';
-      }
+      if (fileInputRefs.current[index]) fileInputRefs.current[index].value = '';
     }
   };
 
-  const handleRemoveImage = (index) => {
+  const handleRemove = (index) => {
     setImages(prev => prev.filter((_, i) => i !== index).map((img, i) => ({ ...img, order: i })));
   };
 
-  const handleSave = () => {
-    updateSectionMutation.mutate(images);
-  };
+  const sectionTabs = [
+    { id: 'hero', label: '🏠 Hero Section' },
+    { id: 'trendingCategories', label: '🔥 Trending Categories' },
+  ];
+
+  const hasUnsaved = JSON.stringify(images) !== JSON.stringify(campaign.sections?.[activeTab] || []);
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-6">
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-slate-200">
-        <button
-          onClick={() => setActiveTab('hero')}
-          className={`px-4 py-3 font-medium transition-colors border-b-2 ${
-            activeTab === 'hero'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          🏠 Hero Section
-        </button>
-        <button
-          onClick={() => setActiveTab('trendingCategories')}
-          className={`px-4 py-3 font-medium transition-colors border-b-2 ${
-            activeTab === 'trendingCategories'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          🔥 Trending Categories
-        </button>
+    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      {/* Section Header */}
+      <div className="px-5 py-4 bg-gradient-to-r from-slate-800 to-slate-700 flex items-center justify-between">
+        <div>
+          <h3 className="font-bold text-white text-sm">{campaign.campaignName}</h3>
+          <p className="text-slate-400 text-xs mt-0.5">Editing campaign content</p>
+        </div>
+        {campaign.isActive && (
+          <span className="text-xs bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-full">🟢 LIVE</span>
+        )}
       </div>
 
-      {/* Images List */}
-      <div className="space-y-4">
+      {/* Section Tabs */}
+      <div className="flex border-b border-slate-200 bg-slate-50">
+        {sectionTabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors relative ${
+              activeTab === tab.id
+                ? 'text-blue-700 bg-white border-b-2 border-blue-600'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-5 sm:p-6 space-y-4">
+        {/* Unsaved changes indicator */}
+        {hasUnsaved && (
+          <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium px-3 py-2 rounded-lg">
+            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+            You have unsaved changes — click "Save Section" to apply.
+          </div>
+        )}
+
+        {/* Image cards */}
         {images.length === 0 ? (
-          <div className="text-center py-12 text-slate-500">
-            <Upload className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-            <p className="font-medium mb-1">No images yet</p>
-            <p className="text-sm">Click "Add Image" below to create your first {activeTab === 'hero' ? 'hero' : 'category'} image.</p>
+          <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
+            <Upload className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-500 font-semibold text-sm">No images in this section</p>
+            <p className="text-slate-400 text-xs mt-1">Click "Add Image" to get started</p>
           </div>
         ) : (
-          images.map((image, index) => (
-            <ImageItem
-              key={image._tempId || image._id || index}
-              index={index}
-              image={image}
-              activeTab={activeTab}
-              uploadingIndex={uploadingIndex}
-              fileInputRefs={fileInputRefs}
-              onUpdate={handleUpdateImage}
-              onUpload={handleImageUpload}
-              onRemove={handleRemoveImage}
-            />
-          ))
+          <div className="space-y-4">
+            {images.map((image, index) => (
+              <ImageCard
+                key={image._tempId || image._id || index}
+                index={index}
+                image={image}
+                activeTab={activeTab}
+                uploadingIndex={uploadingIndex}
+                fileInputRefs={fileInputRefs}
+                onUpdate={handleUpdate}
+                onUpload={handleUpload}
+                onRemove={handleRemove}
+              />
+            ))}
+          </div>
         )}
-      </div>
 
-      {/* Action Buttons */}
-      <div className="mt-8 flex gap-2 flex-wrap sm:flex-nowrap">
-        <button
-          onClick={handleAddImage}
-          className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm text-xs sm:text-sm whitespace-nowrap"
-        >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">Add Image</span>
-          <span className="sm:hidden">Add</span>
-        </button>
+        {/* Actions */}
+        <div className="flex flex-wrap gap-3 pt-2">
+          <button
+            onClick={handleAddImage}
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Image
+          </button>
 
-        {images.length > 0 && (
-          <>
+          {images.length > 0 && (
             <button
-              onClick={handleSave}
-              disabled={updateSectionMutation.isPending}
-              className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white px-3 sm:px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm text-xs sm:text-sm whitespace-nowrap"
+              onClick={() => saveMutation.mutate(images)}
+              disabled={saveMutation.isPending}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm ${
+                hasUnsaved
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+              } disabled:opacity-50`}
             >
-              {updateSectionMutation.isPending ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin flex-shrink-0" />
-                  <span className="hidden sm:inline">Saving...</span>
-                  <span className="sm:hidden">Save...</span>
-                </>
+              {saveMutation.isPending ? (
+                <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving…</>
               ) : (
-                <>
-                  ✓ <span className="hidden sm:inline">Save Changes</span>
-                  <span className="sm:hidden">Save</span>
-                </>
+                <><CheckCircle2 className="w-4 h-4" /> Save Section</>
               )}
             </button>
-            
-            <div className="flex-1 hidden sm:flex items-center text-sm text-slate-600 bg-blue-50 px-4 py-3 rounded-lg border border-blue-200 min-w-max">
-              <span>💡 Upload images, fill in details, then click "Save Changes" to finalize.</span>
-            </div>
-            
-            <div className="w-full sm:hidden text-xs text-slate-600 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-              <span>💡 Upload, fill details, save!</span>
-            </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-const ImageItem = ({
-  index,
-  image,
-  activeTab,
-  uploadingIndex,
-  fileInputRefs,
-  onUpdate,
-  onUpload,
-  onRemove,
-}) => {
-  const hasImage = image.imageUrl && image.imageUrl.trim() !== '';
+/* ─────────────────────── ImageCard ─────────────────────── */
+const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onUpdate, onUpload, onRemove }) => {
+  const hasImage = Boolean(image.imageUrl?.trim());
+  const isUploading = uploadingIndex === index;
 
   return (
-    <div className="p-4 border border-slate-200 rounded-lg space-y-3 hover:border-slate-300 transition-colors">
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="font-medium text-slate-900">Image {index + 1} {hasImage && <span className="text-xs bg-emerald-100 text-emerald-700 ml-2 px-2 py-1 rounded">✓ Uploaded</span>}</h4>
+    <div className={`border rounded-xl overflow-hidden transition-all ${hasImage ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 bg-slate-50/50'}`}>
+      {/* Card Header */}
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-100">
+        <div className="flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">{index + 1}</span>
+          <span className="text-sm font-semibold text-slate-800">Image {index + 1}</span>
+          {hasImage && <span className="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">✓ Uploaded</span>}
+        </div>
         <button
           onClick={() => onRemove(index)}
-          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
-          title="Remove this image"
+          className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
         >
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Image Upload Section - PRIORITY */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <label className="block text-xs font-semibold text-slate-700 mb-2">📸 UPLOAD IMAGE</label>
-        <div className="flex gap-2 items-stretch flex-col sm:flex-row">
+      <div className="p-4 space-y-4">
+        {/* Upload Row */}
+        <div>
           <input
             type="file"
-            ref={(el) => (fileInputRefs.current[index] = el)}
-            onChange={(e) => onUpload(e, index)}
+            ref={el => (fileInputRefs.current[index] = el)}
+            onChange={e => onUpload(e, index)}
             accept="image/jpeg,image/png,image/webp"
             className="hidden"
           />
-          <button
-            type="button"
-            onClick={() => fileInputRefs.current[index]?.click()}
-            disabled={uploadingIndex === index}
-            className="flex-1 px-3 sm:px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm whitespace-nowrap"
-            title="Click to select and upload image"
-          >
-            {uploadingIndex === index ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin flex-shrink-0" />
-                <span className="hidden sm:inline">Uploading...</span>
-                <span className="sm:hidden">Upload...</span>
-              </>
-            ) : (
-              <>
-                <Upload className="w-4 h-4 flex-shrink-0" />
-                <span className="hidden sm:inline">{hasImage ? 'Change Image' : 'Upload Image'}</span>
-                <span className="sm:hidden">{hasImage ? 'Change' : 'Upload'}</span>
-              </>
-            )}
-          </button>
-        </div>
-        <p className="text-xs text-slate-500 mt-2">JPG, PNG, WebP • Max 5MB • Tap button to choose</p>
-      </div>
+          <div className="flex gap-3 items-stretch">
+            <button
+              type="button"
+              onClick={() => fileInputRefs.current[index]?.click()}
+              disabled={isUploading}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                isUploading
+                  ? 'bg-blue-100 text-blue-500 cursor-wait'
+                  : hasImage
+                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
+              }`}
+            >
+              {isUploading ? (
+                <><div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" /> Uploading…</>
+              ) : (
+                <><Upload className="w-4 h-4" /> {hasImage ? 'Change Image' : 'Upload Image'}</>
+              )}
+            </button>
 
-      {/* Image Preview */}
-      {hasImage && (
-        <div className="relative rounded-lg overflow-hidden bg-slate-100 border border-slate-300">
-          <img
-            src={image.imageUrl}
-            alt="Preview"
-            className="w-full h-32 sm:h-48 object-cover"
-            onError={(e) => {
-              e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="200"%3E%3Crect fill="%23f3f4f6" width="400" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-family="sans-serif"%3EImage Preview%3C/text%3E%3C/svg%3E';
-            }}
-          />
-          <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
-            ✓ Ready
+            {/* URL input */}
+            <input
+              type="text"
+              placeholder="Or paste URL…"
+              value={image.imageUrl}
+              onChange={e => onUpdate(index, 'imageUrl', e.target.value)}
+              className="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-w-0"
+            />
+          </div>
+          <p className="text-xs text-slate-400 mt-1.5">JPG, PNG, WebP · Max 5MB</p>
+        </div>
+
+        {/* Image Preview */}
+        {hasImage && (
+          <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+            <img
+              src={image.imageUrl}
+              alt="Preview"
+              className="w-full h-36 sm:h-44 object-cover"
+              onError={e => { e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="180"%3E%3Crect fill="%23f3f4f6" width="400" height="180"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-family="sans-serif" font-size="14"%3EImage Preview%3C/text%3E%3C/svg%3E'; }}
+            />
+            <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">✓ Ready</div>
+          </div>
+        )}
+
+        {/* Fields Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Title *</label>
+            <input
+              type="text"
+              placeholder={activeTab === 'hero' ? 'e.g., Summer Sale' : 'e.g., Laptops'}
+              value={image.title}
+              onChange={e => onUpdate(index, 'title', e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Button Text</label>
+            <input
+              type="text"
+              placeholder="e.g., Shop Now, Explore"
+              value={image.actionText}
+              onChange={e => onUpdate(index, 'actionText', e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            />
           </div>
         </div>
-      )}
 
-      {/* Title */}
-      <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Title *</label>
-        <input
-          type="text"
-          placeholder={activeTab === 'hero' ? 'e.g., Summer Sale' : 'e.g., Laptops'}
-          value={image.title}
-          onChange={(e) => onUpdate(index, 'title', e.target.value)}
-          className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm"
-        />
-      </div>
-
-      {/* Description */}
-      <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Description *</label>
-        <textarea
-          placeholder={activeTab === 'hero' ? 'e.g., Get 50% off all items this season' : 'e.g., Browse the latest laptops'}
-          value={image.description}
-          onChange={(e) => onUpdate(index, 'description', e.target.value)}
-          className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm resize-none"
-          rows="2"
-        />
-      </div>
-
-      {/* Badge for Trending Categories */}
-      {activeTab === 'trendingCategories' && (
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Badge *</label>
-          <input
-            type="text"
-            placeholder="e.g., Electronics, Fashion, Hot, New"
-            value={image.badge}
-            onChange={(e) => onUpdate(index, 'badge', e.target.value)}
-            className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm"
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Description *</label>
+          <textarea
+            placeholder={activeTab === 'hero' ? 'e.g., Get 50% off all items this season' : 'e.g., Browse the latest laptops'}
+            value={image.description}
+            onChange={e => onUpdate(index, 'description', e.target.value)}
+            rows={2}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white resize-none"
           />
         </div>
-      )}
 
-      {/* Action Link */}
-      <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Action Link (Optional)</label>
-        <input
-          type="text"
-          placeholder="e.g., /shop?category=tech or /products/laptops"
-          value={image.actionLink}
-          onChange={(e) => onUpdate(index, 'actionLink', e.target.value)}
-          className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm"
-        />
-      </div>
-
-      {/* Action Text */}
-      <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Button Text (Optional)</label>
-        <input
-          type="text"
-          placeholder="e.g., Shop Now, Explore, Learn More (default: Explore)"
-          value={image.actionText}
-          onChange={(e) => onUpdate(index, 'actionText', e.target.value)}
-          className="w-full px-2 sm:px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm"
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {activeTab === 'trendingCategories' && (
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Badge *</label>
+              <input
+                type="text"
+                placeholder="e.g., Electronics, Hot"
+                value={image.badge}
+                onChange={e => onUpdate(index, 'badge', e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+            </div>
+          )}
+          <div className={activeTab === 'trendingCategories' ? '' : 'sm:col-span-2'}>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Action Link</label>
+            <input
+              type="text"
+              placeholder="e.g., /shop?category=tech"
+              value={image.actionLink}
+              onChange={e => onUpdate(index, 'actionLink', e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
