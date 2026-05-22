@@ -755,11 +755,31 @@ export const uploadImage = async (formData) => {
 
 export const uploadImages = async (formData) => {
   try {
+    console.log('🌐 [API] uploadImages called');
+    console.log('🌐 [API] FormData keys:', Array.from(formData.keys()));
+    console.log('🌐 [API] API base URL:', api.defaults.baseURL);
+    console.log('🌐 [API] Full endpoint:', api.defaults.baseURL + '/upload/images');
+    
+    console.log('🌐 [API] Making POST request to /upload/images...');
     const response = await api.post('/upload/images', formData, {
       timeout: 120000,
     });
+    
+    console.log('🌐 [API] Response status:', response.status);
+    console.log('🌐 [API] Response headers:', response.headers);
+    console.log('🌐 [API] Response data:', response.data);
+    
     return response.data;
   } catch (error) {
+    console.error('🌐 [API] ERROR in uploadImages:');
+    console.error('   Status:', error.response?.status);
+    console.error('   Status text:', error.response?.statusText);
+    console.error('   URL:', error.response?.config?.url);
+    console.error('   Method:', error.response?.config?.method);
+    console.error('   Data:', error.response?.data);
+    console.error('   Message:', error.message);
+    console.error('   Code:', error.code);
+    
     if (error.code === 'ECONNABORTED') {
       throw new Error('Upload timeout - backend is too slow or not responding. Check your backend /upload/images endpoint.');
     }

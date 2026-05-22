@@ -278,18 +278,22 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
   });
 
   const handleAddImage = () => {
-    setImages([
-      ...images,
-      {
-        title: '',
-        description: '',
-        badge: '',
-        imageUrl: '',
-        actionLink: '',
-        actionText: 'Explore',
-        order: images.length,
-      },
-    ]);
+    console.log('🔵 [ADD IMAGE] Button clicked');
+    console.log('📊 Current images count:', images.length);
+    
+    const newImage = {
+      title: '',
+      description: '',
+      badge: '',
+      imageUrl: '',
+      actionLink: '',
+      actionText: 'Explore',
+      order: images.length,
+    };
+    
+    console.log('➕ Adding new image:', newImage);
+    setImages([...images, newImage]);
+    console.log('✅ [ADD IMAGE] Image added to state');
   };
 
   const handleUpdateImage = (index, field, value) => {
@@ -299,54 +303,84 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
   };
 
   const handleImageUpload = async (e, index) => {
+    console.log('🟦 [UPLOAD] Upload button clicked, index:', index);
+    
     const file = e.target.files?.[0];
-    if (!file) return;
+    console.log('📁 File selected:', file ? { name: file.name, size: file.size, type: file.type } : 'NO FILE');
+    
+    if (!file) {
+      console.warn('⚠️ [UPLOAD] No file selected, returning');
+      return;
+    }
 
     // Validate file
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      console.error('❌ [UPLOAD] Invalid file type:', file.type);
       toast.error('Invalid file type. Only JPG, PNG, and WebP are allowed.');
       return;
     }
+    console.log('✅ [UPLOAD] File type valid:', file.type);
 
     if (file.size > 5 * 1024 * 1024) {
+      console.error('❌ [UPLOAD] File too large:', file.size / 1024 / 1024, 'MB');
       toast.error('Image exceeds 5MB limit. Please choose a smaller file.');
       return;
     }
+    console.log('✅ [UPLOAD] File size valid:', file.size / 1024, 'KB');
 
     setUploadingIndex(index);
     try {
       const formDataObj = new FormData();
       formDataObj.append('images', file);
       
-      console.log('Uploading image:', { name: file.name, size: file.size });
+      console.log('📤 [UPLOAD] Sending to API...');
+      console.log('📋 FormData fields:', ['images']);
+      console.log('🔗 API endpoint:', '/upload/images');
+      
       const response = await uploadImages(formDataObj);
+      console.log('📥 [UPLOAD] Response received:', response);
 
       let uploadedUrl = '';
       if (response && response.urls && Array.isArray(response.urls) && response.urls.length > 0) {
         uploadedUrl = response.urls[0];
+        console.log('✅ [UPLOAD] URL extracted from response.urls[0]');
       } else if (Array.isArray(response) && response.length > 0) {
         uploadedUrl = response[0]?.url || response[0];
+        console.log('✅ [UPLOAD] URL extracted from response array');
       } else if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
         uploadedUrl = response.data[0];
+        console.log('✅ [UPLOAD] URL extracted from response.data');
       } else if (typeof response === 'string') {
         uploadedUrl = response;
+        console.log('✅ [UPLOAD] Response is string URL');
       }
 
+      console.log('🔗 Extracted URL:', uploadedUrl);
+
       if (!uploadedUrl || !uploadedUrl.startsWith('http')) {
-        console.error('Invalid URL received:', uploadedUrl);
+        console.error('❌ [UPLOAD] Invalid URL:', uploadedUrl);
         throw new Error('Invalid image URL received from server');
       }
 
       // Update the image URL in state
+      console.log('💾 [UPLOAD] Updating state with URL...');
       handleUpdateImage(index, 'imageUrl', uploadedUrl);
+      
+      console.log('✅ [UPLOAD] Success! URL set');
       toast.success(`✓ Image uploaded! Click "Save Changes" to finalize.`);
       
-      console.log('Upload successful:', uploadedUrl);
+      console.log('✅ [UPLOAD] COMPLETE - uploadedUrl:', uploadedUrl);
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('❌ [UPLOAD] ERROR occurred:');
+      console.error('   Message:', error.message);
+      console.error('   Status:', error.response?.status);
+      console.error('   Response:', error.response?.data);
+      console.error('   Full error:', error);
+      
       const errorMsg = error.message || error.response?.data?.message || 'Failed to upload image';
       toast.error(errorMsg);
     } finally {
+      console.log('🔄 [UPLOAD] Cleanup - setting uploading index to null');
       setUploadingIndex(null);
       if (fileInputRefs.current[index]) {
         fileInputRefs.current[index].value = '';
