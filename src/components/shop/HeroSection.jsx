@@ -89,49 +89,37 @@ const HeroSection = () => {
 
               {/* Promo Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {heroImages.slice(0, 2).map((promo, idx) => (
-                  <div
-                    key={idx}
-                    className={`${promo.bgGradient || defaultContent.promos[idx]?.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 group hover:shadow-lg transition-all`}
-                  >
-                    <div>
-                      <h3 className={`text-sm sm:text-base font-bold ${promo.textColor || defaultContent.promos[idx]?.textColor} mb-1`}>
-                        {renderWithHighlight(promo.title || '', promo.highlightText, promo.highlightColor)}
-                      </h3>
-                      <p className={`text-xs font-semibold ${promo.textColor || defaultContent.promos[idx]?.textColor}`}>
-                        {renderWithHighlight(promo.description || '', promo.highlightText, promo.highlightColor)}
-                      </p>
-                    </div>
-                    <Link
-                      to={promo.actionLink || '/shop'}
-                      className={`inline-flex items-center gap-2 ${promo.bgGradient ? 'bg-blue-600 hover:bg-blue-700 text-white' : (defaultContent.promos[idx]?.actionBg + ' ' + defaultContent.promos[idx]?.actionTextColor)} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}
-                    >
-                      {promo.actionText || 'Explore'}
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-                ))}
-
-                {/* Fallback if fewer than 2 promos */}
-                {heroImages.length < 2 && defaultContent.promos.slice(heroImages.length).map((promo, idx) => (
-                  <div
-                    key={`default-${idx}`}
-                    className={`${promo.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 group hover:shadow-lg transition-all`}
-                  >
-                    <div>
-                      <h3 className={`text-sm sm:text-base font-bold ${promo.textColor} mb-1`}>
-                        {promo.title}
-                      </h3>
-                      <p className={`text-xs font-semibold ${promo.textColor}`}>
-                        {promo.subtitle}
-                      </p>
-                    </div>
-                    <button className={`inline-flex items-center gap-2 ${promo.actionBg} ${promo.actionTextColor} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}>
-                      {promo.actionText}
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
+                {(() => {
+                  // promo items should NOT include the primary hero (index 0)
+                  const promoItems = heroImages.slice(1, 3); // take up to 2 promos after the primary
+                  const filled = promoItems.concat(defaultContent.promos).slice(0, 2);
+                  return filled.map((promo, idx) => {
+                    const fallbackPromo = defaultContent.promos[idx];
+                    const textColorClass = promo.textColor || fallbackPromo?.textColor || '';
+                    return (
+                      <div
+                        key={promo._id || promo._tempId || idx}
+                        className={`${promo.bgGradient || fallbackPromo?.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 group hover:shadow-lg transition-all`}
+                      >
+                        <div>
+                          <h3 className={`text-sm sm:text-base font-bold ${textColorClass} mb-1`}>
+                            {renderWithHighlight(promo.title || fallbackPromo?.title || '', promo.highlightText, promo.highlightColor)}
+                          </h3>
+                          <p className={`text-xs font-semibold ${textColorClass}`}>
+                            {renderWithHighlight(promo.description || promo.subtitle || fallbackPromo?.subtitle || '', promo.highlightText, promo.highlightColor)}
+                          </p>
+                        </div>
+                        <Link
+                          to={promo.actionLink || fallbackPromo?.actionLink || '/shop'}
+                          className={`inline-flex items-center gap-2 ${promo.actionBg || fallbackPromo?.actionBg || 'bg-blue-600 hover:bg-blue-700 text-white'} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}
+                        >
+                          {promo.actionText || fallbackPromo?.actionText || 'Explore'}
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
 
