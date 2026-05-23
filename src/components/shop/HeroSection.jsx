@@ -76,8 +76,8 @@ const HeroSection = () => {
   return (
     <section className="py-12 sm:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-100 rounded-3xl overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16">
+        <div className="bg-gray-100 rounded-3xl overflow-hidden min-h-[500px]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16 h-full">
             {/* Left Column - Dynamic Content */}
             <div className="space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
@@ -124,12 +124,12 @@ const HeroSection = () => {
             </div>
 
             {/* Right Column - Hero Image */}
-            <div className="relative flex items-center justify-center lg:justify-end">
-              <div className="relative w-full max-w-sm lg:max-w-none">
+            <div className="relative flex items-center justify-center lg:justify-end h-full">
+              <div className="relative w-full h-full">
                 <img
                   src={primaryImage.imageUrl || defaultContent.image}
                   alt={primaryImage.title || 'Hero'}
-                  className="w-full h-auto object-contain drop-shadow-xl transform lg:scale-110 lg:translate-x-8 transition-transform hover:scale-105 lg:hover:scale-125"
+                  className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105"
                   onError={(e) => {
                     e.target.src = defaultContent.image;
                   }}
@@ -147,8 +147,8 @@ const DefaultHeroSection = ({ defaultContent }) => {
   return (
     <section className="py-12 sm:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-100 rounded-3xl overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16">
+        <div className="bg-gray-100 rounded-3xl overflow-hidden min-h-[500px]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16 h-full">
             {/* Left Column */}
             <div className="space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
@@ -183,12 +183,12 @@ const DefaultHeroSection = ({ defaultContent }) => {
             </div>
 
             {/* Right Column */}
-            <div className="relative flex items-center justify-center lg:justify-end">
-              <div className="relative w-full max-w-sm lg:max-w-none">
+            <div className="relative flex items-center justify-center lg:justify-end h-full">
+              <div className="relative w-full h-full">
                 <img
                   src={defaultContent.image}
                   alt="Person with yellow shopping bags"
-                  className="w-full h-auto object-contain drop-shadow-xl transform lg:scale-110 lg:translate-x-8 transition-transform hover:scale-105 lg:hover:scale-125"
+                  className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105"
                 />
               </div>
             </div>
