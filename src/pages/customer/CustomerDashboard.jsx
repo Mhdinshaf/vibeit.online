@@ -56,25 +56,25 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <div className="premium-card p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-5">
         <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-sm">
           <Gift className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Your Rewards</h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Your Rewards</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {resellerCustomer ? 'Reseller approved' : `${deliveredOrderCount} delivered orders`}
           </p>
         </div>
       </div>
 
       {promoConfig.freeDeliveryEnabled && (
-        <div className="mb-5 flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+        <div className="mb-5 flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-xl px-4 py-3">
           <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
           <div>
-            <p className="text-sm font-semibold text-emerald-800">🎉 Free Delivery Active!</p>
-            <p className="text-xs text-emerald-600">Admin has enabled free delivery for all orders right now.</p>
+            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">🎉 Free Delivery Active!</p>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400">Admin has enabled free delivery for all orders right now.</p>
           </div>
         </div>
       )}
@@ -83,10 +83,10 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
         <div className="mb-5">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <p className="text-sm font-semibold text-slate-900">Reseller Promotions</p>
-              <p className="text-xs text-slate-500">Available only for approved reseller customers</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white">Reseller Promotions</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Available only for approved reseller customers</p>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
               Approved
             </span>
           </div>
@@ -97,23 +97,23 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
                 <div
                   key={promo.id}
                   className={`rounded-xl border p-4 transition-all ${
-                    isUsed ? 'border-slate-200 bg-slate-50' : 'border-blue-200 bg-blue-50'
+                    isUsed ? 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50' : 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">{promo.label}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{promo.description}</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{promo.label}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{promo.description}</p>
                       <p className="text-xs text-slate-400 mt-1">Reseller only promotion</p>
                     </div>
                     {isUsed ? (
-                      <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-200 text-slate-500 uppercase tracking-wide">
+                      <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                         Used
                       </span>
                     ) : (
                       <button
                         onClick={() => copyCode(promo.promoCode)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+                        className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap"
                       >
                         {copied === promo.promoCode ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                         {copied === promo.promoCode ? 'Copied!' : promo.promoCode}
@@ -129,16 +129,16 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
 
       {nextMilestone && (
         <div className="mb-5">
-          <div className="flex justify-between text-xs text-slate-500 mb-2">
+          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
             <span>{deliveredOrderCount} orders</span>
-            <span>{progressTo} orders to unlock <strong>{nextMilestone.promoCode}</strong></span>
+            <span>{progressTo} orders to unlock <strong className="dark:text-white">{nextMilestone.promoCode}</strong></span>
           </div>
-          <div className="w-full bg-slate-100 rounded-full h-2.5">
+          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5">
             <div className="h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
               style={{ width: `${progressPct}%` }} />
           </div>
-          <p className="text-xs text-slate-500 mt-2">
-            {nextMilestone.minOrders - deliveredOrderCount} more deliveries to unlock <strong>{nextMilestone.description}</strong>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            {nextMilestone.minOrders - deliveredOrderCount} more deliveries to unlock <strong className="dark:text-white">{nextMilestone.description}</strong>
           </p>
         </div>
       )}
@@ -151,37 +151,37 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
             <div key={promo.id}
               className={`rounded-xl border p-4 transition-all ${
                 !promo.earned
-                  ? 'border-slate-200 bg-slate-50 opacity-60'
+                  ? 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 opacity-60'
                   : isUsed
-                    ? 'border-slate-200 bg-slate-50'
-                    : 'border-blue-200 bg-blue-50'
+                    ? 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50'
+                    : 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30'
               }`}>
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className={`text-sm font-semibold ${promo.earned ? 'text-slate-900' : 'text-slate-500'}`}>
+                    <p className={`text-sm font-semibold ${promo.earned ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
                       {promo.label}
                     </p>
                     {promo.earned && isUsed && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-500 uppercase tracking-wide">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                         Used
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">{promo.description}</p>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{promo.description}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                     {promo.resellerOnly ? 'Reseller only promotion' : `${promo.minOrders}+ delivered orders`}
                   </p>
                 </div>
                 {promo.earned ? (
                   isUsed ? (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 text-slate-500 text-xs font-semibold rounded-lg cursor-not-allowed whitespace-nowrap">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs font-semibold rounded-lg cursor-not-allowed whitespace-nowrap">
                       <CheckCircle className="w-3.5 h-3.5" />
                       Used ✓
                     </div>
                   ) : (
                     <button onClick={() => copyCode(promo.promoCode)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+                      className="btn-primary flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
                       {copied === promo.promoCode ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                       {copied === promo.promoCode ? 'Copied!' : promo.promoCode}
                     </button>
@@ -552,10 +552,10 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen lg:flex overflow-x-clip">
+    <div className="bg-slate-50 dark:bg-[#050b18] min-h-screen lg:flex overflow-x-clip">
       <button
         onClick={() => setSidebarOpen(true)}
-        className="lg:hidden fixed top-[5.5rem] left-4 z-30 p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm text-slate-700"
+        className="lg:hidden fixed top-[5.5rem] left-4 z-30 p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-slate-700 dark:text-slate-300"
         aria-label="Open customer menu"
       >
         <Menu className="w-5 h-5" />
@@ -568,21 +568,21 @@ const CustomerDashboard = () => {
       >
         <button
           onClick={() => setSidebarOpen(false)}
-          className="absolute inset-0 bg-slate-900/45 backdrop-blur-sm"
+          className="absolute inset-0 bg-slate-900/45 dark:bg-slate-900/80 backdrop-blur-sm"
           aria-label="Close customer menu overlay"
         />
       </div>
 
       <aside
-        className={`fixed lg:sticky top-0 lg:top-24 left-0 h-screen lg:h-[calc(100vh-6rem)] w-72 bg-white border-r border-slate-200 z-50 lg:z-20 transform transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 lg:top-24 left-0 h-screen lg:h-[calc(100vh-6rem)] w-72 bg-white dark:bg-[#0a1122] border-r border-slate-200 dark:border-slate-800 z-50 lg:z-20 transform transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="h-16 lg:hidden px-4 border-b border-slate-100 flex items-center justify-between">
-          <span className="text-sm font-semibold text-slate-700">Account Menu</span>
+        <div className="h-16 lg:hidden px-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Account Menu</span>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-2 rounded-lg hover:bg-slate-100 text-slate-700"
+            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
             aria-label="Close customer menu"
           >
             <X className="w-5 h-5" />
@@ -602,7 +602,7 @@ const CustomerDashboard = () => {
                   setSidebarOpen(false);
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'
+                  isActive ? 'bg-slate-900 dark:bg-blue-600 text-white' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -611,11 +611,11 @@ const CustomerDashboard = () => {
             );
           })}
 
-          <hr className="my-4 border-slate-200" />
+          <hr className="my-4 border-slate-200 dark:border-slate-800" />
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
           >
             <LogOut className="w-5 h-5" />
             Logout
@@ -627,24 +627,24 @@ const CustomerDashboard = () => {
         {activeSection === 'overview' && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
                 Welcome back, {customer?.firstName}
               </h1>
-              <p className="text-slate-600 mt-1">Here is your account overview.</p>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">Here is your account overview.</p>
             </div>
 
             {orderError && (
-              <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm font-medium text-red-700">{orderError}</p>
+              <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-xl">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm font-medium text-red-700 dark:text-red-400">{orderError}</p>
               </div>
             )}
 
             {isLoadingOrders && (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <Loader2 className="w-8 h-8 animate-spin text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-600">Loading your orders...</p>
+                  <Loader2 className="w-8 h-8 animate-spin text-slate-700 dark:text-slate-400 mx-auto mb-3" />
+                  <p className="text-slate-600 dark:text-slate-400">Loading your orders...</p>
                 </div>
               </div>
             )}
@@ -652,23 +652,23 @@ const CustomerDashboard = () => {
             {!isLoadingOrders && (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                  <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                  <article className="premium-card p-6 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-slate-600 text-sm font-medium">Total Orders</p>
-                        <p className="text-3xl font-semibold text-slate-900 mt-2">{orders.length}</p>
+                        <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">Total Orders</p>
+                        <p className="text-3xl font-semibold text-slate-900 dark:text-white mt-2">{orders.length}</p>
                       </div>
-                      <div className="w-11 h-11 bg-slate-900 rounded-xl flex items-center justify-center">
+                      <div className="w-11 h-11 bg-slate-900 dark:bg-slate-700 rounded-xl flex items-center justify-center">
                         <ShoppingBag className="w-5 h-5 text-white" />
                       </div>
                     </div>
                   </article>
 
-                  <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                  <article className="premium-card p-6 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-slate-600 text-sm font-medium">Active Orders</p>
-                        <p className="text-3xl font-semibold text-slate-900 mt-2">
+                        <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">Active Orders</p>
+                        <p className="text-3xl font-semibold text-slate-900 dark:text-white mt-2">
                           {orders.filter((o) => ['pending', 'confirmed', 'processing', 'shipped'].includes(o.status)).length}
                         </p>
                       </div>
@@ -678,11 +678,11 @@ const CustomerDashboard = () => {
                     </div>
                   </article>
 
-                  <article className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm sm:col-span-2 xl:col-span-1">
+                  <article className="premium-card p-6 shadow-sm sm:col-span-2 xl:col-span-1">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-slate-600 text-sm font-medium">Delivered</p>
-                        <p className="text-3xl font-semibold text-slate-900 mt-2">
+                        <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">Delivered</p>
+                        <p className="text-3xl font-semibold text-slate-900 dark:text-white mt-2">
                           {deliveredOrderCount}
                         </p>
                       </div>
@@ -709,12 +709,12 @@ const CustomerDashboard = () => {
         {activeSection === 'orders' && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900">My Orders</h1>
-              <p className="text-slate-600 mt-1">View and track all your orders.</p>
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">My Orders</h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">View and track all your orders.</p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-              <label htmlFor="order-search" className="block text-sm font-semibold text-slate-700 mb-2">
+            <div className="premium-card p-6 shadow-sm">
+              <label htmlFor="order-search" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 Search by Order ID
               </label>
               <div className="relative">
@@ -725,25 +725,25 @@ const CustomerDashboard = () => {
                   value={orderSearchQuery}
                   onChange={(e) => setOrderSearchQuery(e.target.value)}
                   placeholder="Enter Order ID (e.g., VIB-1001)"
-                  className="w-full border border-slate-200 bg-slate-50 rounded-xl py-2.5 pl-10 pr-4 focus:outline-none focus:border-slate-900 focus:bg-white transition-colors"
+                  className="form-input pl-10 pr-4 py-2.5 w-full"
                 />
               </div>
             </div>
 
             {normalizedQuery && (
-              <div className="bg-slate-100 border border-slate-200 rounded-2xl p-4 md:p-5">
+              <div className="bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 md:p-5">
                 {searchedOrder ? (
                   <div className="space-y-4">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                       <div>
-                        <p className="text-sm text-slate-700 font-medium">Order found</p>
-                        <p className="text-lg font-semibold text-slate-900">{searchedOrder.orderNumber || searchedOrder._id}</p>
-                        <p className="text-sm text-slate-700">
+                        <p className="text-sm text-slate-700 dark:text-slate-400 font-medium">Order found</p>
+                        <p className="text-lg font-semibold text-slate-900 dark:text-white">{searchedOrder.orderNumber || searchedOrder._id}</p>
+                        <p className="text-sm text-slate-700 dark:text-slate-400">
                           {new Date(searchedOrder.createdAt).toLocaleDateString()} • {getOrderItemsCount(searchedOrder)} items
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
-                        <p className="text-sm font-semibold text-slate-900">රු{searchedOrder.total?.toLocaleString() || 0}</p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">රු{searchedOrder.total?.toLocaleString() || 0}</p>
                         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${getStatusBadgeClass(searchedOrder.status)}`}>
                           {searchedOrder.status}
                         </span>
@@ -751,69 +751,69 @@ const CustomerDashboard = () => {
                     </div>
 
                     <div>
-                      <p className="text-sm font-semibold text-slate-800 mb-2">Items</p>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">Items</p>
                       {getOrderItems(searchedOrder).length > 0 ? (
                         <div className="space-y-2">
                           {getOrderItems(searchedOrder).map((item, index) => (
                             <div
                               key={`${searchedOrder._id || searchedOrder.orderNumber}-item-${index}`}
-                              className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-3"
+                              className="flex items-center justify-between premium-card p-3"
                             >
                               <div>
-                                <p className="text-sm font-semibold text-slate-900">
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
                                   {getOrderItemDisplayName(item, index)}
                                 </p>
-                                <p className="text-xs text-slate-600">
+                                <p className="text-xs text-slate-600 dark:text-slate-400">
                                   Qty: {item?.quantity || 0} {item?.size ? `• Size: ${item.size}` : ''}
                                 </p>
                               </div>
-                              <p className="text-sm font-semibold text-slate-900">
+                              <p className="text-sm font-semibold text-slate-900 dark:text-white">
                                 රු{Number((item?.price || 0) * (item?.quantity || 0)).toLocaleString()}
                               </p>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-sm text-slate-600">No item details available for this order.</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">No item details available for this order.</p>
                       )}
                     </div>
 
                     {searchedOrder?.notes && (
                       <div>
-                        <p className="text-sm font-semibold text-slate-800 mb-2">Order Notes</p>
-                        <p className="text-sm text-slate-600 whitespace-pre-wrap">{searchedOrder.notes}</p>
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">Order Notes</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{searchedOrder.notes}</p>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm font-medium text-red-700">No order found for “{orderSearchQuery}”.</p>
+                  <p className="text-sm font-medium text-red-700 dark:text-red-400">No order found for “{orderSearchQuery}”.</p>
                 )}
               </div>
             )}
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <div className="premium-card p-6 shadow-sm">
               {orders.length > 0 ? (
                 displayedOrders.length > 0 ? (
                   <>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm">
                       <thead>
-                        <tr className="border-b border-slate-200 text-left">
-                          <th className="py-3 pr-4 font-semibold text-slate-700">Order ID</th>
-                          <th className="py-3 pr-4 font-semibold text-slate-700">Date</th>
-                          <th className="py-3 pr-4 font-semibold text-slate-700">Items</th>
-                          <th className="py-3 pr-4 font-semibold text-slate-700">Amount</th>
-                          <th className="py-3 pr-4 font-semibold text-slate-700">Status</th>
-                          <th className="py-3 pl-4 font-semibold text-slate-700"></th>
+                        <tr className="border-b border-slate-200 dark:border-slate-700 text-left">
+                          <th className="py-3 pr-4 font-semibold text-slate-700 dark:text-slate-300">Order ID</th>
+                          <th className="py-3 pr-4 font-semibold text-slate-700 dark:text-slate-300">Date</th>
+                          <th className="py-3 pr-4 font-semibold text-slate-700 dark:text-slate-300">Items</th>
+                          <th className="py-3 pr-4 font-semibold text-slate-700 dark:text-slate-300">Amount</th>
+                          <th className="py-3 pr-4 font-semibold text-slate-700 dark:text-slate-300">Status</th>
+                          <th className="py-3 pl-4 font-semibold text-slate-700 dark:text-slate-300"></th>
                         </tr>
                       </thead>
                       <tbody>
                         {displayedOrders.map((order) => (
-                          <tr key={order._id} className="border-b border-slate-100 last:border-b-0">
-                            <td className="py-3 pr-4 font-semibold text-slate-900">{order.orderNumber || order._id}</td>
-                            <td className="py-3 pr-4 text-slate-600">{new Date(order.createdAt).toLocaleDateString()}</td>
-                            <td className="py-3 pr-4 text-slate-600">{getOrderItemsCount(order)}</td>
-                            <td className="py-3 pr-4 font-medium text-slate-900">රු{order.total?.toLocaleString() || 0}</td>
+                          <tr key={order._id} className="border-b border-slate-100 dark:border-slate-800 last:border-b-0">
+                            <td className="py-3 pr-4 font-semibold text-slate-900 dark:text-white">{order.orderNumber || order._id}</td>
+                            <td className="py-3 pr-4 text-slate-600 dark:text-slate-400">{new Date(order.createdAt).toLocaleDateString()}</td>
+                            <td className="py-3 pr-4 text-slate-600 dark:text-slate-400">{getOrderItemsCount(order)}</td>
+                            <td className="py-3 pr-4 font-medium text-slate-900 dark:text-white">රු{order.total?.toLocaleString() || 0}</td>
                             <td className="py-3 pr-4">
                               <span className={`text-xs font-semibold px-3 py-1 rounded-full inline-block ${getStatusBadgeClass(order.status)}`}>
                                 {order.status}
@@ -825,7 +825,7 @@ const CustomerDashboard = () => {
                                   setOrderSearchQuery(order.orderNumber || order._id);
                                   window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}
-                                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg whitespace-nowrap"
+                                className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-3 py-1.5 rounded-lg whitespace-nowrap"
                               >
                                 View Details
                               </button>
@@ -836,8 +836,8 @@ const CustomerDashboard = () => {
                     </table>
                   </div>
                   {totalPages > 1 && (
-                    <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-200 pt-4 mt-4 gap-4">
-                      <p className="text-sm text-slate-700 text-center sm:text-left">
+                    <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-200 dark:border-slate-700 pt-4 mt-4 gap-4">
+                      <p className="text-sm text-slate-700 dark:text-slate-400 text-center sm:text-left">
                         Showing <span className="font-medium">{(currentPage - 1) * ordersPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * ordersPerPage, filteredOrders.length)}</span> of{' '}
                         <span className="font-medium">{filteredOrders.length}</span> results
                       </p>
@@ -845,7 +845,7 @@ const CustomerDashboard = () => {
                         <button
                           onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                           disabled={currentPage === 1}
-                          className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           <ChevronLeft className="w-5 h-5" />
                         </button>
@@ -864,8 +864,8 @@ const CustomerDashboard = () => {
                                   onClick={() => setCurrentPage(i + 1)}
                                   className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                                     currentPage === i + 1
-                                      ? 'bg-slate-900 text-white'
-                                      : 'text-slate-700 hover:bg-slate-100'
+                                      ? 'bg-slate-900 dark:bg-blue-600 text-white'
+                                      : 'text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                   }`}
                                 >
                                   {i + 1}
@@ -873,7 +873,7 @@ const CustomerDashboard = () => {
                               );
                             }
                             if (i + 1 === currentPage - 2 || i + 1 === currentPage + 2) {
-                              return <span key={i} className="px-1 text-slate-400">...</span>;
+                              return <span key={i} className="px-1 text-slate-400 dark:text-slate-500">...</span>;
                             }
                             return null;
                           })}
@@ -882,7 +882,7 @@ const CustomerDashboard = () => {
                         <button
                           onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                           disabled={currentPage === totalPages}
-                          className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           <ChevronRight className="w-5 h-5" />
                         </button>
@@ -891,10 +891,10 @@ const CustomerDashboard = () => {
                   )}
                 </>
               ) : (
-                <p className="text-slate-600 text-center py-12">No orders found for this Order ID.</p>
+                <p className="text-slate-600 dark:text-slate-400 text-center py-12">No orders found for this Order ID.</p>
                 )
               ) : (
-                <p className="text-slate-600 text-center py-12">No orders yet. Ready to shop? Browse our store now.</p>
+                <p className="text-slate-600 dark:text-slate-400 text-center py-12">No orders yet. Ready to shop? Browse our store now.</p>
               )}
             </div>
           </div>
@@ -903,61 +903,61 @@ const CustomerDashboard = () => {
         {activeSection === 'profile' && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900">My Profile</h1>
-              <p className="text-slate-600 mt-1">Manage your personal information.</p>
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">My Profile</h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">Manage your personal information.</p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm max-w-3xl">
+            <div className="premium-card p-6 sm:p-8 shadow-sm max-w-3xl">
               {isEditingProfile ? (
                 <form onSubmit={handleProfileUpdate}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">First Name</label>
+                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">First Name</label>
                       <input
                         type="text"
                         required
                         value={profileForm.firstName}
                         onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
-                        className="w-full border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="form-input w-full"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">Last Name</label>
+                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Last Name</label>
                       <input
                         type="text"
                         required
                         value={profileForm.lastName}
                         onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
-                        className="w-full border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="form-input w-full"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">Email</label>
+                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Email</label>
                       <input
                         type="email"
                         disabled
                         value={customer?.email || ''}
-                        className="w-full border border-slate-200 bg-slate-50 text-slate-500 rounded-xl py-2 px-3 cursor-not-allowed"
+                        className="form-input w-full bg-slate-50 dark:bg-slate-800 text-slate-500 cursor-not-allowed"
                       />
-                      <p className="text-xs text-slate-500 mt-1">Email cannot be changed</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Email cannot be changed</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">Phone</label>
+                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Phone</label>
                       <input
                         type="tel"
                         required
                         value={profileForm.phone}
                         onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                        className="w-full border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="form-input w-full"
                       />
                     </div>
                   </div>
 
-                  <div className="mt-8 pt-6 border-t border-slate-200 flex items-center gap-3">
+                  <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700 flex items-center gap-3">
                     <button
                       type="submit"
                       disabled={isSavingProfile}
-                      className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                      className="btn-primary px-6 py-2.5 flex items-center gap-2"
                     >
                       {isSavingProfile && <Loader2 className="w-4 h-4 animate-spin" />}
                       Save Changes
@@ -973,7 +973,7 @@ const CustomerDashboard = () => {
                         });
                       }}
                       disabled={isSavingProfile}
-                      className="px-6 py-2.5 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-colors disabled:opacity-50"
+                      className="btn-outline px-6 py-2.5"
                     >
                       Cancel
                     </button>
@@ -983,27 +983,27 @@ const CustomerDashboard = () => {
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">First Name</label>
-                      <p className="text-lg font-semibold text-slate-900">{customer?.firstName}</p>
+                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">First Name</label>
+                      <p className="text-lg font-semibold text-slate-900 dark:text-white">{customer?.firstName}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">Last Name</label>
-                      <p className="text-lg font-semibold text-slate-900">{customer?.lastName}</p>
+                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Last Name</label>
+                      <p className="text-lg font-semibold text-slate-900 dark:text-white">{customer?.lastName}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">Email</label>
-                      <p className="text-lg font-semibold text-slate-900 break-all">{customer?.email}</p>
+                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Email</label>
+                      <p className="text-lg font-semibold text-slate-900 dark:text-white break-all">{customer?.email}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-2">Phone</label>
-                      <p className="text-lg font-semibold text-slate-900">{customer?.phone}</p>
+                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Phone</label>
+                      <p className="text-lg font-semibold text-slate-900 dark:text-white">{customer?.phone}</p>
                     </div>
                   </div>
 
-                  <div className="mt-8 pt-6 border-t border-slate-200">
+                  <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
                     <button 
                       onClick={() => setIsEditingProfile(true)}
-                      className="px-6 py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
+                      className="btn-primary px-6 py-2.5"
                     >
                       Edit Profile
                     </button>
@@ -1012,46 +1012,46 @@ const CustomerDashboard = () => {
               )}
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm max-w-3xl">
+            <div className="premium-card p-6 sm:p-8 shadow-sm max-w-3xl">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-slate-900">Account Security</h2>
-                  <p className="text-sm text-slate-500 mt-1">Protect your account with MFA.</p>
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Account Security</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Protect your account with MFA.</p>
                 </div>
                 {mfaEnabled ? (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
                     <CheckCircle className="w-3.5 h-3.5" />
                     MFA Enabled
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                     <Lock className="w-3.5 h-3.5" />
                     MFA Disabled
                   </span>
                 )}
               </div>
               {mfaEnabled && (
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                   Method: {mfaMethod || 'Authenticator app'}
                 </p>
               )}
 
               <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-200 p-4 bg-slate-50">
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-800/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-slate-700 flex items-center justify-center">
                       <ShieldCheck className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">Authenticator app (TOTP)</p>
-                      <p className="text-xs text-slate-500">Scan a QR code to enable MFA.</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">Authenticator app (TOTP)</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Scan a QR code to enable MFA.</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleStartTotpSetup}
                     disabled={isStartingTotp || mfaEnabled}
-                    className="mt-4 w-full px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-colors disabled:opacity-50"
+                    className="mt-4 w-full btn-primary px-4 py-2.5 text-sm"
                   >
                     {isStartingTotp
                       ? 'Starting setup…'
@@ -1063,10 +1063,10 @@ const CustomerDashboard = () => {
                   </button>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 p-4 bg-white">
-                  <p className="text-sm font-semibold text-slate-900 mb-2">Verify setup</p>
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-800/20">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Verify setup</p>
                   {mfaEnabled ? (
-                    <p className="text-sm text-slate-500">MFA is active for this account.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">MFA is active for this account.</p>
                   ) : totpSetup ? (
                     <form onSubmit={handleVerifyTotpSetup} className="space-y-3">
                       {totpSetup.qrCode ? (
@@ -1074,15 +1074,15 @@ const CustomerDashboard = () => {
                           <img
                             src={totpSetup.qrCode}
                             alt="Authenticator QR code"
-                            className="h-32 w-32 rounded-lg border border-slate-200 bg-white p-2"
+                            className="h-32 w-32 rounded-lg border border-slate-200 dark:border-slate-600 bg-white p-2"
                           />
                         </div>
                       ) : totpSetup.otpauthUrl ? (
-                        <p className="text-xs text-slate-500 break-all">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 break-all">
                           {totpSetup.otpauthUrl}
                         </p>
                       ) : totpSetup.secret ? (
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
                           Secret: <span className="font-semibold">{totpSetup.secret}</span>
                         </p>
                       ) : null}
@@ -1093,18 +1093,18 @@ const CustomerDashboard = () => {
                         value={totpCode}
                         onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                         placeholder="Enter 6-digit code"
-                        className="w-full border border-slate-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:border-blue-500"
+                        className="form-input w-full text-sm py-2.5 px-3"
                       />
                       <button
                         type="submit"
                         disabled={isVerifyingTotp}
-                        className="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+                        className="btn-primary w-full px-4 py-2.5 text-sm"
                       >
                         {isVerifyingTotp ? 'Verifying…' : 'Verify & Enable'}
                       </button>
                     </form>
                   ) : (
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
                       Start setup to get your QR code and enable MFA.
                     </p>
                   )}
