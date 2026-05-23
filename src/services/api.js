@@ -723,12 +723,12 @@ export const getOrderStats = async () => {
 
 // Promotions APIs
 export const getPromotionsConfig = async () => {
-  const response = await api.get('/promotions');
+  const response = await api.get('/promo-codes');
   return response.data;
 };
 
 export const updatePromotionsConfig = async (data) => {
-  const response = await api.put('/admin/promotions', data);
+  const response = await api.put('/admin/promo-codes', data);
   return response.data;
 };
 
