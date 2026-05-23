@@ -106,7 +106,7 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full overflow-x-hidden bg-slate-50 dark:bg-[#050b18]">
+    <div className="flex min-h-screen w-full overflow-x-hidden bg-slate-50 dark:bg-slate-900">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 fixed left-0 top-0 bottom-0 z-40 overflow-y-auto">
         <SidebarContent location={location} navLinks={navLinks} admin={admin} handleLogout={handleLogout} setSidebarOpen={setSidebarOpen} />

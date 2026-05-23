@@ -213,7 +213,7 @@ const CustomerRegister = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#050b18] flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-block mb-4">

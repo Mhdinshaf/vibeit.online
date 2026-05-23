@@ -404,7 +404,7 @@ const ShopPage = () => {
             className="fixed inset-0 bg-slate-900/45 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setMobileFilterOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-80 sm:w-96 max-w-[85vw] bg-white dark:bg-[#050b18] z-50 overflow-y-auto md:hidden shadow-2xl border-l border-slate-200 dark:border-slate-700">
+          <div className="fixed inset-y-0 right-0 w-80 sm:w-96 max-w-[85vw] bg-white dark:bg-slate-900 z-50 overflow-y-auto md:hidden shadow-2xl border-l border-slate-200 dark:border-slate-700">
             <div className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">

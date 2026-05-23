@@ -552,7 +552,7 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-[#050b18] min-h-screen lg:flex overflow-x-clip">
+    <div className="bg-slate-50 dark:bg-slate-900 min-h-screen lg:flex overflow-x-clip">
       <button
         onClick={() => setSidebarOpen(true)}
         className="lg:hidden fixed top-[5.5rem] left-4 z-30 p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-slate-700 dark:text-slate-300"
@@ -574,7 +574,7 @@ const CustomerDashboard = () => {
       </div>
 
       <aside
-        className={`fixed lg:sticky top-0 lg:top-24 left-0 h-screen lg:h-[calc(100vh-6rem)] w-72 bg-white dark:bg-[#0a1122] border-r border-slate-200 dark:border-slate-800 z-50 lg:z-20 transform transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 lg:top-24 left-0 h-screen lg:h-[calc(100vh-6rem)] w-72 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-800 z-50 lg:z-20 transform transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >

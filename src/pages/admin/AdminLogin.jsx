@@ -19,7 +19,7 @@ const AdminLogin = () => {
   // Redirect if already logged in
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#050b18]">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -67,7 +67,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-slate-50 dark:bg-[#050b18] overflow-x-clip">
+    <div className="min-h-screen flex items-center justify-center px-6 bg-slate-50 dark:bg-slate-900 overflow-x-clip">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
