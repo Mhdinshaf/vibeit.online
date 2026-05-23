@@ -548,6 +548,31 @@ const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onU
           />
         </div>
 
+        {/* Highlight controls for hero promos */}
+        {activeTab === 'hero' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Highlight Text</label>
+              <input
+                type="text"
+                placeholder="Text to highlight inside title/description"
+                value={image.highlightText || ''}
+                onChange={e => onUpdate(index, 'highlightText', e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Highlight Color</label>
+              <input
+                type="color"
+                value={image.highlightColor || '#000000'}
+                onChange={e => onUpdate(index, 'highlightColor', e.target.value)}
+                className="w-full h-10 p-0 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="sm:col-span-2">
             <label className="block text-xs font-semibold text-slate-600 mb-1.5">Action Link</label>

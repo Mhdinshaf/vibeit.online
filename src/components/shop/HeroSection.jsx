@@ -60,6 +60,19 @@ const HeroSection = () => {
   // Show first hero image or use a carousel
   const primaryImage = heroImages[0];
 
+  // helper: render text with highlighted substring
+  const renderWithHighlight = (text = '', highlight = '', color) => {
+    if (!highlight) return text;
+    const safeColor = color || '#000000';
+    // split by highlight (case-sensitive)
+    const parts = text.split(highlight);
+    if (parts.length === 1) return text;
+    return parts.reduce((acc, part, idx) => {
+      if (idx === parts.length - 1) return acc.concat(part);
+      return acc.concat(part, /* highlight */ <span key={idx} style={{ color: safeColor }}>{highlight}</span>);
+    }, []);
+  };
+
   return (
     <section className="py-12 sm:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,10 +96,10 @@ const HeroSection = () => {
                   >
                     <div>
                       <h3 className={`text-sm sm:text-base font-bold ${promo.textColor || defaultContent.promos[idx]?.textColor} mb-1`}>
-                        {promo.title}
+                        {renderWithHighlight(promo.title || '', promo.highlightText, promo.highlightColor)}
                       </h3>
                       <p className={`text-xs font-semibold ${promo.textColor || defaultContent.promos[idx]?.textColor}`}>
-                        {promo.description}
+                        {renderWithHighlight(promo.description || '', promo.highlightText, promo.highlightColor)}
                       </p>
                     </div>
                     <Link
