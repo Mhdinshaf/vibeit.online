@@ -19,8 +19,8 @@ const AdminLogin = () => {
   // Redirect if already logged in
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#050b18]">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -67,25 +67,25 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-slate-50 overflow-x-clip">
+    <div className="min-h-screen flex items-center justify-center px-6 bg-slate-50 dark:bg-[#050b18] overflow-x-clip">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white font-semibold text-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-semibold text-lg shadow-lg shadow-blue-500/30">
               VB
             </div>
-            <span className="text-2xl font-semibold tracking-tight text-slate-900">VIBEIT</span>
+            <span className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">VIBEIT</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-sm p-8 lg:p-10 border border-slate-200">
+        <div className="premium-card p-8 lg:p-10 rounded-3xl">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2 rounded-full mb-4">
+            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium px-4 py-2 rounded-full mb-4 border border-slate-200 dark:border-slate-700">
               <Lock className="w-4 h-4" />
               Admin Access
             </div>
-            <h1 className="text-2xl font-semibold text-slate-900 mb-2">Welcome Back</h1>
-            <p className="text-slate-500">
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white mb-2">Welcome Back</h1>
+            <p className="text-slate-500 dark:text-slate-400">
               Enter your credentials to access the dashboard
             </p>
           </div>
@@ -101,7 +101,7 @@ const AdminLogin = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold text-slate-700 mb-2"
+                className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
               >
                 Email Address
               </label>
@@ -114,7 +114,7 @@ const AdminLogin = () => {
                   required
                   value={credentials.email}
                   onChange={handleChange}
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors"
+                  className="form-input pl-12 py-3.5 rounded-xl"
                   placeholder="admin@gmail.com"
                   disabled={isLoading}
                   autoComplete="email"
@@ -125,7 +125,7 @@ const AdminLogin = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold text-slate-700 mb-2"
+                className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
               >
                 Password
               </label>
@@ -138,7 +138,7 @@ const AdminLogin = () => {
                   required
                   value={credentials.password}
                   onChange={handleChange}
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-slate-900 focus:bg-white transition-colors"
+                  className="form-input pl-12 py-3.5 rounded-xl"
                   placeholder="••••••••"
                   disabled={isLoading}
                   autoComplete="current-password"
@@ -149,7 +149,7 @@ const AdminLogin = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-semibold uppercase tracking-wide py-4 rounded-xl hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full flex items-center justify-center gap-2 uppercase tracking-wide py-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -168,7 +168,7 @@ const AdminLogin = () => {
           <div className="mt-8 text-center">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-slate-900 font-medium transition-colors group"
+              className="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors group"
             >
               View Store
               <ArrowRight className="w-4 h-4" />
@@ -176,7 +176,7 @@ const AdminLogin = () => {
           </div>
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-8">
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-8">
           VibeIt.lk Admin Portal • Secure Access
         </p>
       </div>

@@ -174,7 +174,7 @@ const CustomerLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#050b18] flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-block mb-4">
@@ -186,11 +186,11 @@ const CustomerLogin = () => {
               />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Login to VIBEIT</h1>
-          <p className="text-slate-500 text-sm">Please enter your details below</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Login to VIBEIT</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Please enter your details below</p>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6 sm:p-8">
+        <div className="premium-card p-6 sm:p-8">
           {error && (
             <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -207,14 +207,14 @@ const CustomerLogin = () => {
 
           {mfaRequired ? (
             <form onSubmit={handleVerifyMfa} className="space-y-5">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
                 {mfaMethod === 'totp'
                   ? 'Open your authenticator app and enter the 6-digit code.'
                   : 'We sent a verification code to your email. Enter it below.'}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Verification Code
                 </label>
                 <input
@@ -224,7 +224,7 @@ const CustomerLogin = () => {
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                   placeholder="Enter 6-digit code"
-                  className="w-full pl-4 pr-4 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
+                  className="form-input pl-4 pr-4 py-2.5"
                   disabled={isVerifyingMfa}
                 />
               </div>
@@ -232,7 +232,7 @@ const CustomerLogin = () => {
               <button
                 type="submit"
                 disabled={isVerifyingMfa}
-                className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                className="btn-primary w-full py-2.5 px-4 text-sm flex items-center justify-center gap-2 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isVerifyingMfa ? (
                   <>
@@ -249,7 +249,7 @@ const CustomerLogin = () => {
                   type="button"
                   onClick={handleResendMfa}
                   disabled={isResendingMfa || resendCooldown > 0}
-                  className="w-full py-2.5 px-4 border border-slate-300 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                  className="btn-outline w-full py-2.5 px-4 text-sm flex items-center justify-center gap-2"
                 >
                   {isResendingMfa
                     ? 'Resending...'
@@ -262,7 +262,7 @@ const CustomerLogin = () => {
               <button
                 type="button"
                 onClick={handleResetMfa}
-                className="w-full text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                className="w-full text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
               >
                 Use a different account
               </button>
@@ -270,7 +270,7 @@ const CustomerLogin = () => {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -281,14 +281,14 @@ const CustomerLogin = () => {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Email Address"
-                    className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
+                    className="form-input pl-12 pr-4 py-2.5"
                     disabled={isLoading}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -299,7 +299,7 @@ const CustomerLogin = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Password"
-                    className="w-full pl-12 pr-12 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
+                    className="form-input pl-12 pr-12 py-2.5"
                     disabled={isLoading}
                   />
                   <button
@@ -327,11 +327,11 @@ const CustomerLogin = () => {
                     className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                     disabled={isLoading}
                   />
-                  <span className="text-sm text-slate-600">Remember me</span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">Remember me</span>
                 </label>
                 <Link
                   to="/auth/customer/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -340,7 +340,7 @@ const CustomerLogin = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                className="btn-primary w-full py-2.5 px-4 text-sm flex items-center justify-center gap-2 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
@@ -357,7 +357,7 @@ const CustomerLogin = () => {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full py-2.5 px-4 border border-slate-300 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                className="btn-outline w-full py-2.5 px-4 text-sm flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
                   <path fill="#4285F4" d="M21.35 11.1H12v2.98h5.35c-.23 1.5-1.73 4.4-5.35 4.4-3.22 0-5.84-2.67-5.84-5.97s2.62-5.97 5.84-5.97c1.84 0 3.07.79 3.78 1.46l2.58-2.5C16.7 3.94 14.56 3 12 3 7.03 3 3 7.03 3 12s4.03 9 9 9c5.19 0 8.62-3.64 8.62-8.77 0-.59-.06-1.04-.27-1.13z" />
@@ -369,24 +369,24 @@ const CustomerLogin = () => {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
+              <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-white text-slate-500">New customer?</span>
+              <span className="px-3 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">New customer?</span>
             </div>
           </div>
 
           <Link
             to="/auth/customer/register"
-            className="w-full py-2.5 px-4 bg-slate-100 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-200 transition-colors text-center block"
+            className="w-full py-2.5 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-sm rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-center block"
           >
             Create an Account
           </Link>
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-6">
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
           By logging in, you agree to our{' '}
-          <a href="/about" className="text-slate-700 hover:underline">
+          <a href="/about" className="text-slate-700 dark:text-slate-300 hover:underline">
             Terms & Conditions
           </a>
         </p>

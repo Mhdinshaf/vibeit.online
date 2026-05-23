@@ -85,7 +85,7 @@ const CustomerResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#050b18] flex items-center justify-center px-4 py-10 sm:py-12 overflow-x-clip">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-block mb-4">
@@ -97,11 +97,11 @@ const CustomerResetPassword = () => {
               />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Reset Password</h1>
-          <p className="text-slate-500 text-sm">Choose a new password for your account.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Reset Password</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Choose a new password for your account.</p>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6 sm:p-8">
+        <div className="premium-card p-6 sm:p-8">
           {error && (
             <div className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -119,7 +119,7 @@ const CustomerResetPassword = () => {
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   New Password
                 </label>
                 <div className="relative">
@@ -130,7 +130,7 @@ const CustomerResetPassword = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="New Password"
-                    className="w-full pl-12 pr-12 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
+                    className="form-input pl-12 pr-12 py-2.5"
                     disabled={isLoading}
                   />
                   <button
@@ -152,7 +152,7 @@ const CustomerResetPassword = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Confirm New Password
                 </label>
                 <div className="relative">
@@ -163,7 +163,7 @@ const CustomerResetPassword = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="Confirm New Password"
-                    className="w-full pl-12 pr-12 py-2.5 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-slate-900 placeholder-slate-400 text-sm"
+                    className="form-input pl-12 pr-12 py-2.5"
                     disabled={isLoading}
                   />
                   <button
@@ -184,7 +184,7 @@ const CustomerResetPassword = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                className="btn-primary w-full py-2.5 px-4 text-sm flex items-center justify-center gap-2 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
@@ -199,7 +199,7 @@ const CustomerResetPassword = () => {
           ) : (
             <Link
               to="/auth/customer/login"
-              className="w-full py-2.5 px-4 bg-blue-600 text-white font-medium text-sm rounded-md hover:bg-blue-700 transition-colors text-center block"
+              className="btn-primary w-full py-2.5 px-4 text-sm text-center block"
             >
               Continue to Login
             </Link>
@@ -207,16 +207,16 @@ const CustomerResetPassword = () => {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
+              <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-white text-slate-500">Need a new link?</span>
+              <span className="px-3 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">Need a new link?</span>
             </div>
           </div>
 
           <Link
             to="/auth/customer/forgot-password"
-            className="w-full py-2.5 px-4 bg-slate-100 text-slate-700 font-medium text-sm rounded-md hover:bg-slate-200 transition-colors text-center block"
+            className="w-full py-2.5 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-sm rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-center block"
           >
             Request another reset email
           </Link>

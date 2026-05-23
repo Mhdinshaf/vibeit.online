@@ -7,21 +7,21 @@ import toast from 'react-hot-toast';
 const SidebarContent = ({ location, navLinks, admin, handleLogout, setSidebarOpen }) => (
     <div className="flex flex-col h-full">
       {/* Logo Area */}
-      <div className="p-6 border-b border-slate-800">
+      <div className="p-6 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">
             VB
           </div>
           <div>
-            <h1 className="text-white font-bold text-lg tracking-tight">VIBEIT</h1>
-            <p className="text-slate-500 text-xs">Admin Panel</p>
+            <h1 className="text-slate-900 dark:text-white font-bold text-lg tracking-tight">VIBEIT</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-xs">Admin Panel</p>
           </div>
         </div>
       </div>
 
       {/* Navigation Links */}
       <nav className="flex-1 p-4 space-y-2">
-        <p className="text-xs uppercase tracking-wider text-slate-600 font-semibold px-3 mb-4">Menu</p>
+        <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold px-3 mb-4">Menu</p>
         {navLinks.map((link) => {
           const Icon = link.icon;
           const isActive = link.exact 
@@ -43,16 +43,16 @@ const SidebarContent = ({ location, navLinks, admin, handleLogout, setSidebarOpe
       </nav>
 
       {/* Admin Info & Logout */}
-      <div className="p-4 border-t border-slate-800">
+      <div className="p-4 border-t border-slate-200 dark:border-slate-800">
         {admin && (
-          <div className="mb-4 p-4 bg-slate-800/50 rounded-xl">
+          <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                 {admin.name?.charAt(0)?.toUpperCase() || 'A'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">{admin.name}</p>
-                <p className="text-slate-500 text-xs truncate">{admin.email}</p>
+                <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{admin.name}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-xs truncate">{admin.email}</p>
               </div>
             </div>
           </div>
@@ -106,9 +106,9 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full overflow-x-hidden bg-gray-50">
+    <div className="flex min-h-screen w-full overflow-x-hidden bg-slate-50 dark:bg-[#050b18]">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-slate-900 fixed left-0 top-0 bottom-0 z-40 overflow-y-auto">
+      <aside className="hidden lg:flex lg:flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 fixed left-0 top-0 bottom-0 z-40 overflow-y-auto">
         <SidebarContent location={location} navLinks={navLinks} admin={admin} handleLogout={handleLogout} setSidebarOpen={setSidebarOpen} />
       </aside>
 
@@ -122,7 +122,7 @@ const AdminLayout = () => {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 z-50 transform transition-transform duration-300 lg:hidden overflow-y-auto ${
+        className={`fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 transform transition-transform duration-300 lg:hidden overflow-y-auto ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -132,20 +132,20 @@ const AdminLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 min-w-0 flex flex-col lg:ml-64">
         {/* Top Header */}
-        <header className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
+        <header className="glass-effect sticky top-0 z-30">
           <div className="flex items-center justify-between px-4 lg:px-8 py-4">
             <div className="flex items-center gap-4">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+                className="lg:hidden p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
               >
-                <Menu className="w-6 h-6 text-gray-600" />
+                <Menu className="w-6 h-6 text-slate-600 dark:text-slate-400" />
               </button>
 
               {/* Page Title */}
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                   {getPageTitle()}
                 </h2>
               </div>
@@ -156,7 +156,7 @@ const AdminLayout = () => {
               to="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all duration-300"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-xl transition-all duration-300"
             >
               <ExternalLink className="w-4 h-4" />
               <span className="hidden sm:inline">View Store</span>

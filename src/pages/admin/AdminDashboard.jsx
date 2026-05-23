@@ -5,10 +5,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { getDashboardStats, ORDER_SYNC_EVENT } from '../../services/api';
 
 const statStyles = {
-  revenue: { iconBg: 'bg-slate-900', icon: TrendingUp },
-  orders: { iconBg: 'bg-slate-700', icon: ShoppingBag },
-  products: { iconBg: 'bg-slate-600', icon: Package },
-  pending: { iconBg: 'bg-amber-500', icon: AlertTriangle },
+  revenue: { iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600', icon: TrendingUp },
+  orders: { iconBg: 'bg-gradient-to-br from-indigo-500 to-indigo-600', icon: ShoppingBag },
+  products: { iconBg: 'bg-gradient-to-br from-purple-500 to-purple-600', icon: Package },
+  pending: { iconBg: 'bg-gradient-to-br from-amber-500 to-amber-600', icon: AlertTriangle },
 };
 
 const AdminDashboard = () => {
@@ -47,15 +47,15 @@ const AdminDashboard = () => {
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <div className="h-8 bg-slate-200 rounded-lg w-48 animate-pulse" />
+        <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded-lg w-48 animate-pulse" />
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 h-36 animate-pulse" />
+            <div key={i} className="premium-card p-6 h-36 animate-pulse" />
           ))}
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <div className="bg-slate-200 rounded-2xl h-96 animate-pulse" />
-          <div className="bg-slate-200 rounded-2xl h-96 animate-pulse" />
+          <div className="bg-slate-200 dark:bg-slate-800 rounded-2xl h-96 animate-pulse" />
+          <div className="bg-slate-200 dark:bg-slate-800 rounded-2xl h-96 animate-pulse" />
         </div>
       </div>
     );
@@ -91,8 +91,8 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Dashboard</h1>
-        <p className="text-slate-500 mt-1">{currentDate}</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Dashboard</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">{currentDate}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -103,7 +103,7 @@ const AdminDashboard = () => {
           return (
             <article
               key={card.key}
-              className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"
+              className="premium-card p-6"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${style.iconBg}`}>
@@ -118,17 +118,17 @@ const AdminDashboard = () => {
                   </div>
                 )}
               </div>
-              <p className="text-sm text-slate-500 mb-1">{card.title}</p>
-              <p className="text-2xl font-semibold text-slate-900">{card.value}</p>
-              {card.subtitle && <p className="text-xs text-slate-500 mt-1">{card.subtitle}</p>}
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">{card.title}</p>
+              <p className="text-2xl font-semibold text-slate-900 dark:text-white">{card.value}</p>
+              {card.subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{card.subtitle}</p>}
             </article>
           );
         })}
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-6">Revenue (Last 7 Days)</h2>
+        <section className="premium-card p-6">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">Revenue (Last 7 Days)</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={stats?.revenueByDay || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -161,8 +161,8 @@ const AdminDashboard = () => {
           </ResponsiveContainer>
         </section>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-6">Orders by Category</h2>
+        <section className="premium-card p-6">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">Orders by Category</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -193,52 +193,52 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-6">Top Selling Products</h2>
+        <section className="premium-card p-6">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">Top Selling Products</h2>
           {stats?.topSellingProducts && stats.topSellingProducts.length > 0 ? (
             <div className="space-y-3">
               {stats.topSellingProducts.map((product, index) => (
                 <div
                   key={product._id}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200"
+                  className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
                 >
-                  <div className="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
                     <span className="text-sm font-semibold text-white">#{index + 1}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-slate-900 truncate">{product.name}</h3>
-                    <p className="text-sm text-slate-500">{product.unitsSold} units sold</p>
+                    <h3 className="font-medium text-slate-900 dark:text-white truncate">{product.name}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{product.unitsSold} units sold</p>
                   </div>
-                  <p className="font-semibold text-slate-900">රු{product.revenue?.toLocaleString()}</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">රු{product.revenue?.toLocaleString()}</p>
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-8 h-8 text-slate-400" />
+              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-slate-400 dark:text-slate-500" />
               </div>
-              <p className="text-slate-500">No sales data available</p>
+              <p className="text-slate-500 dark:text-slate-400">No sales data available</p>
             </div>
           )}
         </section>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-6">Low Stock Alert</h2>
+        <section className="premium-card p-6">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">Low Stock Alert</h2>
           {stats?.lowStockProducts && stats.lowStockProducts.length > 0 ? (
             <div className="space-y-3">
               {stats.lowStockProducts.map((product) => (
                 <div
                   key={product._id}
-                  className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200"
+                  className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
                 >
-                  <h3 className="font-medium text-slate-900 truncate">{product.name}</h3>
+                  <h3 className="font-medium text-slate-900 dark:text-white truncate">{product.name}</h3>
                   {product.stockQuantity === 0 ? (
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                    <span className="status-cancelled">
                       OUT OF STOCK
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                    <span className="status-pending">
                       {product.stockQuantity} left
                     </span>
                   )}
@@ -247,10 +247,10 @@ const AdminDashboard = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="w-8 h-8 text-emerald-600" />
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-200 dark:border-emerald-800/50">
+                <Package className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <p className="text-emerald-700 font-medium">All products well stocked</p>
+              <p className="text-emerald-700 dark:text-emerald-400 font-medium">All products well stocked</p>
             </div>
           )}
         </section>
