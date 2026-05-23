@@ -31,7 +31,6 @@ import ProductCard from '../../components/shop/ProductCard';
 import SectionHeader from '../../components/shop/SectionHeader';
 import StarRating from '../../components/shop/StarRating';
 import HeroSection from '../../components/shop/HeroSection';
-import TrendingCategories from '../../components/shop/TrendingCategories';
 
 const HomePage = () => {
   const { data: featuredProducts, isLoading, isError } = useQuery({
@@ -102,8 +101,6 @@ const HomePage = () => {
       {/* Hero Section - Dynamic */}
       <HeroSection />
 
-      {/* Explore Trending Categories - Dynamic */}
-      <TrendingCategories />
 
 
       {/* Promotional Banners Section */}
