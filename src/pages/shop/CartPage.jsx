@@ -43,13 +43,17 @@ const CartPage = () => {
     updateQuantity(key, newQty);
   };
 
-  // Helper to get image URL
-  const getImageUrl = (img) => {
-    if (!img) return '/placeholder.jpg';
-    if (typeof img === 'string') return img;
-    if (img.url) return img.url;
+  // Helper to get image URL — mirrors ProductCard logic exactly
+  // imageUrls = actual DB field, images = Mongoose virtual (may be absent after $facet)
+  const getImageUrl = (product) => {
+    const arr = product?.imageUrls || product?.images || [];
+    const first = Array.isArray(arr) ? arr[0] : arr;
+    if (!first) return '/placeholder.jpg';
+    if (typeof first === 'string') return first;
+    if (first?.url) return first.url;
     return '/placeholder.jpg';
   };
+
 
   // Count delivered orders for this customer (for promo validation)
   const customerEmail = customer?.email?.toLowerCase();
@@ -200,9 +204,10 @@ const CartPage = () => {
                       className="flex-shrink-0 self-start"
                     >
                       <img
-                        src={getImageUrl(item.product.images?.[0])}
+                        src={getImageUrl(item.product)}
                         alt={item.product.name}
-                        className="w-20 h-20 sm:w-24 sm:h-24 object-contain"
+                        className="w-20 h-20 sm:w-24 sm:h-24 object-contain rounded-lg bg-slate-50"
+                        onError={(e) => { e.target.src = '/placeholder.jpg'; e.target.onerror = null; }}
                       />
                     </Link>
 
