@@ -602,7 +602,7 @@ const CustomerDashboard = () => {
                   setSidebarOpen(false);
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive ? 'bg-slate-900 dark:bg-blue-600 text-white' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+                  isActive ? 'bg-blue-600 text-white' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -658,7 +658,7 @@ const CustomerDashboard = () => {
                         <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">Total Orders</p>
                         <p className="text-3xl font-semibold text-slate-900 dark:text-white mt-2">{orders.length}</p>
                       </div>
-                      <div className="w-11 h-11 bg-slate-900 dark:bg-slate-700 rounded-xl flex items-center justify-center">
+                      <div className="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center">
                         <ShoppingBag className="w-5 h-5 text-white" />
                       </div>
                     </div>
