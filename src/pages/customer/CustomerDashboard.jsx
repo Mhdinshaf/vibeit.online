@@ -551,8 +551,12 @@ const CustomerDashboard = () => {
     return 'bg-slate-100 text-slate-700';
   };
 
+  // Customer initials for avatar
+  const initials = `${customer?.firstName?.[0] || ''}${customer?.lastName?.[0] || ''}`.toUpperCase() || '?';
+
   return (
     <div className="bg-slate-50 dark:bg-slate-900 min-h-screen lg:flex overflow-x-clip">
+      {/* Mobile menu button */}
       <button
         onClick={() => setSidebarOpen(true)}
         className="lg:hidden fixed top-[5.5rem] left-4 z-30 p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm text-slate-700 dark:text-slate-300"
@@ -561,6 +565,7 @@ const CustomerDashboard = () => {
         <Menu className="w-5 h-5" />
       </button>
 
+      {/* Overlay */}
       <div
         className={`fixed inset-0 z-40 lg:hidden transition-opacity duration-300 ${
           sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -573,12 +578,14 @@ const CustomerDashboard = () => {
         />
       </div>
 
+      {/* ── Sidebar ── */}
       <aside
-        className={`fixed lg:sticky top-0 lg:top-24 left-0 h-screen lg:h-[calc(100vh-6rem)] w-72 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-800 z-50 lg:z-20 transform transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 lg:top-24 left-0 h-screen lg:h-[calc(100vh-6rem)] w-72 flex flex-col bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-50 lg:z-20 shadow-sm transform transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="h-16 lg:hidden px-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        {/* Mobile close header */}
+        <div className="h-14 lg:hidden px-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
           <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Account Menu</span>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -589,37 +596,64 @@ const CustomerDashboard = () => {
           </button>
         </div>
 
-        <nav className="p-5 space-y-2 h-full overflow-y-auto">
+        {/* ── Desktop: Blue gradient customer card ── */}
+        <div className="hidden lg:block bg-gradient-to-br from-blue-600 to-blue-700 px-5 py-6 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-bold text-base">{initials}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-white font-bold text-sm truncate">
+                {customer?.firstName} {customer?.lastName}
+              </p>
+              <p className="text-blue-200 text-xs truncate">{customer?.email}</p>
+            </div>
+          </div>
+          {/* Mini stats */}
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            <div className="bg-white/10 rounded-xl px-3 py-2 text-center">
+              <p className="text-white font-bold text-lg leading-none">{orders.length}</p>
+              <p className="text-blue-200 text-xs mt-0.5">Orders</p>
+            </div>
+            <div className="bg-white/10 rounded-xl px-3 py-2 text-center">
+              <p className="text-white font-bold text-lg leading-none">{deliveredOrderCount}</p>
+              <p className="text-blue-200 text-xs mt-0.5">Delivered</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Nav items ── */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest px-3 mb-3 hidden lg:block">Menu</p>
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
-
             return (
               <button
                 key={item.id}
-                onClick={() => {
-                  setActiveSection(item.id);
-                  setSidebarOpen(false);
-                }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive ? 'bg-blue-600 text-white' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+                onClick={() => { setActiveSection(item.id); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-4.5 h-4.5 flex-shrink-0" />
                 {item.label}
+                {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white opacity-70" />}
               </button>
             );
           })}
 
-          <hr className="my-4 border-slate-200 dark:border-slate-800" />
-
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
+          <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+            >
+              <LogOut className="w-4 h-4 flex-shrink-0" />
+              Sign Out
+            </button>
+          </div>
         </nav>
       </aside>
 
@@ -864,7 +898,7 @@ const CustomerDashboard = () => {
                                   onClick={() => setCurrentPage(i + 1)}
                                   className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                                     currentPage === i + 1
-                                      ? 'bg-slate-900 dark:bg-blue-600 text-white'
+                                      ? 'bg-blue-600 text-white'
                                       : 'text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                   }`}
                                 >
@@ -1039,7 +1073,7 @@ const CustomerDashboard = () => {
               <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-800/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-slate-700 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
                       <ShieldCheck className="w-5 h-5 text-white" />
                     </div>
                     <div>
