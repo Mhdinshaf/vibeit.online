@@ -621,8 +621,8 @@ const AdminAddProduct = () => {
                       onChange={handleChange}
                       className={inputClasses}
                       placeholder="1000"
-                      min="1"
-                      step="1"
+                      min="0"
+                      step="any"
                     />
                     <p className="text-xs text-gray-400 mt-2">1st 1000g = රු500 · each extra 1000g = රු150</p>
                   </div>

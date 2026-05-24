@@ -746,8 +746,8 @@ const AdminEditProduct = () => {
                     value={formData.weightGrams}
                     onChange={handleChange}
                     placeholder="1000"
-                    min="1"
-                    step="1"
+                    min="0"
+                    step="any"
                     hint="1st 1000g = රු500 · each extra 1000g = රු150"
                   />
 
