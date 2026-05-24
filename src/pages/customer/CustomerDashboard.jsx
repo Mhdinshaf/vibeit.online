@@ -11,16 +11,19 @@ import { getPromoConfig, getEarnedPromos, getNextMilestone, isResellerCustomer, 
 const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEmail, customer }) => {
   const [copied, setCopied] = useState(null);
   const promos = getEarnedPromos(deliveredOrderCount, promoConfig, customer);
-  const nextMilestone = getNextMilestone(deliveredOrderCount, promoConfig, customer);
   const resellerCustomer = isResellerCustomer(customer);
-  const visiblePromos = resellerCustomer ? promos.filter((promo) => !promo.resellerOnly) : promos;
-  const resellerPromos = (promoConfig?.promoTiers || []).filter((tier) => tier.resellerOnly);
-  const prevMilestone = [...promos].reverse().find(p => p.earned);
+  // For resellers: promos already contains ONLY resellerOnly tiers (filtered by getEarnedPromos)
+  // For normal customers: promos contains ONLY non-resellerOnly tiers
+  const resellerPromos = resellerCustomer ? promos : [];
+  const visiblePromos = resellerCustomer ? [] : promos;
+  const nextMilestone = resellerCustomer ? null : getNextMilestone(deliveredOrderCount, promoConfig, customer);
+  const prevMilestone = [...visiblePromos].reverse().find(p => p.earned);
   const progressFrom = prevMilestone ? prevMilestone.minOrders : 0;
   const progressTo = nextMilestone ? nextMilestone.minOrders : (prevMilestone ? prevMilestone.minOrders : 5);
   const progressPct = nextMilestone
     ? Math.min(100, ((deliveredOrderCount - progressFrom) / (progressTo - progressFrom)) * 100)
     : 100;
+
 
   const normalizedCustomerEmail = customerEmail?.toLowerCase();
   const normalizeStatus = (status) => String(status || '').toLowerCase();
@@ -127,7 +130,8 @@ const RewardsCard = ({ deliveredOrderCount, promoConfig, orders = [], customerEm
         </div>
       )}
 
-      {nextMilestone && (
+      {/* Progress bar — only for normal customers working toward a milestone */}
+      {!resellerCustomer && nextMilestone && (
         <div className="mb-5">
           <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
             <span>{deliveredOrderCount} orders</span>
