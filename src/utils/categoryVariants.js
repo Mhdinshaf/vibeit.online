@@ -8,12 +8,9 @@
 export const CATEGORY_VARIANT_TYPE = {
   'Ladies Dresses': 'sizes',
   'Gents Clothing': 'sizes',
-  'Tech Gadgets':   'none',
-  'Watches':        'none',
   'Creams and Skincare': 'none',
   'Perfumes':       'none',
-  'Bicycle Parts':  'none',
-  // Everything else (Home Accessories, Trending Items, Toys) → 'colors'
+  // Everything else (Home Accessories, Trending Items, Toys, Watches, Tech Gadgets, Bicycle Parts) → 'colors'
 };
 
 /** Returns 'sizes' | 'colors' | 'none' for a given category string */
