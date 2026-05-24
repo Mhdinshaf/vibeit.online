@@ -140,10 +140,13 @@ const CheckoutPage = () => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const getImageUrl = (img) => {
-    if (!img) return '/placeholder.jpg';
-    if (typeof img === 'string') return img;
-    if (img.url) return img.url;
+  // Mirror ProductCard/CartPage logic: check imageUrls (DB field) first, then images (virtual)
+  const getImageUrl = (product) => {
+    const arr = product?.imageUrls || product?.images || [];
+    const first = Array.isArray(arr) ? arr[0] : arr;
+    if (!first) return '/placeholder.jpg';
+    if (typeof first === 'string') return first;
+    if (first?.url) return first.url;
     return '/placeholder.jpg';
   };
 
@@ -545,9 +548,10 @@ const CheckoutPage = () => {
                     <div key={item.key} className="flex gap-4">
                       <div className="relative flex-shrink-0">
                         <img
-                          src={getImageUrl(item.product.images?.[0])}
+                          src={getImageUrl(item.product)}
                           alt={item.product.name}
                           className="w-16 h-16 rounded-md object-contain bg-white border border-slate-200"
+                          onError={(e) => { e.target.src = '/placeholder.jpg'; e.target.onerror = null; }}
                         />
                         <span className="absolute -top-2 -right-2 bg-slate-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center ring-2 ring-slate-50">
                           {item.quantity}
