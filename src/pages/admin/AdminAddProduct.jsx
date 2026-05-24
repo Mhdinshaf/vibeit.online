@@ -72,6 +72,7 @@ const AdminAddProduct = () => {
     originalPrice: '',
     discountPrice: '',
     stockQuantity: '',
+    weightKg: '1',
     brand: '',
     sizes: [],
     tags: '',
@@ -245,6 +246,7 @@ const AdminAddProduct = () => {
       originalPrice: Number(formData.originalPrice),
       discountPrice: formData.discountPrice ? Number(formData.discountPrice) : null,
       stockQuantity: Number(formData.stockQuantity) || 0,
+      weightKg: Number(formData.weightKg) || 1,
       brand: formData.brand,
       sizes: formData.sizes,
       tags: formData.tags ? formData.tags.split(',').map((tag) => tag.trim()).filter(Boolean) : [],
@@ -474,6 +476,23 @@ const AdminAddProduct = () => {
                       min="0"
                       required
                     />
+                  </div>
+
+                  <div>
+                    <label className={labelClasses}>
+                      Weight (kg)
+                    </label>
+                    <input
+                      type="number"
+                      name="weightKg"
+                      value={formData.weightKg}
+                      onChange={handleChange}
+                      className={inputClasses}
+                      placeholder="1"
+                      min="0.1"
+                      step="0.1"
+                    />
+                    <p className="text-xs text-gray-400 mt-2">1st kg = රු500 · each extra kg = රු150</p>
                   </div>
                 </div>
               </div>

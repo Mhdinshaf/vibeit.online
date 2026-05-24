@@ -4,6 +4,7 @@ import { useCartStore } from '../../context/store';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useEffect, useState } from 'react';
 import { getPromoConfig, loadPromoConfigFromServer, PROMO_CONFIG_EVENT, validatePromoCode } from '../../utils/promotions';
+import { calcShipping } from '../../utils/shipping';
 import toast from 'react-hot-toast';
 
 const PROMO_STORAGE_KEY = 'vibeit_cart_promo';
@@ -108,8 +109,9 @@ const CartPage = () => {
     toast.success('Promo code removed');
   };
 
-  const baseShippingCost = subtotal >= 5000 ? 0 : 400;
-  const shippingCost = freeDeliveryEnabled || appliedPromo?.discountType === 'freeDelivery' ? 0 : baseShippingCost;
+  const { fee: shippingCost, breakdown: shippingBreakdown } = calcShipping(
+    items, subtotal, freeDeliveryEnabled, appliedPromo
+  );
   const discountAmount = appliedPromo?.discountType === 'percent'
     ? Math.round((subtotal * appliedPromo.discountValue) / 100)
     : 0;
@@ -313,16 +315,21 @@ const CartPage = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-600 text-sm">Shipping</span>
-                      <span className="font-semibold text-sm">
+                      <div className="text-right">
                         {shippingCost === 0 ? (
-                          <span className="text-blue-600 flex items-center gap-1">
+                          <span className="text-blue-600 flex items-center gap-1 font-semibold text-sm">
                             <Truck className="w-4 h-4" />
                             FREE
                           </span>
                         ) : (
-                          <span className="text-slate-900">Rs {shippingCost.toLocaleString()}</span>
+                          <div>
+                            <span className="font-semibold text-slate-900">Rs {shippingCost.toLocaleString()}</span>
+                            {shippingBreakdown && (
+                              <p className="text-xs text-slate-400 mt-0.5">{shippingBreakdown}</p>
+                            )}
+                          </div>
                         )}
-                      </span>
+                      </div>
                     </div>
                     {discountAmount > 0 && (
                       <div className="flex items-center justify-between">

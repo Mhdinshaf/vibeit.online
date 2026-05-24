@@ -7,6 +7,7 @@ import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { createOrder } from '../../services/api';
 import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
 import { getPromoConfig, loadPromoConfigFromServer, PROMO_CONFIG_EVENT, validatePromoCode } from '../../utils/promotions';
+import { calcShipping } from '../../utils/shipping';
 import toast from 'react-hot-toast';
 
 const SRI_LANKA_DISTRICTS = [
@@ -129,8 +130,9 @@ const CheckoutPage = () => {
     }
   }, [appliedPromo, customer, promoConfig]);
 
-  const baseShippingFee = subtotal >= 5000 ? 0 : 400;
-  const shippingFee = freeDeliveryEnabled || appliedPromo?.discountType === 'freeDelivery' ? 0 : baseShippingFee;
+  const { fee: shippingFee, breakdown: shippingBreakdown } = calcShipping(
+    items, subtotal, freeDeliveryEnabled, appliedPromo
+  );
   const discountAmount = appliedPromo?.discountType === 'percent'
     ? Math.round((subtotal * appliedPromo.discountValue) / 100)
     : 0;
@@ -415,8 +417,11 @@ const CheckoutPage = () => {
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-slate-900">
-                        {shippingFee === 0 ? 'FREE' : `Rs ${shippingFee}`}
+                        {shippingFee === 0 ? 'FREE' : `Rs ${shippingFee.toLocaleString()}`}
                       </p>
+                      {shippingFee > 0 && shippingBreakdown && (
+                        <p className="text-xs text-slate-500 mt-0.5">{shippingBreakdown}</p>
+                      )}
                     </div>
                   </div>
                 </div>
