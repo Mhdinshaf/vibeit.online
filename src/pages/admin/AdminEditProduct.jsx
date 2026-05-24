@@ -255,7 +255,7 @@ const AdminEditProduct = () => {
     originalPrice: '',
     discountPrice: '',
     stockQuantity: '',
-    weightKg: '1',
+    weightGrams: '1000',
     brand: '',
     sizes: [],
     tags: '',
@@ -296,7 +296,7 @@ const AdminEditProduct = () => {
         originalPrice: p.originalPrice || '',
         discountPrice: p.discountPrice || '',
         stockQuantity: p.stockQuantity || '',
-        weightKg: p.weightKg || '1',
+        weightGrams: p.weightGrams || (p.weightKg ? p.weightKg * 1000 : 1000),
         brand: p.brand || '',
         sizes: p.sizes || [],
         tags: p.tags?.join(', ') || '',
@@ -493,7 +493,8 @@ const AdminEditProduct = () => {
       originalPrice: Number(formData.originalPrice),
       discountPrice: formData.discountPrice ? Number(formData.discountPrice) : null,
       stockQuantity: Number(formData.stockQuantity) || 0,
-      weightKg: Number(formData.weightKg) || 1,
+      weightGrams: Number(formData.weightGrams) || 1000,
+      weightKg: Number(formData.weightGrams) / 1000 || 1,
       brand: formData.brand,
       sizes: formData.sizes,
       tags: formData.tags
@@ -739,15 +740,15 @@ const AdminEditProduct = () => {
                     min="0"
                   />
                   <PremiumInput
-                    label="Weight (kg)"
+                    label="Weight (grams)"
                     type="number"
-                    name="weightKg"
-                    value={formData.weightKg}
+                    name="weightGrams"
+                    value={formData.weightGrams}
                     onChange={handleChange}
-                    placeholder="1"
-                    min="0.1"
-                    step="0.1"
-                    hint="1st kg = රු500 · each extra kg = රු150"
+                    placeholder="1000"
+                    min="1"
+                    step="1"
+                    hint="1st 1000g = රු500 · each extra 1000g = රු150"
                   />
 
                   {/* Featured Toggle */}

@@ -203,7 +203,7 @@ const AdminAddProduct = () => {
     originalPrice: '',
     discountPrice: '',
     stockQuantity: '',
-    weightKg: '1',
+    weightGrams: '1000',
     brand: '',
     sizes: [],
     tags: '',
@@ -377,7 +377,8 @@ const AdminAddProduct = () => {
       originalPrice: Number(formData.originalPrice),
       discountPrice: formData.discountPrice ? Number(formData.discountPrice) : null,
       stockQuantity: Number(formData.stockQuantity) || 0,
-      weightKg: Number(formData.weightKg) || 1,
+      weightGrams: Number(formData.weightGrams) || 1000,
+      weightKg: Number(formData.weightGrams) / 1000 || 1, // Store both for legacy compatibility if needed
       brand: formData.brand,
       sizes: formData.sizes,
       tags: formData.tags ? formData.tags.split(',').map((tag) => tag.trim()).filter(Boolean) : [],
@@ -611,19 +612,19 @@ const AdminAddProduct = () => {
 
                   <div>
                     <label className={labelClasses}>
-                      Weight (kg)
+                      Weight (grams)
                     </label>
                     <input
                       type="number"
-                      name="weightKg"
-                      value={formData.weightKg}
+                      name="weightGrams"
+                      value={formData.weightGrams}
                       onChange={handleChange}
                       className={inputClasses}
-                      placeholder="1"
-                      min="0.1"
-                      step="0.1"
+                      placeholder="1000"
+                      min="1"
+                      step="1"
                     />
-                    <p className="text-xs text-gray-400 mt-2">1st kg = රු500 · each extra kg = රු150</p>
+                    <p className="text-xs text-gray-400 mt-2">1st 1000g = රු500 · each extra 1000g = රු150</p>
                   </div>
                 </div>
               </div>

@@ -24,12 +24,15 @@ export const calcShipping = (cartItems = [], subtotal = 0, freeDelivery = false,
     return { fee: 0, totalWeightKg: 0, breakdown: 'FREE' };
   }
 
-  // Calculate total weight
-  const totalWeightKg = cartItems.reduce((sum, item) => {
-    const w = Number(item?.product?.weightKg) || 1;
+  // Calculate total weight in grams
+  const totalWeightGrams = cartItems.reduce((sum, item) => {
+    const legacyGrams = item?.product?.weightKg ? Number(item.product.weightKg) * 1000 : undefined;
+    const w = Number(item?.product?.weightGrams) || legacyGrams || 1000;
     const q = Number(item?.quantity) || 1;
     return sum + w * q;
   }, 0);
+
+  const totalWeightKg = totalWeightGrams / 1000;
 
   // Rs500 for first kg + Rs150 per each additional kg (rounded up)
   const extraKg = Math.max(0, Math.ceil(totalWeightKg) - 1);
