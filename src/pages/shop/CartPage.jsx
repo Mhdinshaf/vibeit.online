@@ -5,6 +5,7 @@ import { useCustomerAuth } from '../../context/CustomerAuthContext';
 import { useEffect, useState } from 'react';
 import { getPromoConfig, loadPromoConfigFromServer, PROMO_CONFIG_EVENT, validatePromoCode } from '../../utils/promotions';
 import { calcShipping } from '../../utils/shipping';
+import { getVariantType } from '../../utils/categoryVariants';
 import toast from 'react-hot-toast';
 
 const PROMO_STORAGE_KEY = 'vibeit_cart_promo';
@@ -230,7 +231,7 @@ const CartPage = () => {
                             )}
                             {item.size && (
                               <span className="text-xs text-slate-500 font-medium">
-                                Size: {item.size}
+                                {getVariantType(item.product?.category) === 'sizes' ? 'Size' : 'Colour'}: {item.size}
                               </span>
                             )}
                           </div>

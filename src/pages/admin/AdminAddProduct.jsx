@@ -16,6 +16,7 @@ import {
   Star
 } from 'lucide-react';
 import { createProduct, uploadImages } from '../../services/api';
+import { getVariantType, SIZE_OPTIONS, COLOR_OPTIONS, COLOR_HEX, variantLabel } from '../../utils/categoryVariants';
 import toast from 'react-hot-toast';
 
 const CATEGORIES_WITH_SUBCATEGORIES = {
@@ -31,7 +32,8 @@ const CATEGORIES_WITH_SUBCATEGORIES = {
   'Gents Clothing': ['T-Shirts', 'Trousers', 'Shirts', 'Shorts', 'Formal Wear'],
 };
 
-const SIZE_OPTIONS = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+const SIZE_OPTIONS_UNUSED = null; // imported from categoryVariants
+void SIZE_OPTIONS_UNUSED;
 
 const AdminAddProduct = () => {
   const navigate = useNavigate();
@@ -497,33 +499,65 @@ const AdminAddProduct = () => {
                 </div>
               </div>
 
-              {/* Variants Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Layers className="w-5 h-5 text-blue-600" />
+              {/* Variants Card — category aware */}
+              {(() => {
+                const vType = getVariantType(formData.category);
+                if (vType === 'none' || !formData.category) return null;
+                const label = variantLabel(vType);
+                const options = vType === 'sizes' ? SIZE_OPTIONS : COLOR_OPTIONS;
+                return (
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Tag className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <h2 className="text-lg font-bold text-blue-900">{label}</h2>
+                    </div>
+
+                    {vType === 'sizes' && (
+                      <div className="flex flex-wrap gap-3">
+                        {options.map((s) => (
+                          <button key={s} type="button" onClick={() => toggleSize(s)}
+                            className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 ${
+                              formData.sizes.includes(s)
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
+                                : 'bg-gray-100 text-gray-600 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50'
+                            }`}>
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {vType === 'colors' && (
+                      <div className="flex flex-wrap gap-3">
+                        {options.map((c) => {
+                          const selected = formData.sizes.includes(c);
+                          const hex = COLOR_HEX[c];
+                          const isGradient = hex?.startsWith('linear');
+                          return (
+                            <button key={c} type="button" onClick={() => toggleSize(c)}
+                              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all duration-200 ${
+                                selected
+                                  ? 'border-blue-600 bg-blue-50 text-blue-800 shadow-sm'
+                                  : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-blue-300'
+                              }`}>
+                              <span className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"
+                                style={isGradient ? { background: hex } : { backgroundColor: hex }} />
+                              {c}
+                              {selected && <Check className="w-3 h-3 text-blue-600" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <p className="text-xs text-gray-400 mt-4">
+                      {vType === 'sizes' ? 'Select all available sizes' : 'Select all available colours'}
+                    </p>
                   </div>
-                  <h2 className="text-lg font-bold text-blue-900">Available Sizes</h2>
-                </div>
-                
-                <div className="flex flex-wrap gap-3">
-                  {SIZE_OPTIONS.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => toggleSize(size)}
-                      className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 ${
-                        formData.sizes.includes(size)
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
-                          : 'bg-gray-100 text-gray-600 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-400 mt-4">Select all sizes available for this product</p>
-              </div>
+                );
+              })()}
             </div>
 
             {/* Right Column - Images & Featured */}

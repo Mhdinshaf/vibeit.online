@@ -8,6 +8,7 @@ import { createOrder } from '../../services/api';
 import { BANK_TRANSFER_DETAILS } from '../../constants/bankDetails';
 import { getPromoConfig, loadPromoConfigFromServer, PROMO_CONFIG_EVENT, validatePromoCode } from '../../utils/promotions';
 import { calcShipping } from '../../utils/shipping';
+import { getVariantType } from '../../utils/categoryVariants';
 import toast from 'react-hot-toast';
 
 const SRI_LANKA_DISTRICTS = [
@@ -568,7 +569,7 @@ const CheckoutPage = () => {
                         </h3>
                         {item.size && (
                           <span className="text-xs text-slate-500 font-medium">
-                            Size: {item.size}
+                            {getVariantType(item.product?.category) === 'sizes' ? 'Size' : 'Colour'}: {item.size}
                           </span>
                         )}
                       </div>

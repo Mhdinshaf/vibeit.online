@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Upload, X, Check, Package, Tag, DollarSign, Layers, Cloud, Loader2, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { getProductById, updateProduct, uploadImages } from '../../services/api';
+import { getVariantType, SIZE_OPTIONS, COLOR_OPTIONS, COLOR_HEX, variantLabel } from '../../utils/categoryVariants';
 import toast from 'react-hot-toast';
 
 const CATEGORIES_WITH_SUBCATEGORIES = {
@@ -18,7 +19,6 @@ const CATEGORIES_WITH_SUBCATEGORIES = {
   'Gents Clothing': ['T-Shirts', 'Trousers', 'Shirts', 'Shorts', 'Formal Wear'],
 };
 
-const SIZE_OPTIONS = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
 
 // Premium Section Card Component
 // eslint-disable-next-line no-unused-vars
@@ -126,6 +126,7 @@ const AdminEditProduct = () => {
     originalPrice: '',
     discountPrice: '',
     stockQuantity: '',
+    weightKg: '1',
     brand: '',
     sizes: [],
     tags: '',
@@ -166,6 +167,7 @@ const AdminEditProduct = () => {
         originalPrice: p.originalPrice || '',
         discountPrice: p.discountPrice || '',
         stockQuantity: p.stockQuantity || '',
+        weightKg: p.weightKg || '1',
         brand: p.brand || '',
         sizes: p.sizes || [],
         tags: p.tags?.join(', ') || '',
@@ -362,6 +364,7 @@ const AdminEditProduct = () => {
       originalPrice: Number(formData.originalPrice),
       discountPrice: formData.discountPrice ? Number(formData.discountPrice) : null,
       stockQuantity: Number(formData.stockQuantity) || 0,
+      weightKg: Number(formData.weightKg) || 1,
       brand: formData.brand,
       sizes: formData.sizes,
       tags: formData.tags
@@ -516,27 +519,57 @@ const AdminEditProduct = () => {
                 </div>
               </SectionCard>
 
-              {/* Sizes Section */}
-              <SectionCard icon={Tag} title="Available Sizes">
-                <div className="flex flex-wrap gap-2">
-                  {SIZE_OPTIONS.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => toggleSize(size)}
-                      className={`px-5 py-2.5 rounded-xl border-2 font-medium transition-all duration-300 ${
-                        formData.sizes.includes(size)
-                          ? 'bg-gradient-to-r from-blue-600 to-blue-500 border-blue-600 text-white shadow-lg shadow-blue-200'
-                          : 'bg-white border-gray-200 text-gray-600 hover:border-blue-400 hover:text-blue-600'
-                      }`}
-                    >
-                      {formData.sizes.includes(size) && <Check className="w-4 h-4 inline mr-1" />}
-                      {size}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-500 mt-3">Click to toggle size availability</p>
-              </SectionCard>
+              {/* Variants — category aware */}
+              {(() => {
+                const vType = getVariantType(formData.category);
+                if (vType === 'none' || !formData.category) return null;
+                const label = variantLabel(vType);
+                const options = vType === 'sizes' ? SIZE_OPTIONS : COLOR_OPTIONS;
+                return (
+                  <SectionCard icon={Tag} title={label}>
+                    {vType === 'sizes' && (
+                      <div className="flex flex-wrap gap-2">
+                        {options.map((s) => (
+                          <button key={s} type="button" onClick={() => toggleSize(s)}
+                            className={`px-5 py-2.5 rounded-xl border-2 font-medium transition-all duration-300 ${
+                              formData.sizes.includes(s)
+                                ? 'bg-gradient-to-r from-blue-600 to-blue-500 border-blue-600 text-white shadow-lg shadow-blue-200'
+                                : 'bg-white border-gray-200 text-gray-600 hover:border-blue-400 hover:text-blue-600'
+                            }`}>
+                            {formData.sizes.includes(s) && <Check className="w-4 h-4 inline mr-1" />}
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {vType === 'colors' && (
+                      <div className="flex flex-wrap gap-2">
+                        {options.map((c) => {
+                          const selected = formData.sizes.includes(c);
+                          const hex = COLOR_HEX[c];
+                          const isGradient = hex?.startsWith('linear');
+                          return (
+                            <button key={c} type="button" onClick={() => toggleSize(c)}
+                              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all duration-300 ${
+                                selected
+                                  ? 'border-blue-600 bg-blue-50 text-blue-800 shadow-sm'
+                                  : 'border-gray-200 bg-white text-gray-600 hover:border-blue-400'
+                              }`}>
+                              <span className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"
+                                style={isGradient ? { background: hex } : { backgroundColor: hex }} />
+                              {c}
+                              {selected && <Check className="w-3 h-3 text-blue-600" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-500 mt-3">
+                      {vType === 'sizes' ? 'Click to toggle size availability' : 'Click to toggle colour availability'}
+                    </p>
+                  </SectionCard>
+                );
+              })()}
             </div>
 
             {/* Right Column */}
