@@ -100,10 +100,10 @@ const HeroSection = () => {
   return (
     <section className="py-12 sm:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-100 rounded-3xl overflow-hidden min-h-[500px]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16 h-full">
+        <div className="bg-gray-100 rounded-3xl overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch">
             {/* Left Column - Dynamic Content */}
-            <div className="space-y-6">
+            <div className="space-y-6 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
                 {renderWithHighlight(
                   primaryImage.title || defaultContent.title,
@@ -120,7 +120,6 @@ const HeroSection = () => {
                 {promoCards.map((promo, idx) => {
                   const fallback = defaultContent.promos[idx];
 
-                  // No CMS promo card for this slot → use default
                   if (!promo) {
                     return (
                       <div
@@ -128,27 +127,17 @@ const HeroSection = () => {
                         className={`${fallback.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 hover:shadow-lg transition-all`}
                       >
                         <div>
-                          <h3 className={`text-sm sm:text-base font-bold ${fallback.textColor} mb-1`}>
-                            {fallback.title}
-                          </h3>
-                          <p className={`text-xs font-semibold ${fallback.textColor}`}>
-                            {fallback.subtitle}
-                          </p>
+                          <h3 className={`text-sm sm:text-base font-bold ${fallback.textColor} mb-1`}>{fallback.title}</h3>
+                          <p className={`text-xs font-semibold ${fallback.textColor}`}>{fallback.subtitle}</p>
                         </div>
-                        <Link
-                          to={fallback.actionLink || '/shop'}
-                          className={`inline-flex items-center gap-2 ${fallback.actionBg} ${fallback.actionTextColor} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}
-                        >
-                          {fallback.actionText}
-                          <ArrowRight className="w-3 h-3" />
+                        <Link to={fallback.actionLink || '/shop'} className={`inline-flex items-center gap-2 ${fallback.actionBg} ${fallback.actionTextColor} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}>
+                          {fallback.actionText}<ArrowRight className="w-3 h-3" />
                         </Link>
                       </div>
                     );
                   }
 
-                  // CMS promo card
                   const { bgClass, bgStyle } = resolvePromoBackground(promo.bgGradient, fallback.bgGradient);
-                  // Use CMS textColor if set, else pick based on whether bgColor is dark or light
                   const textColorClass = promo.textColor || fallback.textColor;
 
                   return (
@@ -158,20 +147,14 @@ const HeroSection = () => {
                       style={bgStyle}
                     >
                       <div>
-                        {/* Promo title: plain text (no highlight — cards are too small) */}
-                        <h3 className={`text-sm sm:text-base font-bold ${textColorClass} mb-1 line-clamp-2`}>
-                          {promo.title || fallback.title}
-                        </h3>
-                        <p className={`text-xs font-semibold ${textColorClass} line-clamp-1`}>
-                          {promo.description || promo.subtitle || fallback.subtitle}
-                        </p>
+                        <h3 className={`text-sm sm:text-base font-bold ${textColorClass} mb-1 line-clamp-2`}>{promo.title || fallback.title}</h3>
+                        <p className={`text-xs font-semibold ${textColorClass} line-clamp-1`}>{promo.description || promo.subtitle || fallback.subtitle}</p>
                       </div>
                       <Link
                         to={promo.actionLink || fallback.actionLink || '/shop'}
                         className={`inline-flex items-center gap-2 ${promo.actionBg || fallback.actionBg} ${promo.actionTextColor || fallback.actionTextColor} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}
                       >
-                        {promo.actionText || fallback.actionText || 'Explore'}
-                        <ArrowRight className="w-3 h-3" />
+                        {promo.actionText || fallback.actionText || 'Explore'}<ArrowRight className="w-3 h-3" />
                       </Link>
                     </div>
                   );
@@ -179,20 +162,16 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* Right Column - Hero Image */}
-            <div className="relative flex items-center justify-center lg:justify-end h-full">
-              <div className="relative w-full h-full">
-                <img
-                  src={primaryImage.imageUrl || defaultContent.image}
-                  alt={primaryImage.title || 'Hero'}
-                  width={600}
-                  height={600}
-                  fetchPriority="high"
-                  decoding="async"
-                  className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105"
-                  onError={(e) => { e.target.src = defaultContent.image; }}
-                />
-              </div>
+            {/* Right Column - Hero Image: fixed height container so image always fills */}
+            <div className="relative h-[360px] sm:h-[460px] lg:h-auto lg:min-h-[520px] overflow-hidden">
+              <img
+                src={primaryImage.imageUrl || defaultContent.image}
+                alt={primaryImage.title || 'Hero'}
+                fetchPriority="high"
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover transition-transform hover:scale-105"
+                onError={(e) => { e.target.src = defaultContent.image; }}
+              />
             </div>
           </div>
         </div>
@@ -204,15 +183,14 @@ const HeroSection = () => {
 const DefaultHeroSection = ({ defaultContent }) => (
   <section className="py-12 sm:py-16 lg:py-20">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="bg-gray-100 rounded-3xl overflow-hidden min-h-[500px]">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16 h-full">
-          <div className="space-y-6">
+      <div className="bg-gray-100 rounded-3xl overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch">
+          {/* Left column */}
+          <div className="space-y-6 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
               Your <span className="text-blue-600">One-Stop</span> <span className="text-blue-600">Shop</span> for Everything You Need!
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 font-medium">
-              {defaultContent.description}
-            </p>
+            <p className="text-base sm:text-lg text-gray-600 font-medium">{defaultContent.description}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {defaultContent.promos.map((promo, idx) => (
                 <div key={idx} className={`${promo.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 hover:shadow-lg transition-all`}>
@@ -227,8 +205,15 @@ const DefaultHeroSection = ({ defaultContent }) => (
               ))}
             </div>
           </div>
-          <div className="relative flex items-center justify-center lg:justify-end h-full">
-            <img src={defaultContent.image} alt="Hero" width={600} height={600} fetchPriority="high" decoding="async" className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105" />
+          {/* Right column: image always fills — object-cover with absolute inset */}
+          <div className="relative h-[360px] sm:h-[460px] lg:h-auto lg:min-h-[520px] overflow-hidden">
+            <img
+              src={defaultContent.image}
+              alt="Hero"
+              fetchPriority="high"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover transition-transform hover:scale-105"
+            />
           </div>
         </div>
       </div>
