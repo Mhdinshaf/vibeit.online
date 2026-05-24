@@ -738,6 +738,17 @@ const AdminEditProduct = () => {
                     placeholder="0"
                     min="0"
                   />
+                  <PremiumInput
+                    label="Weight (kg)"
+                    type="number"
+                    name="weightKg"
+                    value={formData.weightKg}
+                    onChange={handleChange}
+                    placeholder="1"
+                    min="0.1"
+                    step="0.1"
+                    hint="1st kg = රු500 · each extra kg = රු150"
+                  />
 
                   {/* Featured Toggle */}
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
