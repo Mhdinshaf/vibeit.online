@@ -18,7 +18,7 @@ export const useCartStore = create(
             return {
               items: state.items.map((item) =>
                 item.key === key
-                  ? { ...item, quantity: item.quantity + quantity }
+                  ? { ...item, quantity: item.quantity + quantity, product, price }
                   : item
               ),
             };
