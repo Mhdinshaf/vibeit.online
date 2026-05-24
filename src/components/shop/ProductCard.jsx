@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const addItem = useCartStore((state) => state.addItem);
-  const NON_SELECTABLE_SIZES = new Set(['free size', 'freesize', 'one size', 'onesize', 'standard', 'default']);
+  const NON_SELECTABLE_SIZES = new Set(['free size', 'freesize', 'one size', 'onesize', 'standard', 'default', 'none', 'n/a', 'null', 'undefined', 'no size']);
 
   // Handle image - supports both imageUrls (DB field) and images (virtual/alias)
   // NOTE: After $facet aggregation, Mongoose virtuals don't execute,
@@ -41,7 +41,7 @@ const ProductCard = ({ product }) => {
     .map((size) => String(size || '').trim())
     .filter(Boolean);
   const selectableSizes = normalizedSizes.filter((size) => !NON_SELECTABLE_SIZES.has(size.toLowerCase()));
-  const requiresSizeSelection = selectableSizes.length > 0;
+  const requiresSizeSelection = selectableSizes.length > 1;
   const defaultCartSize = normalizedSizes[0] || '';
   const discountPercent = isOnSale 
     ? Math.round((1 - product.discountPrice / product.originalPrice) * 100) 
@@ -98,8 +98,24 @@ const ProductCard = ({ product }) => {
         </div>
 
         <div className="p-4 flex flex-col flex-1">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-semibold">VIBEIT select</p>
-          <h3 className="mt-2 text-sm font-semibold text-slate-900 dark:text-white line-clamp-2 mb-3 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {product.isFeatured && (
+              <span className="text-[10px] uppercase tracking-[0.1em] bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 font-bold px-2 py-0.5 rounded-sm border border-rose-100 dark:border-rose-800">
+                Featured
+              </span>
+            )}
+            {product.subcategory && (
+              <span className="text-[10px] uppercase tracking-[0.1em] bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 font-semibold px-2 py-0.5 rounded-sm border border-blue-100 dark:border-blue-800">
+                {product.subcategory}
+              </span>
+            )}
+            {product.tags && product.tags.slice(0, 1).map((tag, i) => (
+              <span key={i} className="text-[10px] uppercase tracking-[0.1em] bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 font-semibold px-2 py-0.5 rounded-sm border border-slate-200 dark:border-slate-700">
+                {tag}
+              </span>
+            ))}
+          </div>
+          <h3 className="mt-1 text-sm font-semibold text-slate-900 dark:text-white line-clamp-2 mb-3 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {product.name}
           </h3>
 
