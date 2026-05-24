@@ -131,7 +131,7 @@ const HomePage = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-[160px] sm:auto-rows-[180px] gap-3 sm:gap-4">
 
             {/* Tall card — spans 2 rows on sm+ */}
-            <Link to="/shop?category=Fashion" className="group relative rounded-2xl overflow-hidden row-span-2 col-span-1">
+            <Link to={`/shop?category=${encodeURIComponent("Women's Fashion & Accessories")}`} className="group relative rounded-2xl overflow-hidden row-span-2 col-span-1">
               <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500&q=80" alt="Fashion"
                 loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -143,18 +143,18 @@ const HomePage = () => {
             </Link>
 
             {/* Wide top card */}
-            <Link to="/shop?category=Electronics" className="group relative rounded-2xl overflow-hidden col-span-1 sm:col-span-2 lg:col-span-3">
+            <Link to={`/shop?category=${encodeURIComponent("Tech Gadgets & Accessories")}`} className="group relative rounded-2xl overflow-hidden col-span-1 sm:col-span-2 lg:col-span-3">
               <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=700&q=80" alt="Electronics"
                 loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
                 <span className="text-xs font-bold text-blue-300 uppercase tracking-wider block mb-1">Latest Tech</span>
-                <h3 className="text-base sm:text-lg font-bold text-white">Electronics</h3>
+                <h3 className="text-base sm:text-lg font-bold text-white">Tech Gadgets</h3>
               </div>
             </Link>
 
             {/* Two smaller cards on the right bottom */}
-            <Link to="/shop?category=Home" className="group relative rounded-2xl overflow-hidden col-span-1">
+            <Link to={`/shop?category=${encodeURIComponent("Home, Lifestyle & Appliances")}`} className="group relative rounded-2xl overflow-hidden col-span-1">
               <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80" alt="Home & Living"
                 loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
@@ -163,12 +163,12 @@ const HomePage = () => {
               </div>
             </Link>
 
-            <Link to="/shop?category=Accessories" className="group relative rounded-2xl overflow-hidden col-span-1 sm:col-span-1 lg:col-span-2">
+            <Link to={`/shop?category=${encodeURIComponent("Beauty, Health & Personal Care")}`} className="group relative rounded-2xl overflow-hidden col-span-1 sm:col-span-1 lg:col-span-2">
               <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" alt="Accessories"
                 loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
               <div className="absolute bottom-3 left-3 right-3">
-                <h3 className="text-sm font-bold text-white">Accessories</h3>
+                <h3 className="text-sm font-bold text-white">Beauty & Health</h3>
               </div>
             </Link>
           </div>

@@ -7,16 +7,89 @@ import { getVariantType, SIZE_OPTIONS, COLOR_OPTIONS, COLOR_HEX, variantLabel } 
 import toast from 'react-hot-toast';
 
 const CATEGORIES_WITH_SUBCATEGORIES = {
-  'Home Accessories': ['Kitchenware', 'Bedding', 'Wall Decor', 'Storage', 'Lighting'],
-  'Tech Gadgets': ['Mobile Accessories', 'Earbuds', 'Smart Watches', 'Chargers', 'Cables'],
-  'Trending Items': ['Viral Products', 'New Arrivals', 'Best Sellers', 'Limited Edition'],
-  'Watches': ['Men Watches', 'Women Watches', 'Smart Watches', 'Luxury', 'Casual'],
-  'Creams and Skincare': ['Face Cream', 'Body Lotion', 'Sunscreen', 'Serums', 'Moisturizers'],
-  'Perfumes': ['Men Perfume', 'Women Perfume', 'Unisex', 'Gift Sets', 'Body Mist'],
-  'Toys': ['Educational Toys', 'Action Figures', 'Board Games', 'Outdoor Toys', 'Baby Toys'],
-  'Bicycle Parts': ['Tyres', 'Chains', 'Pedals', 'Helmets', 'Accessories'],
-  'Ladies Dresses': ['Casual Wear', 'Party Wear', 'Office Wear', 'Traditional', 'Maxi Dresses'],
-  'Gents Clothing': ['T-Shirts', 'Trousers', 'Shirts', 'Shorts', 'Formal Wear'],
+  'Tech Gadgets & Accessories': [
+    'Smartphones & Tablets',
+    'Mobile Accessories',
+    'Power Banks & Portable Chargers',
+    'Charging Cables & Adapters',
+    'Earbuds, Headphones & Headsets',
+    'Smart Watches & Fitness Bands',
+    'Bluetooth Speakers & Audio',
+    'Computer & Laptop Accessories',
+    'Storage Devices',
+    'Gaming Accessories',
+    'Smart Home Devices',
+    'Drones & Action Cameras',
+    'Photography & Vlog Gear'
+  ],
+  'Home, Lifestyle & Appliances': [
+    'Kitchenware',
+    'Small Kitchen Appliances',
+    'Bedding',
+    'Wall Decor, Clocks & Paintings',
+    'Home Lighting',
+    'Storage & Organization',
+    'Bathroom Accessories & Towels',
+    'Cleaning Tools & Supplies',
+    'Tools & Home Improvement',
+    'Indoor Plants & Garden Accessories'
+  ],
+  'Beauty, Health & Personal Care': [
+    'Skincare',
+    'Makeup & Cosmetics',
+    'Perfumes & Body Mists',
+    'Hair Care',
+    "Men's Grooming",
+    'Bath & Body',
+    'Health & Wellness Monitors'
+  ],
+  "Women's Fashion & Accessories": [
+    'Ladies Dresses',
+    'Tops, Blouses & T-Shirts',
+    'Jeans, Pants & Leggings',
+    'Lingerie, Sleepwear & Loungewear',
+    'Handbags, Totes & Purses',
+    'Shoes, Flats & Heels',
+    'Jewelry',
+    'Sunglasses & Hair Accessories'
+  ],
+  "Men's Fashion & Accessories": [
+    'Shirts',
+    'T-Shirts & Polo Shirts',
+    'Jeans, Trousers & Shorts',
+    'Activewear & Gym Clothes',
+    'Wallets & Belts',
+    'Shoes, Sneakers & Sandals',
+    'Caps & Hats',
+    'Underwear & Socks',
+    'Sunglasses'
+  ],
+  'Babies, Kids & Toys': [
+    'Toys',
+    'Kids Clothing',
+    'Baby Care',
+    'Feeding Essentials',
+    'School Bags & Stationery',
+    'Baby Gear'
+  ],
+  'Sports, Outdoors & Hobbies': [
+    'Fitness & Gym Equipment',
+    'Bicycle Parts & Accessories',
+    'Camping & Hiking Gear',
+    'Sports Equipment',
+    'Musical Instruments & Accessories',
+    'Art & Craft Supplies'
+  ],
+  'Automotive & Motorcycle Accessories': [
+    'Motorcycle Accessories',
+    'Car Interior Accessories',
+    'Car Care & Cleaning Products',
+    'Vehicle Electronics'
+  ],
+  'Office & Stationery': [
+    'Office Supplies',
+    'Stationery'
+  ]
 };
 
 

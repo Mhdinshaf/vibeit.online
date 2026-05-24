@@ -2,21 +2,20 @@ import { useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
-import { Filter, X, ChevronRight, ChevronLeft, ChevronDown, Package, SlidersHorizontal, Home, Smartphone, Flame, Watch, Droplets, Sparkles, Gift, Bike, Shirt, Briefcase } from 'lucide-react';
+import { Filter, X, ChevronRight, ChevronLeft, ChevronDown, Package, SlidersHorizontal, Home, Smartphone, Flame, Watch, Droplets, Sparkles, Gift, Bike, Shirt, Briefcase, Car, BookOpen, Heart } from 'lucide-react';
 import { getProducts } from '../../services/api';
 import ProductCard from '../../components/shop/ProductCard';
 
 const CATEGORIES = [
-  { name: 'Home Accessories', icon: Home, subcategories: ['Kitchenware', 'Bedding', 'Wall Decor', 'Storage', 'Lighting'] },
-  { name: 'Tech Gadgets', icon: Smartphone, subcategories: ['Mobile Accessories', 'Earbuds', 'Smart Watches', 'Chargers', 'Cables'] },
-  { name: 'Trending Items', icon: Flame, subcategories: ['Viral Products', 'New Arrivals', 'Best Sellers', 'Limited Edition'] },
-  { name: 'Watches', icon: Watch, subcategories: ['Men Watches', 'Women Watches', 'Smart Watches', 'Luxury', 'Casual'] },
-  { name: 'Creams and Skincare', icon: Droplets, subcategories: ['Face Cream', 'Body Lotion', 'Sunscreen', 'Serums', 'Moisturizers'] },
-  { name: 'Perfumes', icon: Sparkles, subcategories: ['Men Perfume', 'Women Perfume', 'Unisex', 'Gift Sets', 'Body Mist'] },
-  { name: 'Toys', icon: Gift, subcategories: ['Educational Toys', 'Action Figures', 'Board Games', 'Outdoor Toys', 'Baby Toys'] },
-  { name: 'Bicycle Parts', icon: Bike, subcategories: ['Tyres', 'Chains', 'Pedals', 'Helmets', 'Accessories'] },
-  { name: 'Ladies Dresses', icon: Shirt, subcategories: ['Casual Wear', 'Party Wear', 'Office Wear', 'Traditional', 'Maxi Dresses'] },
-  { name: 'Gents Clothing', icon: Briefcase, subcategories: ['T-Shirts', 'Trousers', 'Shirts', 'Shorts', 'Formal Wear'] },
+  { name: 'Tech Gadgets & Accessories', icon: Smartphone, subcategories: ['Smartphones & Tablets', 'Mobile Accessories', 'Power Banks & Portable Chargers', 'Charging Cables & Adapters', 'Earbuds, Headphones & Headsets', 'Smart Watches & Fitness Bands', 'Bluetooth Speakers & Audio', 'Computer & Laptop Accessories', 'Storage Devices', 'Gaming Accessories', 'Smart Home Devices', 'Drones & Action Cameras', 'Photography & Vlog Gear'] },
+  { name: 'Home, Lifestyle & Appliances', icon: Home, subcategories: ['Kitchenware', 'Small Kitchen Appliances', 'Bedding', 'Wall Decor, Clocks & Paintings', 'Home Lighting', 'Storage & Organization', 'Bathroom Accessories & Towels', 'Cleaning Tools & Supplies', 'Tools & Home Improvement', 'Indoor Plants & Garden Accessories'] },
+  { name: 'Beauty, Health & Personal Care', icon: Heart, subcategories: ['Skincare', 'Makeup & Cosmetics', 'Perfumes & Body Mists', 'Hair Care', "Men's Grooming", 'Bath & Body', 'Health & Wellness Monitors'] },
+  { name: "Women's Fashion & Accessories", icon: Shirt, subcategories: ['Ladies Dresses', 'Tops, Blouses & T-Shirts', 'Jeans, Pants & Leggings', 'Lingerie, Sleepwear & Loungewear', 'Handbags, Totes & Purses', 'Shoes, Flats & Heels', 'Jewelry', 'Sunglasses & Hair Accessories'] },
+  { name: "Men's Fashion & Accessories", icon: Briefcase, subcategories: ['Shirts', 'T-Shirts & Polo Shirts', 'Jeans, Trousers & Shorts', 'Activewear & Gym Clothes', 'Wallets & Belts', 'Shoes, Sneakers & Sandals', 'Caps & Hats', 'Underwear & Socks', 'Sunglasses'] },
+  { name: 'Babies, Kids & Toys', icon: Gift, subcategories: ['Toys', 'Kids Clothing', 'Baby Care', 'Feeding Essentials', 'School Bags & Stationery', 'Baby Gear'] },
+  { name: 'Sports, Outdoors & Hobbies', icon: Bike, subcategories: ['Fitness & Gym Equipment', 'Bicycle Parts & Accessories', 'Camping & Hiking Gear', 'Sports Equipment', 'Musical Instruments & Accessories', 'Art & Craft Supplies'] },
+  { name: 'Automotive & Motorcycle Accessories', icon: Car, subcategories: ['Motorcycle Accessories', 'Car Interior Accessories', 'Car Care & Cleaning Products', 'Vehicle Electronics'] },
+  { name: 'Office & Stationery', icon: BookOpen, subcategories: ['Office Supplies', 'Stationery'] },
 ];
 
 const FilterPanel = ({ searchParams, setParam, setParams, clearFilters, onSubcategorySelect }) => {
