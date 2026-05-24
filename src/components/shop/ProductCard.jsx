@@ -7,22 +7,33 @@ const ProductCard = ({ product }) => {
   const addItem = useCartStore((state) => state.addItem);
   const NON_SELECTABLE_SIZES = new Set(['free size', 'freesize', 'one size', 'onesize', 'standard', 'default']);
 
-  // Handle image - could be string URL or object with url property
-  const getImageUrl = (img) => {
-    if (!img) return '/placeholder.jpg';
-    if (typeof img === 'string') return img;
-    if (img.url) return img.url;
-    return '/placeholder.jpg';
+  // Handle image - supports both imageUrls (DB field) and images (virtual/alias)
+  // NOTE: After $facet aggregation, Mongoose virtuals don't execute,
+  // so we must check both imageUrls and images to be safe.
+  const getImageUrl = (product) => {
+    // Try imageUrls first (actual DB field), then images (virtual)
+    const arr = product?.imageUrls || product?.images || [];
+    const first = Array.isArray(arr) ? arr[0] : arr;
+    if (!first) return null;
+    if (typeof first === 'string') return first;
+    if (first?.url) return first.url;
+    return null;
   };
 
-  // Build Cloudinary optimized URL: auto format, auto quality, resize to 400x400
-  const getOptimizedImageUrl = (img) => {
-    const raw = getImageUrl(img);
-    // Only transform Cloudinary URLs
-    if (!raw || !raw.includes('res.cloudinary.com')) return raw;
-    // Insert transformation before /upload/ path segment
-    return raw.replace('/upload/', '/upload/f_auto,q_auto:good,w_400,h_400,c_fill/');
+  // Safe Cloudinary optimization: only transform if URL is a plain upload
+  // (no existing transformations in the path already)
+  const getOptimizedImageUrl = (url) => {
+    if (!url) return null;
+    if (!url.includes('res.cloudinary.com')) return url;
+    // If URL already has transformations (e.g., /upload/w_400,... or /upload/f_auto,...)
+    // skip to avoid double-transforming
+    if (/\/upload\/[a-z]/.test(url)) return url;
+    // Safe to add transformations
+    return url.replace('/upload/', '/upload/f_auto,q_auto:eco,w_500,h_500,c_limit/');
   };
+
+  const rawImageUrl = getImageUrl(product);
+  const imageUrl = getOptimizedImageUrl(rawImageUrl);
 
   const isOnSale = product.discountPrice && product.discountPrice < product.originalPrice;
   const isOutOfStock = product.stockQuantity === 0;
@@ -54,12 +65,18 @@ const ProductCard = ({ product }) => {
       <Link to={`/product/${product._id}`} className="flex-1 flex flex-col">
         <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 p-5">
           <img
-            src={getOptimizedImageUrl(product.images?.[0])}
-            alt={product.name}
+            src={imageUrl}
+            alt={product.name || product.title || 'Product'}
             width={400}
             height={400}
             loading="lazy"
             decoding="async"
+            onError={(e) => {
+              // If optimized URL fails, fall back to original URL
+              if (rawImageUrl && e.target.src !== rawImageUrl) {
+                e.target.src = rawImageUrl;
+              }
+            }}
             className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105"
           />
 
