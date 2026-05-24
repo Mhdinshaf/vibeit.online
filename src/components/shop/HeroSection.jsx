@@ -81,10 +81,18 @@ const HeroSection = () => {
             {/* Left Column - Dynamic Content */}
             <div className="space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-                {primaryImage.title || defaultContent.title}
+                {renderWithHighlight(
+                  primaryImage.title || defaultContent.title,
+                  primaryImage.highlightText,
+                  primaryImage.highlightColor
+                )}
               </h1>
               <p className="text-base sm:text-lg text-gray-600 font-medium">
-                {primaryImage.description || defaultContent.description}
+                {renderWithHighlight(
+                  primaryImage.description || defaultContent.description,
+                  primaryImage.highlightText,
+                  primaryImage.highlightColor
+                )}
               </p>
 
               {/* Promo Cards */}

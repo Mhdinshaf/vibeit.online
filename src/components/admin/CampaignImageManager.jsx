@@ -279,9 +279,21 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
   }, [campaign._id, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const saveMutation = useMutation({
-    mutationFn: (updatedImages) => updateCampaign(campaignId, {
-      [`sections.${activeTab}`]: updatedImages,
-    }),
+    mutationFn: (updatedImages) => {
+      // Sanitize highlight fields before sending:
+      // - highlightColor must be a valid hex (#xxx or #xxxxxx) or the backend validation fails
+      // - highlightText can be empty string
+      const sanitized = updatedImages.map(img => ({
+        ...img,
+        highlightText: img.highlightText || '',
+        highlightColor: /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(img.highlightColor)
+          ? img.highlightColor
+          : '#000000',
+      }));
+      return updateCampaign(campaignId, {
+        [`sections.${activeTab}`]: sanitized,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       toast.success('Section saved!');
@@ -289,10 +301,13 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
     onError: (err) => toast.error(err.response?.data?.message || 'Save failed'),
   });
 
+
   const handleAddImage = () => {
     setImages(prev => [...prev, {
       _tempId: `temp-${Date.now()}-${Math.random()}`,
-      title: '', description: '', badge: '', imageUrl: '', actionLink: '', actionText: 'Explore',
+      title: '', description: '', badge: '', imageUrl: '',
+      actionLink: '', actionText: 'Explore',
+      highlightText: '', highlightColor: '#ff0000',
       order: prev.length,
     }]);
   };
@@ -550,26 +565,75 @@ const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onU
 
         {/* Highlight controls for hero promos */}
         {activeTab === 'hero' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Highlight Text</label>
-              <input
-                type="text"
-                placeholder="Text to highlight inside title/description"
-                value={image.highlightText || ''}
-                onChange={e => onUpdate(index, 'highlightText', e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              />
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                  Highlight Text
+                  <span className="ml-1 font-normal text-slate-400">(word in your title to color)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Sale, 50%"
+                  value={image.highlightText || ''}
+                  onChange={e => onUpdate(index, 'highlightText', e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                  Highlight Color
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={image.highlightColor || '#ff0000'}
+                    onChange={e => onUpdate(index, 'highlightColor', e.target.value)}
+                    className="w-12 h-10 p-1 border border-slate-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white flex-shrink-0"
+                  />
+                  <input
+                    type="text"
+                    value={image.highlightColor || '#ff0000'}
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (/^#([0-9a-fA-F]{0,6})$/.test(val)) {
+                        onUpdate(index, 'highlightColor', val);
+                      }
+                    }}
+                    placeholder="#ff0000"
+                    maxLength={7}
+                    className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Highlight Color</label>
-              <input
-                type="color"
-                value={image.highlightColor || '#000000'}
-                onChange={e => onUpdate(index, 'highlightColor', e.target.value)}
-                className="w-full h-10 p-0 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              />
-            </div>
+
+            {/* Live Preview */}
+            {image.title && image.highlightText && (
+              <div className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3">
+                <p className="text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Live Preview</p>
+                <p className="text-sm font-bold text-slate-800 leading-snug">
+                  {image.title.split(image.highlightText).reduce((acc, part, idx, arr) => {
+                    if (idx === arr.length - 1) return [...acc, part];
+                    return [
+                      ...acc,
+                      part,
+                      <span
+                        key={idx}
+                        style={{ color: /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(image.highlightColor) ? image.highlightColor : '#ff0000' }}
+                      >
+                        {image.highlightText}
+                      </span>,
+                    ];
+                  }, [])}
+                </p>
+              </div>
+            )}
+            {image.title && image.highlightText && !image.title.includes(image.highlightText) && (
+              <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg">
+                ⚠️ Highlight text not found in the title — check spelling or case (case-sensitive match).
+              </p>
+            )}
           </div>
         )}
 
