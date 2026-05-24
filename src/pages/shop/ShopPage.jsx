@@ -2,20 +2,28 @@ import { useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
-import { Filter, X, ChevronRight, ChevronLeft, ChevronDown, Package, SlidersHorizontal, Home, Smartphone, Flame, Watch, Droplets, Sparkles, Gift, Bike, Shirt, Briefcase, Car, BookOpen, Heart } from 'lucide-react';
+import { Filter, X, ChevronRight, ChevronLeft, ChevronDown, Package, SlidersHorizontal, Home, Smartphone, Flame, Watch, Droplets, Sparkles, Gift, Bike, Shirt, Briefcase, Car, BookOpen, Heart, Wrench, Activity, Headphones, Plane, ShoppingBag } from 'lucide-react';
 import { getProducts } from '../../services/api';
 import ProductCard from '../../components/shop/ProductCard';
 
 const CATEGORIES = [
   { name: 'Tech Gadgets & Accessories', icon: Smartphone, subcategories: ['Smartphones & Tablets', 'Mobile Accessories', 'Power Banks & Portable Chargers', 'Charging Cables & Adapters', 'Earbuds, Headphones & Headsets', 'Smart Watches & Fitness Bands', 'Bluetooth Speakers & Audio', 'Computer & Laptop Accessories', 'Storage Devices', 'Gaming Accessories', 'Smart Home Devices', 'Drones & Action Cameras', 'Photography & Vlog Gear'] },
   { name: 'Home, Lifestyle & Appliances', icon: Home, subcategories: ['Kitchenware', 'Small Kitchen Appliances', 'Bedding', 'Wall Decor, Clocks & Paintings', 'Home Lighting', 'Storage & Organization', 'Bathroom Accessories & Towels', 'Cleaning Tools & Supplies', 'Tools & Home Improvement', 'Indoor Plants & Garden Accessories'] },
-  { name: 'Beauty, Health & Personal Care', icon: Heart, subcategories: ['Skincare', 'Makeup & Cosmetics', 'Perfumes & Body Mists', 'Hair Care', "Men's Grooming", 'Bath & Body', 'Health & Wellness Monitors'] },
+  { name: 'Beauty, Health & Personal Care', icon: Heart, subcategories: ['Skincare', 'Makeup & Cosmetics', 'Perfumes & Body Mists', 'Hair Care', "Men's Grooming", "Women's Grooming", 'Bath & Body', 'Health & Wellness Monitors'] },
   { name: "Women's Fashion & Accessories", icon: Shirt, subcategories: ['Ladies Dresses', 'Tops, Blouses & T-Shirts', 'Jeans, Pants & Leggings', 'Lingerie, Sleepwear & Loungewear', 'Handbags, Totes & Purses', 'Shoes, Flats & Heels', 'Jewelry', 'Sunglasses & Hair Accessories'] },
   { name: "Men's Fashion & Accessories", icon: Briefcase, subcategories: ['Shirts', 'T-Shirts & Polo Shirts', 'Jeans, Trousers & Shorts', 'Activewear & Gym Clothes', 'Wallets & Belts', 'Shoes, Sneakers & Sandals', 'Caps & Hats', 'Underwear & Socks', 'Sunglasses'] },
   { name: 'Babies, Kids & Toys', icon: Gift, subcategories: ['Toys', 'Kids Clothing', 'Baby Care', 'Feeding Essentials', 'School Bags & Stationery', 'Baby Gear'] },
   { name: 'Sports, Outdoors & Hobbies', icon: Bike, subcategories: ['Fitness & Gym Equipment', 'Bicycle Parts & Accessories', 'Camping & Hiking Gear', 'Sports Equipment', 'Musical Instruments & Accessories', 'Art & Craft Supplies'] },
   { name: 'Automotive & Motorcycle Accessories', icon: Car, subcategories: ['Motorcycle Accessories', 'Car Interior Accessories', 'Car Care & Cleaning Products', 'Vehicle Electronics'] },
   { name: 'Office & Stationery', icon: BookOpen, subcategories: ['Office Supplies', 'Stationery'] },
+  { name: 'Torches & Portable Lighting', icon: Flame, subcategories: ['Rechargeable Torches', 'Tactical & Heavy-Duty Torches', 'Headlamps & Head Torches', 'Camping Lanterns & Tents Lights', 'Emergency Lights', 'Mini & Keychain Torches', 'Work Lights & Spotlights', 'Solar Torches & Lights', 'Bicycle Lights'] },
+  { name: 'Groceries & Pet Supplies', icon: ShoppingBag, subcategories: ['Snacks & Beverages', 'Tea & Coffee', 'Pantry Essentials', 'Pet Food & Treats', 'Pet Accessories'] },
+  { name: 'Hardware & DIY Tools', icon: Wrench, subcategories: ['Power Tools', 'Hand Tools', 'Electrical & Wiring', 'Plumbing Supplies', 'Paints & Home DIY'] },
+  { name: 'Gifts, Events & Party Supplies', icon: Sparkles, subcategories: ['Gift Boxes & Wrapping Paper', 'Party Decorations', 'Greeting Cards', 'Customized & Personalized Gifts'] },
+  { name: 'Watches & Jewelry', icon: Watch, subcategories: ["Men's Watches", "Women's Watches", 'Smart Watches & Fitness Bands', 'Couple Watches', 'Fine & Fashion Jewelry'] },
+  { name: 'Health & Medical Care', icon: Activity, subcategories: ['Vitamins & Supplements', 'First Aid & Medical Supplies', 'Mobility & Support Braces', 'Massagers & Relaxation Devices'] },
+  { name: 'Books, Music & Media', icon: Headphones, subcategories: ['Educational & School Books', 'Novels & Fiction', 'Musical Instruments', 'Vinyl Records & CDs'] },
+  { name: 'Luggage & Travel Essentials', icon: Plane, subcategories: ['Suitcases & Trolley Bags', 'Travel Adapters & Accessories', 'Neck Pillows & Eye Masks'] },
 ];
 
 const FilterPanel = ({ searchParams, setParam, setParams, clearFilters, onSubcategorySelect }) => {

@@ -10,6 +10,10 @@ export const CATEGORY_VARIANT_TYPE = {
   "Men's Fashion & Accessories": 'sizes',
   'Beauty, Health & Personal Care': 'none',
   'Office & Stationery': 'none',
+  'Groceries & Pet Supplies': 'none',
+  'Hardware & DIY Tools': 'none',
+  'Health & Medical Care': 'none',
+  'Books, Music & Media': 'none',
   // Everything else (Tech, Home, Toys, Sports, Auto, etc.) → 'colors'
 };
 

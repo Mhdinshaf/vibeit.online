@@ -53,6 +53,7 @@ const CATEGORIES_WITH_SUBCATEGORIES = {
     'Perfumes & Body Mists',
     'Hair Care',
     "Men's Grooming",
+    "Women's Grooming",
     'Bath & Body',
     'Health & Wellness Monitors'
   ],
@@ -102,6 +103,61 @@ const CATEGORIES_WITH_SUBCATEGORIES = {
   'Office & Stationery': [
     'Office Supplies',
     'Stationery'
+  ],
+  'Torches & Portable Lighting': [
+    'Rechargeable Torches',
+    'Tactical & Heavy-Duty Torches',
+    'Headlamps & Head Torches',
+    'Camping Lanterns & Tents Lights',
+    'Emergency Lights',
+    'Mini & Keychain Torches',
+    'Work Lights & Spotlights',
+    'Solar Torches & Lights',
+    'Bicycle Lights'
+  ],
+  'Groceries & Pet Supplies': [
+    'Snacks & Beverages',
+    'Tea & Coffee',
+    'Pantry Essentials',
+    'Pet Food & Treats',
+    'Pet Accessories'
+  ],
+  'Hardware & DIY Tools': [
+    'Power Tools',
+    'Hand Tools',
+    'Electrical & Wiring',
+    'Plumbing Supplies',
+    'Paints & Home DIY'
+  ],
+  'Gifts, Events & Party Supplies': [
+    'Gift Boxes & Wrapping Paper',
+    'Party Decorations',
+    'Greeting Cards',
+    'Customized & Personalized Gifts'
+  ],
+  'Watches & Jewelry': [
+    "Men's Watches",
+    "Women's Watches",
+    'Smart Watches & Fitness Bands',
+    'Couple Watches',
+    'Fine & Fashion Jewelry'
+  ],
+  'Health & Medical Care': [
+    'Vitamins & Supplements',
+    'First Aid & Medical Supplies',
+    'Mobility & Support Braces',
+    'Massagers & Relaxation Devices'
+  ],
+  'Books, Music & Media': [
+    'Educational & School Books',
+    'Novels & Fiction',
+    'Musical Instruments',
+    'Vinyl Records & CDs'
+  ],
+  'Luggage & Travel Essentials': [
+    'Suitcases & Trolley Bags',
+    'Travel Adapters & Accessories',
+    'Neck Pillows & Eye Masks'
   ]
 };
 
