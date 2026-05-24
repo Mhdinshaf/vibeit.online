@@ -304,21 +304,17 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
 
 
   const handleAddImage = () => {
-    const isPromo = images.length >= 1; // index 0 = hero, rest = promo cards
+    // All images are hero carousel slides — each gets its own title, description, image
     setImages(prev => [...prev, {
       _tempId: `temp-${Date.now()}-${Math.random()}`,
       imageUrl: '',
-      title: isPromo ? 'Summer Sale' : '',
-      description: isPromo ? 'Up to 40% OFF' : '',
+      title: '',
+      description: '',
       badge: '',
-      actionText: isPromo ? 'Shop now' : 'Explore Products',
+      actionText: 'Explore Products',
       actionLink: '/shop',
       highlightText: '',
       highlightColor: '#ffd700',
-      bgGradient: isPromo ? '#f59e0b' : '',
-      textColor: isPromo ? 'text-slate-900' : '',
-      actionBg: isPromo ? 'bg-blue-600 hover:bg-blue-700' : '',
-      actionTextColor: isPromo ? 'text-white' : '',
       order: prev.length,
     }]);
   };
@@ -463,39 +459,148 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
 };
 
 /* ─────────────────────── ImageCard ─────────────────────── */
-const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onUpdate, onUpload, onRemove }) => {
+const ImageCard = ({ index, image, uploadingIndex, fileInputRefs, onUpdate, onUpload, onRemove }) => {
   const hasImage = Boolean(image.imageUrl?.trim());
   const isUploading = uploadingIndex === index;
-  const isHero = index === 0;       // Image 1 = main hero banner
-  const isPromo = index > 0;        // Images 2+ = small promo cards
 
-  // Normalize hex color so pickers always get valid values
   const normalizeHex = (c, fallback = '#ffd700') => {
     if (!c) return fallback;
     if (c.startsWith('#')) return c;
     if (/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(c)) return '#' + c;
     return fallback;
   };
+  const safeColor = normalizeHex(image.highlightColor);
 
-  const safeHighlightColor = normalizeHex(image.highlightColor, '#ffd700');
-  const safeBgColor = normalizeHex(image.bgGradient, '#f59e0b');
+  return (
+    <div className={`border-2 rounded-2xl overflow-hidden ${hasImage ? 'border-emerald-200' : 'border-slate-200'} bg-white shadow-sm`}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 bg-blue-50 border-b border-blue-100">
+        <div className="flex items-center gap-2">
+          <span className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">{index + 1}</span>
+          <div>
+            <span className="text-sm font-bold text-blue-800">🖼️ Hero Slide {index + 1}</span>
+            <p className="text-xs text-slate-500">{index === 0 ? 'First slide on page load' : 'Auto-advances in carousel'}</p>
+          </div>
+          {hasImage && <span className="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full ml-1">✓ Uploaded</span>}
+        </div>
+        <button onClick={() => onRemove(index)} className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
 
-  // Role metadata
-  const roleLabel = isHero ? '🏠 Main Hero Banner' : `📢 Promo Card ${index}`;
-  const roleDesc = isHero
-    ? 'Big banner: image on right, title + description on left'
-    : 'Small card below the hero title (short text + colored background)';
-  const roleColor = isHero ? 'bg-blue-600' : 'bg-purple-600';
+      <div className="p-4 space-y-4">
+        {/* Upload row */}
+        <div>
+          <input type="file" ref={el => (fileInputRefs.current[index] = el)} onChange={e => onUpload(e, index)} accept="image/jpeg,image/png,image/webp" className="hidden" />
+          <div className="flex gap-3">
+            <button type="button" onClick={() => fileInputRefs.current[index]?.click()} disabled={isUploading}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${isUploading ? 'bg-blue-100 text-blue-500 cursor-wait' : hasImage ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}>
+              {isUploading
+                ? <><div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />Uploading…</>
+                : <><Upload className="w-4 h-4" />{hasImage ? 'Change Image' : 'Upload Image'}</>}
+            </button>
+            <input type="text" placeholder="Or paste image URL…" value={image.imageUrl} onChange={e => onUpdate(index, 'imageUrl', e.target.value)}
+              className="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-w-0" />
+          </div>
+          <p className="text-xs text-slate-400 mt-1.5">JPG, PNG, WebP · Max 5MB</p>
+        </div>
+
+        {/* Image preview */}
+        {hasImage && (
+          <div className="relative rounded-xl overflow-hidden border border-slate-200">
+            <img src={image.imageUrl} alt="Preview" className="w-full h-40 object-cover"
+              onError={e => { e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="160"%3E%3Crect fill="%23f3f4f6" width="400" height="160"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="13" font-family="sans-serif"%3EImage Preview%3C/text%3E%3C/svg%3E'; }} />
+            <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">✓ Ready</div>
+          </div>
+        )}
+
+        {/* Title + Button text */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Title *</label>
+            <input type="text" placeholder="e.g., Your One-Stop Shop" value={image.title || ''} onChange={e => onUpdate(index, 'title', e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Button Text</label>
+            <input type="text" placeholder="e.g., Explore Products" value={image.actionText || ''} onChange={e => onUpdate(index, 'actionText', e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+          </div>
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Description *</label>
+          <textarea placeholder="e.g., Shop premium products at unbeatable prices" value={image.description || ''} onChange={e => onUpdate(index, 'description', e.target.value)}
+            rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white resize-none" />
+        </div>
+
+        {/* Highlight */}
+        <div className="space-y-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+          <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">✨ Text Highlight</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Highlight Text <span className="font-normal text-slate-400">(word in title)</span>
+              </label>
+              <input type="text" placeholder="e.g., One-Stop" value={image.highlightText || ''} onChange={e => onUpdate(index, 'highlightText', e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Highlight Color</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={safeColor} onChange={e => onUpdate(index, 'highlightColor', e.target.value)}
+                  className="w-12 h-10 p-1 border border-slate-300 rounded-lg cursor-pointer bg-white flex-shrink-0" />
+                <input type="text" value={safeColor}
+                  onChange={e => { const v = e.target.value; if (/^#([0-9a-fA-F]{0,6})$/.test(v)) onUpdate(index, 'highlightColor', v); }}
+                  placeholder="#ffd700" maxLength={7}
+                  className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+              </div>
+            </div>
+          </div>
+
+          {/* Live preview */}
+          {image.title && image.highlightText && (
+            <div className="bg-white border border-slate-200 rounded-lg px-4 py-3">
+              <p className="text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Live Preview</p>
+              <p className="text-sm font-bold text-slate-800">
+                {image.title.split(image.highlightText).reduce((acc, part, i, arr) => {
+                  if (i === arr.length - 1) return [...acc, part];
+                  return [...acc, part, <span key={i} style={{ color: safeColor }}>{image.highlightText}</span>];
+                }, [])}
+              </p>
+            </div>
+          )}
+          {image.title && image.highlightText && !image.title.includes(image.highlightText) && (
+            <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg">
+              ⚠️ Not found in title — check spelling (case-sensitive).
+            </p>
+          )}
+        </div>
+
+        {/* Action link */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Action Link</label>
+          <input type="text" placeholder="e.g., /shop?category=Trending+Items" value={image.actionLink || ''} onChange={e => onUpdate(index, 'actionLink', e.target.value)}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CampaignImageManager;
+
 
   return (
     <div className={`border-2 rounded-2xl overflow-hidden transition-all ${hasImage ? 'border-emerald-200' : 'border-slate-200'} bg-white shadow-sm`}>
       {/* Card Header */}
-      <div className={`flex items-center justify-between px-4 py-3 ${isHero ? 'bg-blue-50 border-b border-blue-100' : 'bg-purple-50 border-b border-purple-100'}`}>
+      <div className="flex items-center justify-between px-4 py-3 bg-blue-50 border-b border-blue-100">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`w-6 h-6 rounded-full ${roleColor} text-white text-xs font-bold flex items-center justify-center flex-shrink-0`}>{index + 1}</span>
+          <span className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">{slideNumber}</span>
           <div>
-            <span className={`text-sm font-bold ${isHero ? 'text-blue-800' : 'text-purple-800'}`}>{roleLabel}</span>
-            <p className="text-xs text-slate-500">{roleDesc}</p>
+            <span className="text-sm font-bold text-blue-800">{slideLabel}</span>
+            <p className="text-xs text-slate-500">{slideDesc}</p>
           </div>
           {hasImage && <span className="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">✓ Uploaded</span>}
         </div>
@@ -565,15 +670,7 @@ const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onU
                   <label className="block text-xs font-semibold text-slate-600 mb-1.5">Highlight Color</label>
                   <div className="flex items-center gap-2">
                     <input type="color" value={safeHighlightColor} onChange={e => onUpdate(index, 'highlightColor', e.target.value)} className="w-12 h-10 p-1 border border-slate-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white flex-shrink-0" />
-                    <input type="text" value={safeHighlightColor} onChange={e => { const v = e.target.value; if (/^#([0-9a-fA-F]{0,6})$/.test(v)) onUpdate(index, 'highlightColor', v); }} placeholder="#ffd700" maxLength={7} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
-                  </div>
-                </div>
-              </div>
-              {image.title && image.highlightText && (
-                <div className="bg-white border border-slate-200 rounded-lg px-4 py-3">
-                  <p className="text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Live Preview</p>
-                  <p className="text-sm font-bold text-slate-800 leading-snug">
-                    {image.title.split(image.highlightText).reduce((acc, part, i, arr) => {
+                    <input type="text" value={safeHighlightColor} onChange={e => { const v = e.target.value; if (/^#([0-9a-fA-F]{0,6})$/.test(v)) onUpdate(index, 'highlightColor', v); }} placeholder="#ffd700" maxLength={7} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 fo                    {image.title.split(image.highlightText).reduce((acc, part, i, arr) => {
                       if (i === arr.length - 1) return [...acc, part];
                       return [...acc, part, <span key={i} style={{ color: safeHighlightColor }}>{image.highlightText}</span>];
                     }, [])}
@@ -591,69 +688,13 @@ const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onU
             </div>
           </>
         )}
+      </div>
+    </div>
+  );
+};
 
-        {/* ── PROMO CARD FIELDS (Images 2+ only) ── */}
-        {isPromo && (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Short Title * <span className="font-normal text-slate-400">(keep it brief)</span></label>
-                <input type="text" placeholder="e.g., Summer Sale" value={image.title} onChange={e => onUpdate(index, 'title', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Subtitle *</label>
-                <input type="text" placeholder="e.g., Up to 40% OFF" value={image.description} onChange={e => onUpdate(index, 'description', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
-              </div>
-            </div>
-
-            {/* Promo card styling */}
-            <div className="space-y-3 bg-purple-50 border border-purple-200 rounded-xl p-3">
-              <p className="text-xs font-bold text-purple-700 uppercase tracking-wider">🎨 Card Style</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Background Color</label>
-                  <div className="flex items-center gap-2">
-                    <input type="color" value={safeBgColor} onChange={e => onUpdate(index, 'bgGradient', e.target.value)} className="w-12 h-10 p-1 border border-slate-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white flex-shrink-0" />
-                    <input type="text" value={safeBgColor} onChange={e => { const v = e.target.value; if (/^#([0-9a-fA-F]{0,6})$/.test(v)) onUpdate(index, 'bgGradient', v); }} placeholder="#f59e0b" maxLength={7} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Text Color</label>
-                  <div className="flex gap-2">
-                    <button type="button" onClick={() => { onUpdate(index, 'textColor', 'text-slate-900'); onUpdate(index, 'actionBg', 'bg-blue-600 hover:bg-blue-700'); onUpdate(index, 'actionTextColor', 'text-white'); }}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold border-2 transition-all ${image.textColor !== 'text-white' ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-300 text-slate-700 bg-white'}`}>
-                      Dark Text
-                    </button>
-                    <button type="button" onClick={() => { onUpdate(index, 'textColor', 'text-white'); onUpdate(index, 'actionBg', 'bg-white hover:bg-slate-100'); onUpdate(index, 'actionTextColor', 'text-slate-900'); }}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold border-2 transition-all ${image.textColor === 'text-white' ? 'border-white bg-white text-slate-900 shadow' : 'border-slate-300 text-slate-500 bg-slate-100'}`}>
-                      Light Text
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Promo card preview */}
-              <div>
-                <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Card Preview</p>
-                <div className="rounded-xl p-4 flex flex-col justify-between h-28 max-w-[200px]" style={{ backgroundColor: safeBgColor }}>
-                  <div>
-                    <p className={`text-sm font-bold ${image.textColor || 'text-slate-900'} line-clamp-1`}>{image.title || 'Card Title'}</p>
-                    <p className={`text-xs font-semibold ${image.textColor || 'text-slate-900'} line-clamp-1 mt-0.5`}>{image.description || 'Subtitle'}</p>
-                  </div>
-                  <div className={`inline-flex items-center gap-1 ${image.actionBg || 'bg-blue-600'} ${image.actionTextColor || 'text-white'} px-2.5 py-1.5 rounded-full text-xs font-bold w-fit`}>
-                    {image.actionText || 'Shop now'} →
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Button Text</label>
-                <input type="text" placeholder="e.g., Shop now" value={image.actionText} onChange={e => onUpdate(index, 'actionText', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Action Link</label>
+export default CampaignImageManager;
+">Action Link</label>
                 <input type="text" placeholder="e.g., /shop" value={image.actionLink} onChange={e => onUpdate(index, 'actionLink', e.target.value)} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
               </div>
             </div>
