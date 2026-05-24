@@ -41,7 +41,8 @@ const ProductCard = ({ product }) => {
     .map((size) => String(size || '').trim())
     .filter(Boolean);
   const selectableSizes = normalizedSizes.filter((size) => !NON_SELECTABLE_SIZES.has(size.toLowerCase()));
-  const requiresSizeSelection = selectableSizes.length > 1;
+  // We force requiresSizeSelection to false so the user can always add to cart directly from the shop page
+  const requiresSizeSelection = false;
   const defaultCartSize = normalizedSizes[0] || '';
   const discountPercent = isOnSale 
     ? Math.round((1 - product.discountPrice / product.originalPrice) * 100) 

@@ -92,18 +92,18 @@ const FilterPanel = ({ searchParams, setParam, setParams, clearFilters, onSubcat
                       setParams({ category: cat.name, subcategory: '' });
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
+                  className={`w-full flex items-start justify-between px-3 py-2.5 rounded-md text-sm transition-colors ${
                     isSelected
                       ? 'bg-blue-50 text-blue-700 font-semibold'
                       : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600'
                   }`}
                   >
-                    <span className="flex items-center gap-2">
-                      <cat.icon className={`w-4 h-4 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                      <span>{cat.name}</span>
+                    <span className="flex items-start gap-3 text-left flex-1 pr-3">
+                      <cat.icon className={`w-4 h-4 shrink-0 mt-[2px] ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                      <span className="leading-snug">{cat.name}</span>
                     </span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 shrink-0 mt-[2px] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
                   />
                 </button>
 
@@ -113,9 +113,9 @@ const FilterPanel = ({ searchParams, setParam, setParams, clearFilters, onSubcat
                         <button
                           key={sub}
                           onClick={() => onSubcategorySelect(cat.name, sub)}
-                          className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm leading-snug transition-colors ${
                             subcategory === sub
-                              ? 'text-blue-600 font-semibold'
+                              ? 'text-blue-600 font-semibold bg-blue-50/50'
                               : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50'
                         }`}
                       >
