@@ -280,9 +280,6 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
 
   const saveMutation = useMutation({
     mutationFn: (updatedImages) => {
-      // Sanitize highlight fields before sending:
-      // - highlightColor must be a valid hex (#xxx or #xxxxxx) or the backend validation fails
-      // - highlightText can be empty string
       const sanitized = updatedImages.map(img => ({
         ...img,
         highlightText: img.highlightText || '',
@@ -295,11 +292,15 @@ const ImageEditor = ({ campaign, campaignId, activeTab, setActiveTab }) => {
       });
     },
     onSuccess: () => {
+      // Invalidate BOTH the admin list AND the active campaign
+      // so HeroSection immediately reflects the saved changes
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      queryClient.invalidateQueries({ queryKey: ['campaigns/active'] });
       toast.success('Section saved!');
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Save failed'),
   });
+
 
 
   const handleAddImage = () => {

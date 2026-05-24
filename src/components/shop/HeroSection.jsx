@@ -36,7 +36,8 @@ const HeroSection = () => {
   const { data: activeCampaign, isLoading } = useQuery({
     queryKey: ['campaigns/active'],
     queryFn: getActiveCampaign,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
     retry: 1,
     throwOnError: false,
   });
