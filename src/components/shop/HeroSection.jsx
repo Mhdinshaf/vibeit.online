@@ -3,19 +3,47 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowRight } from 'lucide-react';
 import { getActiveCampaign } from '../../services/api';
 
+// Normalize hex color — add '#' if missing (e.g. 'ffd73c' → '#ffd73c')
+const normalizeColor = (c) => {
+  if (!c) return null;
+  if (c.startsWith('#')) return c;
+  if (/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(c)) return '#' + c;
+  return null;
+};
+
+// Render text with a highlighted substring colored inline
+const renderWithHighlight = (text = '', highlight = '', color) => {
+  if (!highlight || !text) return text;
+  const safeColor = normalizeColor(color) || '#000000';
+  const parts = text.split(highlight);
+  if (parts.length === 1) return text;
+  return parts.reduce((acc, part, idx) => {
+    if (idx === parts.length - 1) return acc.concat(part);
+    return acc.concat(part, <span key={idx} style={{ color: safeColor }}>{highlight}</span>);
+  }, []);
+};
+
+// Resolve a background: supports Tailwind class (e.g. 'bg-yellow-400') or hex color
+const resolvePromoBackground = (bgGradient, fallbackClass) => {
+  if (!bgGradient) return { bgClass: fallbackClass, bgStyle: {} };
+  if (bgGradient.startsWith('#') || bgGradient.startsWith('rgb')) {
+    return { bgClass: '', bgStyle: { backgroundColor: bgGradient } };
+  }
+  return { bgClass: bgGradient, bgStyle: {} };
+};
+
 const HeroSection = () => {
-  // Fetch active campaign
   const { data: activeCampaign, isLoading } = useQuery({
     queryKey: ['campaigns/active'],
     queryFn: getActiveCampaign,
-    staleTime: 1000 * 60 * 60, // 1 hour
-    retry: 1, // Retry once on failure
-    throwOnError: false, // Don't throw on error, let component handle it
+    staleTime: 1000 * 60 * 60,
+    retry: 1,
+    throwOnError: false,
   });
 
   const heroImages = activeCampaign?.sections?.hero || [];
 
-  // Fallback content
+  // Default fallback content shown when no CMS campaign is active
   const defaultContent = {
     title: 'Your One-Stop Shop for Everything You Need!',
     description: 'Shop premium products at unbeatable prices with fast delivery across Sri Lanka.',
@@ -28,6 +56,7 @@ const HeroSection = () => {
         actionText: 'Shop now',
         actionBg: 'bg-blue-600 hover:bg-blue-700',
         actionTextColor: 'text-white',
+        actionLink: '/shop',
       },
       {
         title: 'Tech Gadgets',
@@ -37,6 +66,7 @@ const HeroSection = () => {
         actionText: 'Explore',
         actionBg: 'bg-white hover:bg-slate-100',
         actionTextColor: 'text-blue-600',
+        actionLink: '/shop',
       },
     ],
     image: '/hero_fashion.png',
@@ -52,34 +82,19 @@ const HeroSection = () => {
     );
   }
 
-  // If no active campaign, show default
   if (!activeCampaign || heroImages.length === 0) {
     return <DefaultHeroSection defaultContent={defaultContent} />;
   }
 
-  // Show first hero image or use a carousel
   const primaryImage = heroImages[0];
 
-  // helper: render text with highlighted substring
-  // Normalize hex color — add '#' if missing (e.g. 'ffd73c' → '#ffd73c')
-  const normalizeColor = (c) => {
-    if (!c) return '#000000';
-    if (c.startsWith('#')) return c;
-    if (/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(c)) return '#' + c;
-    return '#000000';
-  };
-
-  const renderWithHighlight = (text = '', highlight = '', color) => {
-    if (!highlight) return text;
-    const safeColor = normalizeColor(color);
-    // split by highlight (case-sensitive)
-    const parts = text.split(highlight);
-    if (parts.length === 1) return text;
-    return parts.reduce((acc, part, idx) => {
-      if (idx === parts.length - 1) return acc.concat(part);
-      return acc.concat(part, <span key={idx} style={{ color: safeColor }}>{highlight}</span>);
-    }, []);
-  };
+  // Promo cards = images at index 1 and 2 (NOT the primary hero image)
+  const promoImages = heroImages.slice(1, 3);
+  // Fill up to 2 promo cards: use CMS images first, then default fallbacks
+  const promoCards = [
+    promoImages[0] || null,
+    promoImages[1] || null,
+  ];
 
   return (
     <section className="py-12 sm:py-16 lg:py-20">
@@ -88,7 +103,7 @@ const HeroSection = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16 h-full">
             {/* Left Column - Dynamic Content */}
             <div className="space-y-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
                 {renderWithHighlight(
                   primaryImage.title || defaultContent.title,
                   primaryImage.highlightText,
@@ -96,46 +111,70 @@ const HeroSection = () => {
                 )}
               </h1>
               <p className="text-base sm:text-lg text-gray-600 font-medium">
-                {renderWithHighlight(
-                  primaryImage.description || defaultContent.description,
-                  primaryImage.highlightText,
-                  primaryImage.highlightColor
-                )}
+                {primaryImage.description || defaultContent.description}
               </p>
 
               {/* Promo Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(() => {
-                  // promo items should NOT include the primary hero (index 0)
-                  const promoItems = heroImages.slice(1, 3); // take up to 2 promos after the primary
-                  const filled = promoItems.concat(defaultContent.promos).slice(0, 2);
-                  return filled.map((promo, idx) => {
-                    const fallbackPromo = defaultContent.promos[idx];
-                    const textColorClass = promo.textColor || fallbackPromo?.textColor || '';
+                {promoCards.map((promo, idx) => {
+                  const fallback = defaultContent.promos[idx];
+
+                  // No CMS promo card for this slot → use default
+                  if (!promo) {
                     return (
                       <div
-                        key={promo._id || promo._tempId || idx}
-                        className={`${promo.bgGradient || fallbackPromo?.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 group hover:shadow-lg transition-all`}
+                        key={`default-${idx}`}
+                        className={`${fallback.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 hover:shadow-lg transition-all`}
                       >
                         <div>
-                          <h3 className={`text-sm sm:text-base font-bold ${textColorClass} mb-1`}>
-                            {renderWithHighlight(promo.title || fallbackPromo?.title || '', promo.highlightText, promo.highlightColor)}
+                          <h3 className={`text-sm sm:text-base font-bold ${fallback.textColor} mb-1`}>
+                            {fallback.title}
                           </h3>
-                          <p className={`text-xs font-semibold ${textColorClass}`}>
-                            {renderWithHighlight(promo.description || promo.subtitle || fallbackPromo?.subtitle || '', promo.highlightText, promo.highlightColor)}
+                          <p className={`text-xs font-semibold ${fallback.textColor}`}>
+                            {fallback.subtitle}
                           </p>
                         </div>
                         <Link
-                          to={promo.actionLink || fallbackPromo?.actionLink || '/shop'}
-                          className={`inline-flex items-center gap-2 ${promo.actionBg || fallbackPromo?.actionBg || 'bg-blue-600 hover:bg-blue-700 text-white'} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}
+                          to={fallback.actionLink || '/shop'}
+                          className={`inline-flex items-center gap-2 ${fallback.actionBg} ${fallback.actionTextColor} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}
                         >
-                          {promo.actionText || fallbackPromo?.actionText || 'Explore'}
+                          {fallback.actionText}
                           <ArrowRight className="w-3 h-3" />
                         </Link>
                       </div>
                     );
-                  });
-                })()}
+                  }
+
+                  // CMS promo card
+                  const { bgClass, bgStyle } = resolvePromoBackground(promo.bgGradient, fallback.bgGradient);
+                  // Use CMS textColor if set, else pick based on whether bgColor is dark or light
+                  const textColorClass = promo.textColor || fallback.textColor;
+
+                  return (
+                    <div
+                      key={promo._id || promo._tempId || idx}
+                      className={`${bgClass} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 hover:shadow-lg transition-all`}
+                      style={bgStyle}
+                    >
+                      <div>
+                        {/* Promo title: plain text (no highlight — cards are too small) */}
+                        <h3 className={`text-sm sm:text-base font-bold ${textColorClass} mb-1 line-clamp-2`}>
+                          {promo.title || fallback.title}
+                        </h3>
+                        <p className={`text-xs font-semibold ${textColorClass} line-clamp-1`}>
+                          {promo.description || promo.subtitle || fallback.subtitle}
+                        </p>
+                      </div>
+                      <Link
+                        to={promo.actionLink || fallback.actionLink || '/shop'}
+                        className={`inline-flex items-center gap-2 ${promo.actionBg || fallback.actionBg} ${promo.actionTextColor || fallback.actionTextColor} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}
+                      >
+                        {promo.actionText || fallback.actionText || 'Explore'}
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -150,9 +189,7 @@ const HeroSection = () => {
                   fetchPriority="high"
                   decoding="async"
                   className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105"
-                  onError={(e) => {
-                    e.target.src = defaultContent.image;
-                  }}
+                  onError={(e) => { e.target.src = defaultContent.image; }}
                 />
               </div>
             </div>
@@ -163,64 +200,39 @@ const HeroSection = () => {
   );
 };
 
-const DefaultHeroSection = ({ defaultContent }) => {
-  return (
-    <section className="py-12 sm:py-16 lg:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-100 rounded-3xl overflow-hidden min-h-[500px]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16 h-full">
-            {/* Left Column */}
-            <div className="space-y-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-                Your <span className="text-blue-600">One-Stop</span> <span className="text-blue-600">Shop</span> for Everything You Need!
-              </h1>
-              <p className="text-base sm:text-lg text-gray-600 font-medium">
-                {defaultContent.description}
-              </p>
-
-              {/* Promo Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {defaultContent.promos.map((promo, idx) => (
-                  <div
-                    key={idx}
-                    className={`${promo.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 group hover:shadow-lg transition-all`}
-                  >
-                    <div>
-                      <h3 className={`text-sm sm:text-base font-bold ${promo.textColor} mb-1`}>
-                        {promo.title}
-                      </h3>
-                      <p className={`text-xs font-semibold ${promo.textColor}`}>
-                        {promo.subtitle}
-                      </p>
-                    </div>
-                    <button className={`inline-flex items-center gap-2 ${promo.actionBg} ${promo.actionTextColor} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}>
-                      {promo.actionText}
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
+const DefaultHeroSection = ({ defaultContent }) => (
+  <section className="py-12 sm:py-16 lg:py-20">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-gray-100 rounded-3xl overflow-hidden min-h-[500px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center p-8 sm:p-12 lg:p-16 h-full">
+          <div className="space-y-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
+              Your <span className="text-blue-600">One-Stop</span> <span className="text-blue-600">Shop</span> for Everything You Need!
+            </h1>
+            <p className="text-base sm:text-lg text-gray-600 font-medium">
+              {defaultContent.description}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {defaultContent.promos.map((promo, idx) => (
+                <div key={idx} className={`${promo.bgGradient} rounded-2xl p-4 sm:p-6 flex flex-col justify-between h-32 sm:h-40 hover:shadow-lg transition-all`}>
+                  <div>
+                    <h3 className={`text-sm sm:text-base font-bold ${promo.textColor} mb-1`}>{promo.title}</h3>
+                    <p className={`text-xs font-semibold ${promo.textColor}`}>{promo.subtitle}</p>
                   </div>
-                ))}
-              </div>
+                  <Link to={promo.actionLink || '/shop'} className={`inline-flex items-center gap-2 ${promo.actionBg} ${promo.actionTextColor} px-3 py-2 rounded-full text-xs font-bold transition-colors w-fit`}>
+                    {promo.actionText}<ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              ))}
             </div>
-
-            {/* Right Column */}
-            <div className="relative flex items-center justify-center lg:justify-end h-full">
-              <div className="relative w-full h-full">
-                <img
-                  src={defaultContent.image}
-                  alt="Person with yellow shopping bags"
-                  width={600}
-                  height={600}
-                  fetchPriority="high"
-                  decoding="async"
-                  className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105"
-                />
-              </div>
-            </div>
+          </div>
+          <div className="relative flex items-center justify-center lg:justify-end h-full">
+            <img src={defaultContent.image} alt="Hero" width={600} height={600} fetchPriority="high" decoding="async" className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105" />
           </div>
         </div>
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 export default HeroSection;
