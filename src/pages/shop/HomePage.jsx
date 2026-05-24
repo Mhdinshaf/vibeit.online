@@ -36,7 +36,17 @@ const HomePage = () => {
   const { data: featuredProducts, isLoading, isError } = useQuery({
     queryKey: ['homepage-products'],
     queryFn: () => getProducts({ limit: 20 }),
+    staleTime: 10 * 60 * 1000, // 10 min — homepage products rarely change
   });
+
+  // Deduplicated brand list (marquee duplication handled in JSX)
+  const brands = [
+    { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple', invertDark: true },
+    { name: 'Nike', iconUrl: 'https://cdn.simpleicons.org/nike', invertDark: true },
+    { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true },
+    { name: 'Dior', iconUrl: 'https://cdn.simpleicons.org/dior', invertDark: true },
+    { name: 'Adidas', iconUrl: 'https://cdn.simpleicons.org/adidas', invertDark: true },
+  ];
 
   const promotionalBanners = [
     {
@@ -145,18 +155,7 @@ const HomePage = () => {
             <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
               {[...Array(2)].map((_, groupIdx) => (
                 <div key={groupIdx} className="flex gap-3 sm:gap-4 pr-3 sm:pr-4 items-center">
-                  {[
-                    { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple', invertDark: true },
-                    { name: 'Nike', iconUrl: 'https://cdn.simpleicons.org/nike', invertDark: true },
-                    { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true },
-                    { name: 'Dior', iconUrl: 'https://cdn.simpleicons.org/dior', invertDark: true },
-                    { name: 'Adidas', iconUrl: 'https://cdn.simpleicons.org/adidas', invertDark: true },
-                    { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple', invertDark: true },
-                    { name: 'Nike', iconUrl: 'https://cdn.simpleicons.org/nike', invertDark: true },
-                    { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true },
-                    { name: 'Dior', iconUrl: 'https://cdn.simpleicons.org/dior', invertDark: true },
-                    { name: 'Adidas', iconUrl: 'https://cdn.simpleicons.org/adidas', invertDark: true },
-                  ].map((brand, idx) => (
+                  {brands.map((brand, idx) => (
                     <Link
                       key={`${groupIdx}-${idx}`}
                       to={`/shop?search=${encodeURIComponent(brand.name)}`}
@@ -166,6 +165,10 @@ const HomePage = () => {
                         <img 
                           src={brand.iconUrl} 
                           alt={brand.name} 
+                          width={64}
+                          height={64}
+                          loading="lazy"
+                          decoding="async"
                           className={`max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110 ${brand.invertDark ? 'dark:invert' : ''}`} 
                         />
                       </div>

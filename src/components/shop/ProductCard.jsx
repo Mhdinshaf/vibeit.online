@@ -15,6 +15,15 @@ const ProductCard = ({ product }) => {
     return '/placeholder.jpg';
   };
 
+  // Build Cloudinary optimized URL: auto format, auto quality, resize to 400x400
+  const getOptimizedImageUrl = (img) => {
+    const raw = getImageUrl(img);
+    // Only transform Cloudinary URLs
+    if (!raw || !raw.includes('res.cloudinary.com')) return raw;
+    // Insert transformation before /upload/ path segment
+    return raw.replace('/upload/', '/upload/f_auto,q_auto:good,w_400,h_400,c_fill/');
+  };
+
   const isOnSale = product.discountPrice && product.discountPrice < product.originalPrice;
   const isOutOfStock = product.stockQuantity === 0;
   const normalizedSizes = (product.sizes || [])
@@ -45,8 +54,12 @@ const ProductCard = ({ product }) => {
       <Link to={`/product/${product._id}`} className="flex-1 flex flex-col">
         <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 p-5">
           <img
-            src={getImageUrl(product.images?.[0])}
+            src={getOptimizedImageUrl(product.images?.[0])}
             alt={product.name}
+            width={400}
+            height={400}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105"
           />
 

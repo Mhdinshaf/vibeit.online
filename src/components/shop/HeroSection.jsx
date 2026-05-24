@@ -129,6 +129,10 @@ const HeroSection = () => {
                 <img
                   src={primaryImage.imageUrl || defaultContent.image}
                   alt={primaryImage.title || 'Hero'}
+                  width={600}
+                  height={600}
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105"
                   onError={(e) => {
                     e.target.src = defaultContent.image;
@@ -188,6 +192,10 @@ const DefaultHeroSection = ({ defaultContent }) => {
                 <img
                   src={defaultContent.image}
                   alt="Person with yellow shopping bags"
+                  width={600}
+                  height={600}
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-full h-full object-cover drop-shadow-xl transition-transform hover:scale-105"
                 />
               </div>
