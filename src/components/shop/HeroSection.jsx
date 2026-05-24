@@ -61,15 +61,23 @@ const HeroSection = () => {
   const primaryImage = heroImages[0];
 
   // helper: render text with highlighted substring
+  // Normalize hex color — add '#' if missing (e.g. 'ffd73c' → '#ffd73c')
+  const normalizeColor = (c) => {
+    if (!c) return '#000000';
+    if (c.startsWith('#')) return c;
+    if (/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(c)) return '#' + c;
+    return '#000000';
+  };
+
   const renderWithHighlight = (text = '', highlight = '', color) => {
     if (!highlight) return text;
-    const safeColor = color || '#000000';
+    const safeColor = normalizeColor(color);
     // split by highlight (case-sensitive)
     const parts = text.split(highlight);
     if (parts.length === 1) return text;
     return parts.reduce((acc, part, idx) => {
       if (idx === parts.length - 1) return acc.concat(part);
-      return acc.concat(part, /* highlight */ <span key={idx} style={{ color: safeColor }}>{highlight}</span>);
+      return acc.concat(part, <span key={idx} style={{ color: safeColor }}>{highlight}</span>);
     }, []);
   };
 

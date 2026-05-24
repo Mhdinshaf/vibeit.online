@@ -456,6 +456,15 @@ const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onU
   const hasImage = Boolean(image.imageUrl?.trim());
   const isUploading = uploadingIndex === index;
 
+  // Normalize hex color so the color picker always gets a valid value
+  const normalizeHex = (c) => {
+    if (!c) return '#ff0000';
+    if (c.startsWith('#')) return c;
+    if (/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(c)) return '#' + c;
+    return '#ff0000';
+  };
+  const safeHighlightColor = normalizeHex(image.highlightColor);
+
   return (
     <div className={`border rounded-xl overflow-hidden transition-all ${hasImage ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 bg-slate-50/50'}`}>
       {/* Card Header */}
@@ -587,13 +596,13 @@ const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onU
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
-                    value={image.highlightColor || '#ff0000'}
+                    value={safeHighlightColor}
                     onChange={e => onUpdate(index, 'highlightColor', e.target.value)}
                     className="w-12 h-10 p-1 border border-slate-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white flex-shrink-0"
                   />
                   <input
                     type="text"
-                    value={image.highlightColor || '#ff0000'}
+                    value={safeHighlightColor}
                     onChange={e => {
                       const val = e.target.value;
                       if (/^#([0-9a-fA-F]{0,6})$/.test(val)) {
@@ -620,7 +629,7 @@ const ImageCard = ({ index, image, activeTab, uploadingIndex, fileInputRefs, onU
                       part,
                       <span
                         key={idx}
-                        style={{ color: /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(image.highlightColor) ? image.highlightColor : '#ff0000' }}
+                        style={{ color: safeHighlightColor }}
                       >
                         {image.highlightText}
                       </span>,
