@@ -117,7 +117,7 @@ const CartPage = () => {
     ? Math.round((subtotal * appliedPromo.discountValue) / 100)
     : 0;
   const total = subtotal + shippingCost - discountAmount;
-  const freeShippingRemaining = subtotal >= 5000 ? 0 : 5000 - subtotal;
+  const freeShippingRemaining = subtotal >= 10000 ? 0 : 10000 - subtotal;
 
   const handleProceedToCheckout = () => {
     if (isAuthenticated()) {

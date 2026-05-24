@@ -2,7 +2,7 @@
  * Shipping fee calculator
  * - First 1 kg  → Rs 500 (base)
  * - Each extra kg (or part thereof) → Rs 150
- * - Free if subtotal >= 5000 OR freeDeliveryEnabled OR promo applies
+ * - Free if subtotal >= 10000 OR freeDeliveryEnabled OR promo applies
  *
  * @param {Array}   cartItems   - cart items with { product: { weightKg }, quantity }
  * @param {number}  subtotal    - cart subtotal in Rs
@@ -10,7 +10,7 @@
  * @param {object}  appliedPromo - promo object (may have discountType: 'freeDelivery')
  * @returns {{ fee: number, totalWeightKg: number, breakdown: string }}
  */
-export const FREE_SHIPPING_THRESHOLD = 5000;
+export const FREE_SHIPPING_THRESHOLD = 10000;
 export const BASE_SHIPPING_FEE = 500;   // first 1 kg
 export const EXTRA_KG_FEE = 150;        // per additional kg
 
