@@ -137,6 +137,23 @@ body {
   }
 }
 
+/* Verified seller badge */
+@keyframes badge-pop {
+  0% { transform: scale(.6); opacity: 0; }
+  70% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@layer components {
+  .verified-badge {
+    @apply absolute top-3 right-3 w-7 h-7 bg-white/95 text-emerald-600 rounded-full shadow flex items-center justify-center;
+    animation: badge-pop 360ms cubic-bezier(.2,.9,.3,1) both;
+  }
+  .verified-badge:hover {
+    transform: scale(1.08);
+    transition: transform .12s ease;
+  }
+}
+
 html {
   color-scheme: light;
 }

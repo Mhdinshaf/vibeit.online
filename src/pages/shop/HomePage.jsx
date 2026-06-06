@@ -72,12 +72,21 @@ const HomePage = () => {
   const products = featuredProducts?.products || [];
 
   const brands = [
-    { name: 'Apple',   iconUrl: 'https://cdn.simpleicons.org/apple',   invertDark: true },
-    { name: 'Nike',    iconUrl: 'https://cdn.simpleicons.org/nike',    invertDark: true },
-    { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true },
-    { name: 'Dior',    iconUrl: 'https://cdn.simpleicons.org/dior',    invertDark: true },
-    { name: 'Adidas',  iconUrl: 'https://cdn.simpleicons.org/adidas',  invertDark: true },
-    { name: 'Sony',    iconUrl: 'https://cdn.simpleicons.org/sony',    invertDark: true },
+    { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple', invertDark: true, verified: true },
+    { name: 'Nike', iconUrl: 'https://cdn.simpleicons.org/nike', invertDark: true, verified: true },
+    { name: 'Samsung', iconUrl: 'https://cdn.simpleicons.org/samsung', invertDark: true, verified: true },
+    { name: 'Dior', iconUrl: 'https://cdn.simpleicons.org/dior', invertDark: true, verified: false },
+    { name: 'Adidas', iconUrl: 'https://cdn.simpleicons.org/adidas', invertDark: true, verified: true },
+    { name: 'Sony', iconUrl: 'https://cdn.simpleicons.org/sony', invertDark: true, verified: true },
+    { name: 'Gucci', iconUrl: 'https://cdn.simpleicons.org/gucci', invertDark: true, verified: true },
+    { name: 'H&M', iconUrl: 'https://cdn.simpleicons.org/h-and-m', invertDark: true, verified: false },
+    { name: 'Zara', iconUrl: 'https://cdn.simpleicons.org/zara', invertDark: true, verified: false },
+    { name: 'Microsoft', iconUrl: 'https://cdn.simpleicons.org/microsoft', invertDark: true, verified: true },
+    { name: 'LG', iconUrl: 'https://cdn.simpleicons.org/lg', invertDark: true, verified: false },
+    { name: 'Huawei', iconUrl: 'https://cdn.simpleicons.org/huawei', invertDark: true, verified: false },
+    { name: 'Lenovo', iconUrl: 'https://cdn.simpleicons.org/lenovo', invertDark: true, verified: true },
+    { name: 'Panasonic', iconUrl: 'https://cdn.simpleicons.org/panasonic', invertDark: true, verified: false },
+    { name: 'Puma', iconUrl: 'https://cdn.simpleicons.org/puma', invertDark: true, verified: true },
   ];
 
   return (
@@ -251,7 +260,14 @@ const HomePage = () => {
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4">
             {brands.map((brand, idx) => (
               <Link key={idx} to={`/shop?search=${encodeURIComponent(brand.name)}`}
-                className="bg-white rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all p-4 sm:p-5 flex flex-col items-center gap-3 group">
+                className="relative bg-white rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all p-4 sm:p-5 flex flex-col items-center gap-3 group">
+                {brand.verified && (
+                  <span className="verified-badge" role="img" aria-label="Verified seller" title="Verified seller">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9.3 16.3L4.6 11.6 3.2 13l6.1 6.1L21 7.4 19.6 6z" />
+                    </svg>
+                  </span>
+                )}
                 <img src={brand.iconUrl} alt={brand.name} width={40} height={40} loading="lazy" decoding="async"
                   className={`w-8 h-8 sm:w-10 sm:h-10 object-contain group-hover:scale-110 transition-transform ${brand.invertDark ? 'dark:invert' : ''}`} />
                 <span className="text-xs font-bold text-slate-600 group-hover:text-blue-600 transition-colors uppercase tracking-wider text-center">{brand.name}</span>
