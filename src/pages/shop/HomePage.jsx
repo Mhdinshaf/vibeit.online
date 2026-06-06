@@ -256,21 +256,22 @@ const HomePage = () => {
       {/* ── Brand logos ── */}
       <section className="py-10 sm:py-14 bg-slate-50 border-y border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionTitle label="Verified sellers" title="Our Brands" />
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4">
+          <SectionTitle title="Our Brands" />
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {brands.map((brand, idx) => (
               <Link key={idx} to={`/shop?search=${encodeURIComponent(brand.name)}`}
-                className="relative bg-white rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all p-4 sm:p-5 flex flex-col items-center gap-3 group">
+                style={{ animationDelay: `${idx * 80}ms` }}
+                className="brand-card relative bg-white/60 dark:bg-slate-800/50 rounded-xl border border-slate-200/60 dark:border-slate-700/40 p-4 sm:p-5 flex flex-col items-center gap-3 group">
                 {brand.verified && (
                   <span className="verified-badge" role="img" aria-label="Verified seller" title="Verified seller">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M9.3 16.3L4.6 11.6 3.2 13l6.1 6.1L21 7.4 19.6 6z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6L9 17l-5-5" stroke="#059669" />
                     </svg>
                   </span>
                 )}
-                <img src={brand.iconUrl} alt={brand.name} width={40} height={40} loading="lazy" decoding="async"
-                  className={`w-8 h-8 sm:w-10 sm:h-10 object-contain group-hover:scale-110 transition-transform ${brand.invertDark ? 'dark:invert' : ''}`} />
-                <span className="text-xs font-bold text-slate-600 group-hover:text-blue-600 transition-colors uppercase tracking-wider text-center">{brand.name}</span>
+                <img src={brand.iconUrl} alt={brand.name} width={56} height={56} loading="lazy" decoding="async"
+                  className={`w-12 h-12 sm:w-14 sm:h-14 object-contain transition-transform ${brand.invertDark ? 'dark:invert' : ''}`} />
+                <span className="mt-2 text-sm font-semibold text-slate-700 dark:text-slate-100 text-center">{brand.name}</span>
               </Link>
             ))}
           </div>
