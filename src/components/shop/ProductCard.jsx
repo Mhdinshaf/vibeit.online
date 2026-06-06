@@ -116,8 +116,8 @@ const ProductCard = ({ product }) => {
               </span>
             ))}
           </div>
-          <h3 className="mt-1 text-sm font-semibold text-slate-900 dark:text-white line-clamp-2 mb-3 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            {product.name}
+          <h3 className="mt-2 mb-3 text-sm font-semibold text-slate-900 dark:text-white clamp-2 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            {product.name || product.title || 'Untitled Product'}
           </h3>
 
           <div className="mt-auto flex items-center gap-2">
